@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="15">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.model.ModelLocator;
+		]]>
+	</mx:Script>
+	<mx:Label id="statusMessage" text="{ModelLocator.getInstance().statusMessage}" left="2"/>
+	<mx:ProgressBar id="progress" indeterminate="true" visible="{ModelLocator.getInstance().showStatusProgressBar}" right="5" width="100" bottom="0" label="" labelPlacement="right"/>
+</mx:Canvas>

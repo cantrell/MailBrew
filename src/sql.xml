@@ -1,0 +1,730 @@
+<sql>
+    <feeds>
+        <create>
+            CREATE TABLE IF NOT EXISTS feeds (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                custom_name TEXT,
+                description TEXT,
+                icon BYTEARRAY,
+                feed_url TEXT,
+                site_url TEXT,
+                sort_order INT DEFAULT -1,
+                etag TEXT,
+                last_updated DATE,
+                parsable BOOLEAN DEFAULT true,
+                error_message TEXT,
+                is_folder BOOLEAN DEFAULT false,
+                parent INTEGER DEFAULT -1,
+                is_open BOOLEAN DEFAULT false
+            );
+        </create>
+        <insert>
+            INSERT INTO
+                feeds (
+                    name,
+                    description,
+                    icon,
+                    feed_url,
+                    site_url,
+                    sort_order,
+                    etag,
+                    last_updated,
+                    parsable,
+                    error_message,
+                    is_folder,
+                    parent
+                )
+            VALUES (
+                    :name,
+                    :description,
+                    :icon,
+                    :feed_url,
+                    :site_url,
+                    :sort_order,
+                    :etag,
+                    :last_updated,
+                    :parsable,
+                    :error_message,
+                    :is_folder,
+                    :parent
+                );
+        </insert>
+        <update>
+            UPDATE
+                feeds
+            SET
+                name = :name,
+                description = :description,
+                icon = :icon,
+                feed_url = :feed_url,
+                site_url = :site_url,
+                etag = :etag,
+                last_updated = :last_updated,
+                parsable = :parsable,
+                error_message = :error_message
+            WHERE
+                id = :feed_id;
+        </update>
+        <updateError>
+            UPDATE
+                feeds
+            SET
+                last_updated = :last_updated,
+                parsable = :parsable,
+                error_message = :error_message
+            WHERE
+                id = :feed_id;
+        </updateError>
+        <updateName>
+            UPDATE
+                feeds
+            SET
+                name = :name
+            WHERE
+                id = :feed_id;
+        </updateName>
+        <updateCustomName>
+        	UPDATE
+        		feeds
+        	SET
+        		custom_name = :custom_name
+        	WHERE
+        		id = :feed_id;
+        </updateCustomName>
+        <updateParent>
+            UPDATE
+                feeds
+            SET
+                parent = :parent
+            WHERE
+                id = :feed_id;
+        </updateParent>
+        <updateFolderOpen>
+        	UPDATE 
+        		feeds
+        	SET
+        		is_open = :is_open
+        	WHERE
+        		id = :feed_id;
+        </updateFolderOpen>
+        <updateSortOrder>
+        	UPDATE
+        		feeds
+        	SET
+        		sort_order = :sort_order
+        	WHERE
+        		id = :feed_id;
+        </updateSortOrder>
+        <selectIdByFeedUrl>
+            SELECT
+                id
+            FROM
+                feeds 
+            WHERE
+                feed_url = :feed_url;
+        </selectIdByFeedUrl>
+        <selectAll>
+            SELECT
+                *, 0 unread
+            FROM
+                feeds
+            ORDER BY
+            	sort_order, LOWER(custom_name), LOWER(name) ASC;
+        </selectAll>   
+        <selectByParent>
+            SELECT
+                *, 0 unread
+            FROM
+                feeds
+            WHERE
+            	parent = :parent
+            ORDER BY
+            	name ASC;
+        </selectByParent>
+        <selectUrls>
+            SELECT
+                feed_url
+            FROM
+                feeds
+            WHERE
+            	is_folder = false;
+        </selectUrls>
+        <selectOnlyUnread>
+            SELECT
+            	feeds.id AS id,
+                name,
+                count(posts.id) AS unread
+            FROM
+                posts,
+                feeds
+            WHERE
+                posts.feed_id = feeds.id 
+            AND
+                posts.read = false
+            AND
+            	feeds.is_folder = false
+            GROUP BY
+                name;
+        </selectOnlyUnread>
+        <selectErrorMessageById>
+            SELECT
+				error_message
+            FROM
+                feeds
+            WHERE
+                id = :feed_id;
+        </selectErrorMessageById>
+        <selectInfoById>
+			SELECT
+				feeds.*,
+				count(posts.id) AS post_count
+			FROM
+				feeds LEFT OUTER JOIN posts
+			ON
+				posts.feed_id = feeds.id
+			WHERE
+				feeds.id = :feed_id;
+        </selectInfoById>
+        <deleteByFeedId>
+            DELETE FROM
+                feeds
+            WHERE
+                id = :feed_id;
+        </deleteByFeedId>
+        <deleteFeedSortOrder>
+        	UPDATE 
+        		feeds
+        	SET
+        		sort_order = null;
+        </deleteFeedSortOrder>
+    </feeds>
+
+    <posts>
+        <create>
+            CREATE TABLE IF NOT EXISTS posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                guid TEXT,
+                feed_id INT NOT NULL,
+                title TEXT NOT NULL,
+                content TEXT,
+                url TEXT NOT NULL,
+                post_date DATE NOT NULL,
+                read BOOLEAN DEFAULT false NOT NULL,
+                checked BOOLEAN DEFAULT false NOT NULL
+            );
+        </create>
+        <insert>
+            INSERT INTO
+                posts (
+                	guid,
+                    feed_id,
+                    title,
+                    content,
+                    url,
+                    post_date,
+                    read,
+                    checked 
+                )
+            VALUES (
+                    :guid,
+                    :feed_id,
+                    :title,
+                    :content,
+                    :url,
+                    :post_date,
+                    :read,
+                    :checked
+                );
+        </insert>
+        <update>
+            UPDATE
+                posts
+            SET
+                title = :title,
+                content = :content,
+                url = :url,
+                post_date = :post_date,
+                read = :read,
+                checked = :checked
+            WHERE
+                id = :post_id;
+        </update>
+        <updateRead>
+            UPDATE
+                posts
+            SET
+                read = :read
+            WHERE
+                id = :post_id;
+        </updateRead>
+        <updateChecked>
+            UPDATE
+                posts
+            SET
+                checked = :checked
+            WHERE
+                id = :post_id;
+        </updateChecked>
+        <selectContentById>
+        	SELECT
+        		content
+        	FROM 
+        		posts
+        	WHERE
+        		id = :post_id;
+        </selectContentById>
+        <selectContentAndAuthorById>
+            SELECT
+                posts.content,authors.author
+            FROM
+                posts
+            LEFT JOIN 
+            	authors
+            ON 
+            	posts.id=authors.post_id
+            WHERE
+                posts.id = :post_id;
+        </selectContentAndAuthorById>
+        <selectByUrl>
+            SELECT
+                id,
+                post_date,
+                read,
+                checked
+            FROM
+                posts
+            WHERE
+                url = :post_url;
+        </selectByUrl>
+        <selectByTitle>
+        	SELECT
+        		id,
+        		post_date,
+        		read,
+        		checked
+        	FROM
+        		posts
+			WHERE 
+				title = :post_title;
+        </selectByTitle>        
+        <selectByGuid>
+        	SELECT
+        		id,
+        		post_date,
+        		read,
+        		checked
+        	FROM 
+        		posts
+			WHERE
+				guid = :guid;
+        </selectByGuid>
+        <selectByAuthor>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, authors, feeds
+            WHERE
+                posts.id = authors.post_id
+            AND
+                authors.author = :author
+            AND
+                posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </selectByAuthor>
+        <selectByTopic>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, topics, feeds
+            WHERE
+                posts.id = topics.post_id
+            AND
+                topics.topic = :topic
+            AND
+                posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </selectByTopic>
+        <selectByFeed>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, feeds
+            WHERE
+                feed_id = :feed_id
+            AND
+                posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </selectByFeed>
+        <selectUnread>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, feeds
+            WHERE
+                read = false
+            AND
+                posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </selectUnread>
+        <selectChecked>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, feeds
+            WHERE
+                checked = true
+            AND
+                posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </selectChecked>
+        <countUnread>
+            SELECT
+                count(id) AS unread
+            FROM
+                posts
+            WHERE
+                read = false;
+        </countUnread>
+        <countChecked>
+            SELECT
+                count(id) AS checked
+            FROM
+                posts
+            WHERE
+                checked = true;
+        </countChecked>
+        <deleteByFeedId>
+            DELETE FROM
+                posts
+            WHERE
+                feed_id = :feed_id;
+        </deleteByFeedId>
+        <deleteOlderThan>
+            DELETE FROM
+                posts
+            WHERE
+                post_date &lt; :older_than_date
+            AND
+            	posts.checked = false;
+        </deleteOlderThan>
+        <deleteLessThanPostId>
+        	DELETE FROM
+        		posts
+        	WHERE
+        		id &lt; :post_id
+        	AND
+        		checked = false;
+        </deleteLessThanPostId>
+        <search>
+            SELECT
+                posts.id,
+                feed_id,
+                feeds.name AS feed_name,
+                title,
+                posts.url,
+                post_date,
+                read,
+                checked
+            FROM
+                posts, feeds
+            WHERE
+                :search_query
+            AND
+            	posts.feed_id = feeds.id
+            ORDER BY
+            	posts.post_date DESC;
+        </search>
+        <selectPrunePostId>
+        	SELECT
+        		id
+        	FROM
+        		posts
+        	ORDER BY
+        		id DESC	
+        	LIMIT
+        		100000,1;
+        </selectPrunePostId>
+    </posts>
+
+    <authors>
+        <create>
+            CREATE TABLE IF NOT EXISTS authors (
+                author TEXT NOT NULL,
+                post_id INT NOT NULL
+            );
+        </create>
+        <insert>
+            INSERT INTO
+                authors (
+                    post_id,
+                    author 
+                )
+            VALUES (
+                    :post_id,
+                    :author
+                );
+        </insert>
+        <selectDistinct>
+            SELECT DISTINCT
+                author, 0 unread
+            FROM
+                authors
+            ORDER BY
+                author ASC;
+        </selectDistinct>
+        <selectOnlyUnread>
+            SELECT
+                author,
+                count(posts.id) AS unread
+            FROM
+                posts,
+                authors
+            WHERE
+                posts.id = authors.post_id
+            AND
+                posts.read = false
+            GROUP BY
+                author;
+        </selectOnlyUnread>
+        <deleteByPostId>
+            DELETE FROM
+                authors
+            WHERE
+                post_id = :post_id;
+        </deleteByPostId>
+        <deleteLessThanPostId>
+        	DELETE FROM
+        		authors
+        	WHERE
+        		post_id &lt; :post_id;        	
+        </deleteLessThanPostId>
+        <deleteByFeedId>
+            DELETE FROM
+                authors
+            WHERE
+              post_id
+            IN
+              (SELECT
+                  id
+              FROM
+                  posts
+              WHERE
+                  feed_id = :feed_id);
+        </deleteByFeedId>
+        <deleteOlderThan>
+            DELETE FROM
+                authors
+            WHERE
+            	post_id
+            IN
+            	(SELECT
+            		id
+            	FROM
+            		posts
+            	WHERE
+            		post_date &lt; :older_than_date
+	            AND
+    	        	posts.checked = false);
+        </deleteOlderThan>
+    </authors>
+
+    <topics>
+        <create>
+            CREATE TABLE IF NOT EXISTS topics (
+                topic TEXT NOT NULL,
+                post_id INT NOT NULL
+            );
+        </create>
+        <insert>
+            INSERT INTO
+                topics (
+                    post_id,
+                    topic 
+                )
+            VALUES (
+                    :post_id,
+                    :topic
+                );
+        </insert>
+        <selectDistinct>
+			SELECT
+				topic,
+				0 unread,
+				count(topic) AS cnt
+			FROM
+				topics
+			GROUP BY
+				topic
+			ORDER BY
+				cnt DESC
+			LIMIT
+				100;
+        </selectDistinct>
+        <selectOnlyUnread>
+            SELECT
+                topic,
+                count(posts.id) AS unread
+            FROM
+                posts,
+                topics
+            WHERE
+                posts.id = topics.post_id
+            AND
+                posts.read = false
+            GROUP BY
+                topic;
+        </selectOnlyUnread>
+        <deleteByPostId>
+            DELETE FROM
+                topics
+            WHERE
+                post_id = :post_id;
+        </deleteByPostId>
+        <deleteLessThanPostId>
+        	DELETE FROM
+        		topics
+        	WHERE
+        		post_id &lt; :post_id;
+        </deleteLessThanPostId>
+        <deleteByFeedId>
+            DELETE FROM
+                topics
+            WHERE
+              post_id
+            IN
+              (SELECT
+                  id
+              FROM
+                  posts
+              WHERE
+                  feed_id = :feed_id);
+        </deleteByFeedId>
+        <deleteOlderThan>
+            DELETE FROM
+                topics
+            WHERE
+            	post_id
+            IN
+            	(SELECT
+            		id
+            	FROM
+            		posts
+            	WHERE
+            		post_date &lt; :older_than_date
+	            AND
+    	        	posts.checked = false);
+        </deleteOlderThan>
+    </topics>
+    
+    <smartFolders>
+    	<create>
+    		CREATE TABLE IF NOT EXISTS smartFolders (
+    			id INTEGER PRIMARY KEY AUTOINCREMENT,
+    			name TEXT NOT NULL,
+    			smart_folder_terms TEXT,
+    			notify_on_update BOOLEAN
+    		);
+    	</create>
+    	<insert>
+    		INSERT INTO 
+    			smartFolders ( 
+    				name,
+    				smart_folder_terms,
+    				notify_on_update
+    			)
+    		VALUES
+    			(
+    				:name,
+    				:smart_folder_terms,
+    				:notify_on_update
+    			);
+       	</insert>
+    	<update>
+    		UPDATE
+    			smartFolders
+    		SET 
+    			name = :name,
+    			smart_folder_terms = :smart_folder_terms,
+    			notify_on_update = :notify_on_update
+    		WHERE
+    			id = :id;    		
+    	</update>
+    	<updateNotifyOnUpdate>
+    		UPDATE
+    			smartFolders
+    		SET
+    			notify_on_update = :notify_on_update
+    		WHERE
+    			id = :id;
+		</updateNotifyOnUpdate>	
+    	<deleteBySmartFolderId>
+    		DELETE FROM 
+    			smartFolders
+    		WHERE
+    			id = :smart_folder_id;
+    	</deleteBySmartFolderId>
+    	<selectAll>
+			SELECT
+				*
+			FROM
+				smartFolders;
+   		</selectAll>
+   		<selectById>
+   			SELECT
+   				*
+   			FROM
+   				smartFolders
+   			WHERE
+   				id = :id;
+   		</selectById>
+   		<selectNotifyOnUpdate>
+			SELECT
+				notify_on_update
+			FROM
+				smartFolders
+			WHERE
+				id = :id;
+		</selectNotifyOnUpdate>	
+    </smartFolders>    
+</sql>

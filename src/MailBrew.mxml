@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" visible="false" applicationComplete="onApplicationComplete();">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.model.ModelLocator;
+			
+			private var main:Main;
+			private var ml:ModelLocator;
+			
+			private function onApplicationComplete():void
+			{
+				this.ml = ModelLocator.getInstance();
+				ml.statusMessage = "Welcome to MailBrew!";
+				this.showMain();
+			}
+			
+			private function showMain():void
+			{
+				if (main == null || main.closed)
+				{
+					this.main = new Main();
+					this.main.open(true);
+				}
+				else
+				{
+					this.main.activate();
+				}
+			}
+		]]>
+	</mx:Script>
+</mx:WindowedApplication>
