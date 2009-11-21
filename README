@@ -1,0 +1,8 @@
+A generic email notifier that supports Gmail and IMAP.
+
+Dependencies include:
+
+http://code.google.com/p/as3preferenceslib/
+http://code.google.com/p/as3notificationlib/
+
+Written by Christian Cantrell.
