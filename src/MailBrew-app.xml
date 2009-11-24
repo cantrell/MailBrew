@@ -2,7 +2,7 @@
 <application xmlns="http://ns.adobe.com/air/application/2.0beta">
 
 	<!-- The application identifier string, unique to this application. Required. -->
-	<id>MailBrew</id>
+	<id>com.mailbrew.mailbrew</id>
 
 	<filename>MailBrew</filename>
 	<name>MailBrew</name>

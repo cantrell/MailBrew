@@ -1,6 +1,7 @@
 package com.mailbrew.model
 {
 	import com.adobe.cairngorm.model.IModelLocator;
+	import com.mailbrew.database.Database;
 	
 	import flash.display.Bitmap;
 
@@ -15,6 +16,8 @@ package com.mailbrew.model
 
 		[Bindable] public var statusMessage:String;
 		[Bindable] public var showStatusProgressBar:Boolean;
+		
+		public var db:Database;
 
 		public function ModelLocator()
 		{

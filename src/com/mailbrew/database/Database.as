@@ -23,12 +23,14 @@ package com.mailbrew.database
 		{
 			this.dbFile = File.applicationStorageDirectory.resolvePath("mailbrew.db");	
 			this.aConn = new SQLConnection();
-			this.aConn.addEventListener(SQLEvent.OPEN,
-				function(e:SQLEvent):void
-				{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					responder.dispatchEvent(dbe);
-				});
+			var listener:Function = function(e:SQLEvent):void
+			{
+				aConn.removeEventListener(SQLEvent.OPEN, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			
+			this.aConn.addEventListener(SQLEvent.OPEN, listener);
 			this.aConn.openAsync(dbFile, SQLMode.CREATE);
 		}
 				
@@ -51,119 +53,100 @@ package com.mailbrew.database
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
             stmt.text = this.sql.accounts.create;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					responder.dispatchEvent(dbe);
-            	});
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			
+            stmt.addEventListener(SQLEvent.RESULT, listener);
             stmt.execute();
 		}
 
-		/*
-		public function insertFeed(responder:DatabaseResponder, feedUrl:String, feed:IFeed, parent:int = -1):void
+		public function insertAccount(responder:DatabaseResponder,
+									  name:String,
+									  accountType:String,
+									  username:String,
+									  password:String,
+									  notificationLocation:String,
+									  imapServer:String = null,
+									  imapPort:int = -1,
+									  secure:Boolean = false):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
             stmt.text = this.sql.feeds.insert;
-            stmt.parameters[":name"] = (feed.metadata.title != null) ? feed.metadata.title : feedUrl;
-            stmt.parameters[":description"] = feed.metadata.description;
-            stmt.parameters[":icon"] = null;
-            stmt.parameters[":feed_url"] = feedUrl;
-            stmt.parameters[":site_url"] = feed.metadata.link;
-            stmt.parameters[":sort_order"] = -1;
-            stmt.parameters[":etag"] = null;
-            stmt.parameters[":last_updated"] = new Date();
-            stmt.parameters[":parsable"] = 1;
-            stmt.parameters[":error_message"] = null;
-            stmt.parameters[":is_folder"] = false;
-            stmt.parameters[":parent"] = parent;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					dbe.data = stmt.getResult().lastInsertRowID;
-					responder.dispatchEvent(dbe);
-            	});
+            stmt.parameters[":name"] = name;
+            stmt.parameters[":account_type"] = accountType;
+            stmt.parameters[":username"] = username;
+            stmt.parameters[":password"] = password;
+            stmt.parameters[":notification_location"] = notificationLocation;
+            stmt.parameters[":imap_server"] = imapServer;
+            stmt.parameters[":imapPort"] = imapPort;
+            stmt.parameters[":secure"] = secure;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().lastInsertRowID;
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
             stmt.execute();
 		}
 
-		public function updateFeed(responder:DatabaseResponder, feedId:Number, feedUrl:String, feed:IFeed):void
+		public function updateAccount(responder:DatabaseResponder,
+									  accountId:uint,
+									  name:String,
+									  accountType:String,
+									  username:String,
+									  password:String,
+									  notificationLocation:String,
+									  imapServer:String = null,
+									  imapPort:int = -1,
+									  secure:Boolean = false):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.update;
-            stmt.parameters[":name"] = (feed.metadata.title != null) ? feed.metadata.title : feedUrl;
-            stmt.parameters[":description"] = feed.metadata.description;
-            stmt.parameters[":icon"] = null;
-            stmt.parameters[":feed_url"] = feedUrl;
-            stmt.parameters[":site_url"] = feed.metadata.link;            
-            stmt.parameters[":etag"] = null;
-            stmt.parameters[":last_updated"] = new Date();
-            stmt.parameters[":parsable"] = 1;
-            stmt.parameters[":error_message"] = null;
-            stmt.parameters[":feed_id"] = feedId;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					responder.dispatchEvent(dbe);
-            	});
-            stmt.execute();
+            stmt.text = this.sql.feeds.insert;
+            stmt.parameters[":name"] = name;
+            stmt.parameters[":account_type"] = accountType;
+            stmt.parameters[":username"] = username;
+            stmt.parameters[":password"] = password;
+            stmt.parameters[":notification_location"] = notificationLocation;
+            stmt.parameters[":imap_server"] = imapServer;
+            stmt.parameters[":imapPort"] = imapPort;
+            stmt.parameters[":secure"] = secure;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
 		}
 
-		public function deleteFeedById(responder:DatabaseResponder, feedId:Number):void
+		public function createMessagesTable(responder:DatabaseResponder):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.deleteByFeedId;
-            stmt.parameters[":feed_id"] = feedId;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					responder.dispatchEvent(dbe);
-            	});
-            stmt.execute();
-		}
-		
-		public function getFeedInfoById(responder:DatabaseResponder, feedId:Number):void
-		{
-			if (!this.aConn.connected) return;
-			var stmt:SQLStatement = this.getStatement();
-			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.selectInfoById;
-            stmt.parameters[":feed_id"] = feedId;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-            		var results:SQLResult = stmt.getResult();
-					dbe.data = results.data[0];
-					responder.dispatchEvent(dbe);
-            	});
-            stmt.execute();
+			stmt.text = this.sql.messages.create;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
 		}
 
-		public function getFeeds(responder:DatabaseResponder):void
-		{
-			if (!this.aConn.connected) return;
-			var stmt:SQLStatement = this.getStatement();
-			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.selectAll;
-            stmt.addEventListener(SQLEvent.RESULT,
-            	function(e:SQLEvent):void
-            	{
-					var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					dbe.data = stmt.getResult().data;
-					responder.dispatchEvent(dbe);
-            	});
-            stmt.execute();
-		}
-		*/
+		// Private functions
 		
 		private function getStatement():SQLStatement
 		{
@@ -172,7 +155,7 @@ package com.mailbrew.database
 				function(e:SQLErrorEvent):void
 				{
 					trace("getStatement SQLError event: ", e);
-				});
+				}, false, 0, true);
 			return stmt;
 		}
 	}

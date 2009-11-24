@@ -2,16 +2,21 @@
 <mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" visible="false" applicationComplete="onApplicationComplete();">
 	<mx:Script>
 		<![CDATA[
+			import com.mailbrew.controller.Controller;
+			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			
 			private var main:Main;
 			private var ml:ModelLocator;
+			private var controller:Controller;
 			
 			private function onApplicationComplete():void
 			{
+				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
 				ml.statusMessage = "Welcome to MailBrew!";
 				this.showMain();
+				new InitEvent().dispatch();
 			}
 			
 			private function showMain():void
