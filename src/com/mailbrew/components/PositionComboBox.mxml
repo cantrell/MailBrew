@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ComboBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete();">
+	<mx:Script>
+		<![CDATA[
+			import com.adobe.air.notification.AbstractNotification;
+			
+			import mx.collections.ArrayCollection;
+			
+			private var dp:ArrayCollection;
+			
+			private function onCreationComplete():void
+			{
+				this.dp = new ArrayCollection();
+				this.dp.addItem({label:"Top Left", data:AbstractNotification.TOP_LEFT});
+				this.dp.addItem({label:"Top Right", data:AbstractNotification.TOP_RIGHT});
+				this.dp.addItem({label:"Bottom Left", data:AbstractNotification.BOTTOM_LEFT});
+				this.dp.addItem({label:"Bottm Right", data:AbstractNotification.BOTTOM_RIGHT});
+				this.dataProvider = dp;
+			}
+			
+			public function setSelectionByData(data:String):void
+			{
+				for each (var o:Object in this.dp)
+				{
+					if (o.data == data)
+					{
+						this.selectedItem = o;
+						break;
+					}
+				}
+			}
+			
+			public function clearSelection():void
+			{
+				this.selectedIndex = 0;
+			}
+		]]>
+	</mx:Script>
+</mx:ComboBox>

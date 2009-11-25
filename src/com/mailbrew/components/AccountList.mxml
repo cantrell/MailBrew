@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete();">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.data.AccountInfo;
+			import com.mailbrew.data.MainAppViews;
+			import com.mailbrew.database.Database;
+			import com.mailbrew.database.DatabaseEvent;
+			import com.mailbrew.database.DatabaseResponder;
+			import com.mailbrew.events.DeleteAccountEvent;
+			import com.mailbrew.events.PopulateAccountInfoEvent;
+			import com.mailbrew.model.ModelLocator;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.ListEvent;
+			
+			private var ml:ModelLocator;
+			
+			private function onCreationComplete():void
+			{
+				this.ml = ModelLocator.getInstance();
+			}
+			
+			private function onRemoveAccount(e:MouseEvent):void
+			{
+				if (this.accountList.selectedItem == null) return;
+				Alert.show("Are you sure you want to delete " + this.accountList.selectedItem.label + "?",
+					"Confirm",
+					Alert.YES|Alert.NO,
+					null,
+					onRemoveAccountConfirm);
+			}
+			
+			private function onRemoveAccountConfirm(e:CloseEvent):void
+			{
+				if (this.accountList.selectedItem == null) return;
+				if (e.detail == Alert.YES)
+				{
+					var dae:DeleteAccountEvent = new DeleteAccountEvent();
+					dae.accountId = this.accountList.selectedItem.accountId;
+					dae.dispatch();
+				}
+			}
+			
+			private function onAccountListChange(e:ListEvent):void
+			{
+				this.onAddAccount();
+				var list:List = e.target as List;
+				if (list.selectedItem == null) return;
+				var paie:PopulateAccountInfoEvent = new PopulateAccountInfoEvent();
+				paie.accountId = list.selectedItem.accountId;
+				paie.dispatch();
+			}
+			
+			private function onAddAccount():void
+			{
+				if (ml.mainAppView == MainAppViews.INSTRUCTIONS)
+				{
+					ml.mainAppView = MainAppViews.WORKING;
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:List id="accountList" width="100%" height="100%" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);"/>
+	<mx:HBox width="100%" horizontalAlign="center">
+		<mx:Button icon="{ModelLocator.getInstance().listAddClass}" click="onAddAccount();"/>
+		<mx:Button icon="{ModelLocator.getInstance().listRemoveClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}"/>
+	</mx:HBox>
+</mx:VBox>
