@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="onApplicationComplete();">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.email.EmailCounts;
+			import com.mailbrew.email.EmailEvent;
+			import com.mailbrew.email.EmailHeader;
+			import com.mailbrew.email.IEmailService;
+			import com.mailbrew.email.gmail.Gmail;
+			import com.mailbrew.email.imap.IMAP;
+			private function onApplicationComplete():void
+			{
+				//var emailService:IEmailService = new IMAP("fake", "fake", "imap.gmail.com", 993, true);
+				var emailService:IEmailService = new Gmail("fake", "fake");
+				
+				emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+				emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
+				emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+				emailService.addEventListener(EmailEvent.CONNECTION_SUCCEEDED, onConnectionSucceeded);
+				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
+			
+				//emailService.testAccount();
+				//emailService.getUnseenEmailCount();
+				emailService.getUnseenEmailHeaders();
+			}
+			
+			private function onAuthenticationFailed(e:EmailEvent):void
+			{
+				trace("onAuthenticationFailed", e.data);
+			}
+			
+			private function onAuthenticationSucceeded(e:EmailEvent):void
+			{
+				trace("onAuthenticationSucceeded", e.data);
+			}
+			
+			private function onConnectionFailed(e:EmailEvent):void
+			{
+				trace("onConnectionFailed", e.data);
+			}
+			
+			private function onConnectionSucceeded(e:EmailEvent):void
+			{
+				trace("onConnectionSucceeded", e.data);
+			}
+			
+			private function onUnseenEmails(e:EmailEvent):void
+			{
+				trace("onUnseenEmails", e.data);
+				var emailHeaders:Vector.<EmailHeader> = e.data as Vector.<EmailHeader>;
+				for each (var emailHeader:EmailHeader in emailHeaders)
+				{
+					trace("emailHeader.id", emailHeader.id);
+					trace("emailHeader.from", emailHeader.from);
+					trace("emailHeader.subject", emailHeader.subject);
+					trace("emailHeader.summary", emailHeader.summary);
+					trace("emailHeader.url", emailHeader.url);
+					trace("------");
+				}
+			}
+			
+			private function onUnseenEmailsCount(e:EmailEvent):void
+			{
+				trace("onUnseenEmailsCount", e.data);
+				var counts:EmailCounts = e.data as EmailCounts;
+				trace("totalEmails", counts.totalEmails);
+				trace("unseenEmails", counts.unseenEmails);
+			}
+			
+		]]>
+	</mx:Script>
+</mx:WindowedApplication>
