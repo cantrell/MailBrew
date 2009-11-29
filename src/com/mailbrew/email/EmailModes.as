@@ -1,6 +1,6 @@
-package com.mailbrew.email.imap
+package com.mailbrew.email
 {
-	public class IMAPMode
+	public class EmailModes
 	{
 		public static const AUTHENTICATION_TEST_MODE:String  = "authenticationTestMode";
 		public static const UNSEEN_COUNT_MODE:String         = "unseenCountMode";
