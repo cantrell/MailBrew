@@ -16,6 +16,7 @@ package com.mailbrew.events
 		public var portNumber:Number;
 		public var secure:Boolean;
 		public var notificationPosition:String;
+		public var sound:String;
 		
 		public function SaveAccountEvent()
 		{

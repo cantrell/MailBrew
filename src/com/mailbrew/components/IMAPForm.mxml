@@ -26,6 +26,7 @@
 			{
 				this.clearData();
 				var ml:ModelLocator = ModelLocator.getInstance();
+				if (ml.accountInfo == null) return;
 				if (ml.accountInfo.accountType == AccountTypes.IMAP)
 				{
 					ml.accountFormView = AccountTypes.IMAP;
@@ -46,6 +47,7 @@
 				sae.portNumber = Number(this.portNumberInput.text);
 				sae.secure = this.secureCheckBox.selected;
 				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
+				sae.sound = null; // TBD: implement sounds
 				sae.dispatch();
 			}
 			
@@ -59,6 +61,7 @@
 				this.portNumberInput.text = String(accountInfo.portNumber);
 				this.secureCheckBox.selected = accountInfo.secure;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
+				// TBD: implement sounds
 				this.saveButton.label = "Update";
 			}
 			
@@ -72,6 +75,7 @@
 				this.portNumberInput.text = "";
 				this.secureCheckBox.selected = false;
 				this.notificationPositionInput.clearSelection();
+				// TBD: implement sounds
 				this.saveButton.label = "Save";
 			}
 			

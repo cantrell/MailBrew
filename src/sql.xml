@@ -11,7 +11,10 @@
                 port_number INT,
                 secure BOOLEAN,
                 notification_location TEXT NOT NULL,
-                working BOOLEAN DEFAULT false NOT NULL
+                sound,
+                working BOOLEAN DEFAULT false NOT NULL,
+                working_reason TEXT,
+                last_checked DATE
             );
         </create>
         <insert>
@@ -25,7 +28,10 @@
                     port_number,
                     secure,
                     notification_location,
-                    working
+                    sound,
+                    working,
+                    working_reason,
+                    last_checked
                 )
             VALUES (
                     :name,
@@ -36,7 +42,10 @@
                     :port_number,
                     :secure,
                     :notification_location,
-                    :working
+                    :sound,
+                    :working,
+                    :working_reason,
+                    :last_checked
                 );
         </insert>
         <update>
@@ -51,26 +60,39 @@
                 port_number = :port_number,
                 secure = :secure,
                 notification_location = :notification_location,
-                working = :working
+                sound = :sound,
+                working = :working,
+                working_reason = :working_reason,
+                last_checked = :last_checked
             WHERE
                 id = :account_id;
         </update>
-        <updateWorking>
+        <updateLastChecked>
             UPDATE
-                feeds
+                accounts
             SET
-                working = :working
+                working = :working,
+                working_reason = working_reason,
+                last_checked = :last_checked
             WHERE
                 id = :account_id;
-        </updateWorking>
+        </updateLastChecked>
         <selectAll>
             SELECT
-                *
+            	*
             FROM
                 accounts
             ORDER BY
             	id ASC;
         </selectAll>   
+        <selectIdAndName>
+            SELECT
+                id, name
+            FROM
+                accounts
+            ORDER BY
+            	id ASC;
+        </selectIdAndName>   
         <selectById>
             SELECT
                 *

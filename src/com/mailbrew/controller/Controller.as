@@ -17,6 +17,11 @@ package com.mailbrew.controller
 		private function addCommands():void
 		{
 			this.addCommand(InitEvent.INIT_EVENT, InitCommand);
+			this.addCommand(SaveAccountEvent.SAVE_ACCOUNT_EVENT, SaveAccountCommand);
+			this.addCommand(DeleteAccountEvent.DELETE_ACCOUNT_EVENT, DeleteAccountCommand);
+			this.addCommand(PopulateAccountListEvent.POPULATE_ACCOUNT_LIST_EVENT, PopulateAccountListCommand);
+			this.addCommand(PopulateAccountInfoEvent.POPULATE_ACCOUNT_INFO_EVENT, PopulateAccountInfoCommand);
+			this.addCommand(CheckMailEvent.CHECK_MAIL_EVENT, CheckMailCommand);
 		}
 	}
 }

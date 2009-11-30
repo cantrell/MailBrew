@@ -25,6 +25,7 @@
 			{
 				this.clearData();
 				var ml:ModelLocator = ModelLocator.getInstance();
+				if (ml.accountInfo == null) return;
 				if (ml.accountInfo.accountType == AccountTypes.GMAIL)
 				{
 					ml.accountFormView = AccountTypes.GMAIL;
@@ -42,6 +43,7 @@
 				sae.username = this.usernameInput.text;
 				sae.password = this.passwordInput.text;
 				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
+				sae.sound = null; // TBD: implement sounds
 				sae.dispatch();
 			}
 			
@@ -52,6 +54,7 @@
 				this.usernameInput.text = accountInfo.username;
 				this.passwordInput.text = accountInfo.password;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
+				// TBD: implement sounds
 				this.saveButton.label = "Update";
 			}
 			
@@ -62,6 +65,7 @@
 				this.usernameInput.text = "";
 				this.passwordInput.text = "";
 				this.notificationPositionInput.clearSelection();
+				// TBD: implement sounds
 				this.saveButton.label = "Save";
 			}
 

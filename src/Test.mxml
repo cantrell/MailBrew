@@ -10,8 +10,8 @@
 			import com.mailbrew.email.imap.IMAP;
 			private function onApplicationComplete():void
 			{
-				//var emailService:IEmailService = new IMAP("fake", "fake", "imap.gmail.com", 993, true);
-				var emailService:IEmailService = new Gmail("fake", "fake");
+				var emailService:IEmailService = new IMAP("fake", "fake", "imap.gmail.com", 993, true);
+				//var emailService:IEmailService = new Gmail("fake", "fake");
 				
 				emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 				emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);

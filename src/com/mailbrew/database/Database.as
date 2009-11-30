@@ -47,6 +47,8 @@ package com.mailbrew.database
 			}
 		}
 
+		// Accounts
+		
 		public function createAccountsTable(responder:DatabaseResponder):void
 		{
 			if (!this.aConn.connected) return;
@@ -69,23 +71,28 @@ package com.mailbrew.database
 									  accountType:String,
 									  username:String,
 									  password:String,
+									  imapServer:String,
+									  imapPort:Number,
+									  secure:Boolean,
 									  notificationLocation:String,
-									  imapServer:String = null,
-									  imapPort:int = -1,
-									  secure:Boolean = false):void
+									  sound:String):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.insert;
+            stmt.text = this.sql.accounts.insert;
             stmt.parameters[":name"] = name;
             stmt.parameters[":account_type"] = accountType;
             stmt.parameters[":username"] = username;
             stmt.parameters[":password"] = password;
             stmt.parameters[":notification_location"] = notificationLocation;
+            stmt.parameters[":sound"] = sound;
             stmt.parameters[":imap_server"] = imapServer;
-            stmt.parameters[":imapPort"] = imapPort;
+            stmt.parameters[":port_number"] = imapPort;
             stmt.parameters[":secure"] = secure;
+            stmt.parameters[":working"] = true;
+            stmt.parameters[":working_reason"] = null;
+            stmt.parameters[":last_checked"] = null;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
@@ -98,28 +105,34 @@ package com.mailbrew.database
 		}
 
 		public function updateAccount(responder:DatabaseResponder,
-									  accountId:uint,
+									  accountId:Number,
 									  name:String,
 									  accountType:String,
 									  username:String,
 									  password:String,
+									  imapServer:String,
+									  imapPort:Number,
+									  secure:Boolean,
 									  notificationLocation:String,
-									  imapServer:String = null,
-									  imapPort:int = -1,
-									  secure:Boolean = false):void
+									  sound:String):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-            stmt.text = this.sql.feeds.insert;
+            stmt.text = this.sql.accounts.update;
+            stmt.parameters[":account_id"] = accountId;
             stmt.parameters[":name"] = name;
             stmt.parameters[":account_type"] = accountType;
             stmt.parameters[":username"] = username;
             stmt.parameters[":password"] = password;
             stmt.parameters[":notification_location"] = notificationLocation;
+            stmt.parameters[":sound"] = sound;
             stmt.parameters[":imap_server"] = imapServer;
-            stmt.parameters[":imapPort"] = imapPort;
+            stmt.parameters[":port_number"] = imapPort;
             stmt.parameters[":secure"] = secure;
+            stmt.parameters[":working"] = true;
+            stmt.parameters[":working_reason"] = null;
+            stmt.parameters[":last_checked"] = null;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
@@ -130,12 +143,126 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		public function updateLastChecked(responder:DatabaseResponder,
+									  	  accountId:Number,
+									      working:Boolean,
+										  workingReason:String,
+										  lastChecked:Date):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+            stmt.text = this.sql.accounts.updateLastChecked;
+            stmt.parameters[":account_id"] = accountId;
+            stmt.parameters[":working"] = working;
+            stmt.parameters[":working_reason"] = workingReason;
+            stmt.parameters[":last_checked"] = lastChecked;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function deleteAccountById(responder:DatabaseResponder,
+									      accountId:uint):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+            stmt.text = this.sql.accounts.deleteById;
+            stmt.parameters[":account_id"] = accountId;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function getAccountLabels(responder:DatabaseResponder):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.accounts.selectIdAndName;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data;
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function getAccounts(responder:DatabaseResponder):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.accounts.selectAll;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data;
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function getAccountById(responder:DatabaseResponder, accountId:Number):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.accounts.selectById;
+			stmt.parameters[":account_id"] = accountId;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data[0];
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		// Messages
+		
 		public function createMessagesTable(responder:DatabaseResponder):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
 			stmt.text = this.sql.messages.create;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function deleteMessagesByAccountId(responder:DatabaseResponder,
+										          accountId:uint):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.messages.deleteByAccountId;
+			stmt.parameters[":account_id"] = accountId;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);

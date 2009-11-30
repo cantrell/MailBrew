@@ -16,15 +16,32 @@ package com.mailbrew.commands
 		{
 			var ml:ModelLocator = ModelLocator.getInstance();
 			var dae:DeleteAccountEvent = DeleteAccountEvent(e);
-			var db:Database = ml.db;
+			this.deleteMessages(dae.accountId);
+		}
+		
+		private function deleteMessages(accountId:Number):void
+		{
 			var responder:DatabaseResponder = new DatabaseResponder();
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+				deleteAccount(accountId);
+			};
+			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
+			ModelLocator.getInstance().db.deleteMessagesByAccountId(responder, accountId);
+		}
+		
+		private function deleteAccount(accountId:Number):void
+		{
+			var responder:DatabaseResponder = new DatabaseResponder();
+			var listener:Function = function(e:DatabaseEvent):void
+			{
+				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+				ModelLocator.getInstance().accountInfo = null;
 				new PopulateAccountListEvent().dispatch();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
-			db.deleteAccount(responder, dae.accountId);
+			ModelLocator.getInstance().db.deleteAccountById(responder, accountId);
 		}
 	}
 }

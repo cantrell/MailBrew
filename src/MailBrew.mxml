@@ -1,36 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" visible="false" applicationComplete="onApplicationComplete();">
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:c="com.mailbrew.components.*"
+		   layout="absolute"
+		   width="500" height="400"
+		   showStatusBar="false"
+		   applicationComplete="onApplicationComplete();">
+
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.controller.Controller;
+			import com.mailbrew.data.AccountTypes;
+			import com.mailbrew.data.MainAppViews;
+			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			
-			private var main:Main;
-			private var ml:ModelLocator;
+			import flash.events.MouseEvent;
+			import flash.geom.Rectangle;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			import mx.events.PropertyChangeEvent;
+			import mx.messaging.events.ChannelEvent;
+			
+			[Bindable] private var accountTypes:Array = [AccountTypes.IMAP, AccountTypes.GMAIL];
 			private var controller:Controller;
+			private var ml:ModelLocator;
 			
 			private function onApplicationComplete():void
 			{
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
-				ml.statusMessage = "Welcome to MailBrew!";
-				this.showMain();
+				this.ml.statusMessage = "Welcome to MailBrew!";
+
+				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onAppViewChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "accountFormView", onAccountFormViewChange);
+
+				this.ml.mainAppView = MainAppViews.INSTRUCTIONS;
+				this.ml.accountFormView = AccountTypes.IMAP;
+
+				var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (this.width/2)), (Screen.mainScreen.bounds.height / 2 - (this.height/2)), this.width, this.height);
+				this.nativeWindow.bounds = initialBounds;
+				this.visible = true;
+
+				
 				new InitEvent().dispatch();
 			}
 			
-			private function showMain():void
+			private function onAppViewChange(e:PropertyChangeEvent):void
 			{
-				if (main == null || main.closed)
+				this.toggleMainView(ModelLocator.getInstance().mainAppView);
+			}
+
+			private function onAccountFormViewChange(e:PropertyChangeEvent):void
+			{
+				if (this.ml.accountFormView == AccountTypes.GMAIL)
 				{
-					this.main = new Main();
-					this.main.open(true);
+					accountType.selectedIndex = 1;
+					this.formView.selectedChild = gmailForm;
 				}
 				else
 				{
-					this.main.activate();
+					accountType.selectedIndex = 0;
+					this.formView.selectedChild = imapForm;
 				}
 			}
+
+			private function toggleMainView(view:String):void
+			{
+				if (view == MainAppViews.INSTRUCTIONS)
+				{
+					this.mainAppView.selectedChild = instructionsView;
+				}
+				else if (view == MainAppViews.WORKING)
+				{
+					this.mainAppView.selectedChild = workingView;
+				}
+			}
+			
+			private function onAccountTypeChange(e:ItemClickEvent):void
+			{
+				this.ml.accountFormView = e.label;
+			}
+			
 		]]>
 	</mx:Script>
+	<mx:VBox width="100%" height="100%">
+		<mx:HDividedBox width="100%" height="100%">
+			<c:AccountList width="30%" height="100%"/>
+			<mx:ViewStack id="mainAppView" width="100%" height="100%" creationPolicy="all">
+				<mx:Canvas id="instructionsView">
+					<mx:Label text="Instructions Here..."/>
+				</mx:Canvas>
+				<mx:VBox id="workingView" width="100%" height="100%" horizontalAlign="center">
+					<mx:VBox width="100%" horizontalAlign="center">
+						<mx:Label text="Account Data"/>
+						<mx:ToggleButtonBar id="accountType" dataProvider="{accountTypes}" itemClick="onAccountTypeChange(event);"/>
+					</mx:VBox>
+					<mx:ViewStack id="formView" width="100%" height="100%" creationPolicy="all">
+						<c:IMAPForm id="imapForm"/>
+						<c:GmailForm id="gmailForm"/>
+					</mx:ViewStack>
+				</mx:VBox>
+			</mx:ViewStack>
+		</mx:HDividedBox>
+		<c:Status/>
+	</mx:VBox>
 </mx:WindowedApplication>

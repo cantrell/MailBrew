@@ -2,10 +2,11 @@ package com.mailbrew.commands
 {
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
-	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
+	import com.mailbrew.events.CheckMailEvent;
+	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	
 	import flash.events.Event;
@@ -56,6 +57,8 @@ package com.mailbrew.commands
 		{
 			var oldResponder:DatabaseResponder = e.target as DatabaseResponder;
 			oldResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, start);
+			new PopulateAccountListEvent().dispatch();
+			new CheckMailEvent().dispatch();
 		}
 	}
 }

@@ -3,6 +3,7 @@
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.data.AccountInfo;
+			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.data.MainAppViews;
 			import com.mailbrew.database.Database;
 			import com.mailbrew.database.DatabaseEvent;
@@ -26,10 +27,10 @@
 			{
 				if (this.accountList.selectedItem == null) return;
 				Alert.show("Are you sure you want to delete " + this.accountList.selectedItem.label + "?",
-					"Confirm",
-					Alert.YES|Alert.NO,
-					null,
-					onRemoveAccountConfirm);
+						   "Confirm",
+						   Alert.YES|Alert.NO,
+						   null,
+						   onRemoveAccountConfirm);
 			}
 			
 			private function onRemoveAccountConfirm(e:CloseEvent):void
@@ -55,10 +56,13 @@
 			
 			private function onAddAccount():void
 			{
-				if (ml.mainAppView == MainAppViews.INSTRUCTIONS)
+				//this.accountList.selectedItem = null;
+				if (this.ml.mainAppView == MainAppViews.INSTRUCTIONS)
 				{
-					ml.mainAppView = MainAppViews.WORKING;
+					this.ml.mainAppView = MainAppViews.WORKING;
 				}
+				this.ml.accountInfo = null;
+				this.ml.accountFormView = AccountTypes.IMAP;
 			}
 		]]>
 	</mx:Script>

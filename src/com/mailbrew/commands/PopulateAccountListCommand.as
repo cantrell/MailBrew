@@ -28,7 +28,7 @@ package com.mailbrew.commands
 				ml.accounts = new ArrayCollection(accountData);
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
-			db.getAccounts(responder);
+			db.getAccountLabels(responder);
 		}
 	}
 }

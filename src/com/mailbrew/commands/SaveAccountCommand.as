@@ -38,7 +38,8 @@ package com.mailbrew.commands
 								 sae.imapServer,
 								 sae.portNumber,
 								 sae.secure,
-								 sae.notificationPosition);
+								 sae.notificationPosition,
+								 sae.sound);
 			}
 			else
 			{
@@ -51,7 +52,8 @@ package com.mailbrew.commands
 								 sae.imapServer,
 								 sae.portNumber,
 								 sae.secure,
-								 sae.notificationPosition);
+								 sae.notificationPosition,
+								 sae.sound);
 			}
 		}
 	}

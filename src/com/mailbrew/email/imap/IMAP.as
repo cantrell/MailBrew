@@ -3,7 +3,6 @@ package com.mailbrew.email.imap
 	import com.mailbrew.email.EmailCounts;
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.EmailHeader;
-	import com.mailbrew.email.EmailService;
 	import com.mailbrew.email.IEmailService;
 	
 	import flash.events.Event;
@@ -13,11 +12,13 @@ package com.mailbrew.email.imap
 	import flash.net.SecureSocket;
 	import flash.net.Socket;
 	import flash.utils.ByteArray;
+	import com.mailbrew.email.EmailModes;
 
 	[Event(name="connectionFailed",        type="com.mailbrew.email.EmailEvent")]
 	[Event(name="connectionSucceeded",     type="com.mailbrew.email.EmailEvent")]
-	[Event(name="authenticationSucceeded", type="com.mailbrew.email.EmailEvent")]
 	[Event(name="authenticationFailed",    type="com.mailbrew.email.EmailEvent")]
+	[Event(name="authenticationSucceeded", type="com.mailbrew.email.EmailEvent")]
+	[Event(name="unseenEmailsCount",       type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmails",            type="com.mailbrew.email.EmailEvent")]
 
 	public class IMAP extends EventDispatcher implements IEmailService
@@ -50,19 +51,19 @@ package com.mailbrew.email.imap
 
 		public function testAccount():void
 		{
-			this.mode = IMAPMode.AUTHENTICATION_TEST_MODE;
+			this.mode = EmailModes.AUTHENTICATION_TEST_MODE;
 			start();
 		}
 
 		public function getUnseenEmailHeaders():void
 		{
-			this.mode = IMAPMode.UNSEEN_EMAIL_HEADERS_MODE;
+			this.mode = EmailModes.UNSEEN_EMAIL_HEADERS_MODE;
 			this.start();
 		}
 		
 		public function getUnseenEmailCount():void
 		{
-			this.mode = IMAPMode.UNSEEN_COUNT_MODE;
+			this.mode = EmailModes.UNSEEN_COUNT_MODE;
 			this.start();
 		}
 		
@@ -132,11 +133,11 @@ package com.mailbrew.email.imap
 				if (bufferString.indexOf(Tags.LOGIN_TAG + " OK") != -1) // Successful login
 				{
 					this.dispatchEvent(new EmailEvent(EmailEvent.AUTHENTICATION_SUCCEEDED));
-					if (this.mode == IMAPMode.UNSEEN_COUNT_MODE)
+					if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
 					{
 						this.getStatus(bufferString);
 					}
-					else if (this.mode == IMAPMode.UNSEEN_EMAIL_HEADERS_MODE)
+					else if (this.mode == EmailModes.UNSEEN_EMAIL_HEADERS_MODE)
 					{
 						this.selectInbox();
 					}
