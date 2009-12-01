@@ -1,5 +1,6 @@
 package com.mailbrew.model
 {
+	import com.adobe.air.notification.Purr;
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.MainAppViews;
@@ -18,8 +19,12 @@ package com.mailbrew.model
 		[Bindable] [Embed(source="assets/list-remove.png")] public var listRemoveClass:Class;
 		
         [Embed(source="assets/dynamic_logo_128.png")]
-        public var dynamicIconClass:Class;
+        public var DynamicIconClass:Class;
 		public var dynamicAppIcon:Bitmap;
+		
+		[Embed(source="assets/notification_icon.png")]
+		public var NotificationIconClass:Class;
+		public var notificationIcon:Bitmap;
 
 		[Bindable] public var statusMessage:String;
 		[Bindable] public var showStatusProgressBar:Boolean;
@@ -28,6 +33,7 @@ package com.mailbrew.model
 		[Bindable] public var accountFormView:String;
 		[Bindable] public var accountInfo:AccountInfo;
 		[Bindable] public var checkEmailLock:Boolean;
+		[Bindable] public var purr:Purr;
 		
 		public var db:Database;
 

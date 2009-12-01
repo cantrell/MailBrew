@@ -8,6 +8,7 @@
 
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.air.notification.AbstractNotification;
 			import com.mailbrew.controller.Controller;
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.data.MainAppViews;
@@ -15,6 +16,7 @@
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			
+			import flash.events.Event;
 			import flash.events.MouseEvent;
 			import flash.geom.Rectangle;
 			
@@ -33,6 +35,8 @@
 			
 			private function onApplicationComplete():void
 			{
+				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
+				
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
 				this.ml.statusMessage = "Welcome to MailBrew!";
@@ -46,7 +50,6 @@
 				var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (this.width/2)), (Screen.mainScreen.bounds.height / 2 - (this.height/2)), this.width, this.height);
 				this.nativeWindow.bounds = initialBounds;
 				this.visible = true;
-
 				
 				new InitEvent().dispatch();
 			}
@@ -85,6 +88,24 @@
 			private function onAccountTypeChange(e:ItemClickEvent):void
 			{
 				this.ml.accountFormView = e.label;
+			}
+			
+			private function onWindowClosing(e:Event):void
+			{
+				e.preventDefault();
+				this.visible = false;
+			}
+			
+			private function onApplicationExiting(e:Event):void
+			{
+				this.ml.purr.clear(AbstractNotification.TOP_RIGHT);
+				this.ml.purr.clear(AbstractNotification.TOP_LEFT);
+				this.ml.purr.clear(AbstractNotification.BOTTOM_RIGHT);
+				this.ml.purr.clear(AbstractNotification.BOTTOM_LEFT);
+				for (var i:int = NativeApplication.nativeApplication.openedWindows.length - 1; i >= 0; --i)
+				{
+					NativeWindow(NativeApplication.nativeApplication.openedWindows[i]).close();
+				}
 			}
 			
 		]]>

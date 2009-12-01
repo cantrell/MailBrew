@@ -1,6 +1,8 @@
 package com.mailbrew.database
 {
 	
+	import com.mailbrew.email.EmailHeader;
+	
 	import flash.data.*;
 	import flash.errors.SQLError;
 	import flash.events.SQLErrorEvent;
@@ -255,6 +257,25 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		public function getMessagesByAccountId(responder:DatabaseResponder,
+											   accountId:Number):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.messages.selectByAccountId;
+			stmt.parameters[":account_id"] = accountId;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data;
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
 		public function deleteMessagesByAccountId(responder:DatabaseResponder,
 										          accountId:uint):void
 		{
@@ -273,6 +294,37 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		public function insertUnseenMessage(responder:DatabaseResponder,
+										    accountId:Number,
+											uniqueId:String):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.messages.insert;
+			stmt.parameters[":account_id"] = accountId;
+			stmt.parameters[":unique_id"] = uniqueId;
+			
+			/*
+			var sql:String = "INSERT INTO messages (account_id, unique_id) VALUES ";
+			for each (var emailHeader:EmailHeader in unseenMessages)
+			{
+				sql += "("+accountId+", '"+emailHeader.id+"'),";
+			}
+			sql = sql.slice(0, sql.length - 1);
+			stmt.text = sql;
+			*/
+
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+		
 		// Private functions
 		
 		private function getStatement():SQLStatement

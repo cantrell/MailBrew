@@ -1,5 +1,6 @@
 package com.mailbrew.commands
 {
+	import com.adobe.air.notification.Purr;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	import com.mailbrew.database.Database;
@@ -20,6 +21,11 @@ package com.mailbrew.commands
 		public function execute(e:CairngormEvent):void
 		{
 			var ml:ModelLocator = ModelLocator.getInstance();
+			
+			ml.purr = new Purr(10);
+			
+			ml.notificationIcon = new ml.NotificationIconClass();
+			
 			var sqlFile:File = File.applicationDirectory.resolvePath("sql.xml");
 			var sqlFileStream:FileStream = new FileStream();
 			sqlFileStream.open(sqlFile, FileMode.READ);
