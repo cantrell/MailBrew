@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.events.CheckMailEvent;
+			
+			private function onCheckNow():void
+			{
+				new CheckMailEvent().dispatch();
+			}
+
+			private function onOpenSettings():void
+			{
+				// TBD
+			}
+			
+			private function onOpenAbout():void
+			{
+				// TBD
+			}
+		]]>
+	</mx:Script>
+	<mx:Label text="MailBrew" left="5" top="2"/>
+	<mx:Button id="checkNowButton" label="Check Now" top="2" right="155" click="onCheckNow();"/>
+	<mx:Button id="settingsButton" label="Settings" top="2" right="80" click="onOpenSettings();"/>
+	<mx:Button id="aboutButton" label="About" top="2" right="5" click="onOpenAbout();"/>
+</mx:Canvas>
