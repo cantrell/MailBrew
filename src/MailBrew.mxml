@@ -111,6 +111,7 @@
 		]]>
 	</mx:Script>
 	<mx:VBox width="100%" height="100%">
+		<c:CommandBar width="100%"/>
 		<mx:HDividedBox width="100%" height="100%">
 			<c:AccountList width="30%" height="100%"/>
 			<mx:ViewStack id="mainAppView" width="100%" height="100%" creationPolicy="all">

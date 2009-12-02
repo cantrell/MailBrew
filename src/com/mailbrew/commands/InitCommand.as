@@ -64,7 +64,7 @@ package com.mailbrew.commands
 			var oldResponder:DatabaseResponder = e.target as DatabaseResponder;
 			oldResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, start);
 			new PopulateAccountListEvent().dispatch();
-			new CheckMailEvent().dispatch();
+			//new CheckMailEvent().dispatch();
 		}
 	}
 }
