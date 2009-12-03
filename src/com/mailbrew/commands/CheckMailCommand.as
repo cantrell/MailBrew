@@ -12,6 +12,7 @@ package com.mailbrew.commands
 	import com.mailbrew.email.IEmailService;
 	import com.mailbrew.email.gmail.Gmail;
 	import com.mailbrew.email.imap.IMAP;
+	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
 	
@@ -53,6 +54,19 @@ package com.mailbrew.commands
 			db.getAccounts(responder);
 		}
 		
+		private function updateAccountAndContinue(working:Boolean, workingReason:String):void
+		{
+			var db:Database = this.ml.db;
+			var responder:DatabaseResponder = new DatabaseResponder();
+			var listener:Function = function(e:DatabaseEvent):void
+			{
+				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+				checkEmailLoop();
+			};
+			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
+			db.updateLastChecked(responder, this.currentAccount.id, working, workingReason, new Date());
+		}
+		
 		public function checkEmailLoop():void
 		{
 			// The loop is finished
@@ -68,6 +82,12 @@ package com.mailbrew.commands
 				var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
 				uaie.unseenCount = this.unseenTotal;
 				uaie.dispatch();
+				
+				// Refresh the account list to show or clear errors
+				new PopulateAccountListEvent().dispatch();
+				
+				// Update the status message
+				this.ml.statusMessage = "Done";
 				
 				return;
 			}
@@ -92,23 +112,34 @@ package com.mailbrew.commands
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			
+			this.ml.statusMessage = "Checking " + this.currentAccount.name + "...";
 			emailService.getUnseenEmailHeaders();
 		}
 		
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
-			// TBD: Update database
 			trace("onAuthenticationFailed");
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+			var reason:String = "Authentication failed. Your credentials were not accepted. Please update your username and password.";
+			if (e.data != null)
+			{
+				reason += " [Error message: "+e.data+"]"; 
+			}
+			this.updateAccountAndContinue(false, reason);
 		}
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
-			// TBD: Update database
 			trace("onConnectionFailed", e.data);
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+			var reason:String = "Unable to connect to email service.";
+			if (e.data != null)
+			{
+				reason += " [Error message: "+e.data+"]"; 
+			}
+			this.updateAccountAndContinue(false, reason);
 		}
 		
 		private function onUnseenEmails(e:EmailEvent):void
@@ -118,7 +149,7 @@ package com.mailbrew.commands
 			this.newUnseenEmails = e.data;
 			if (this.newUnseenEmails == null || this.newUnseenEmails.length == 0)
 			{
-				this.checkEmailLoop();
+				this.updateAccountAndContinue(true, null);
 				return;
 			}
 			// If unseenTotal isn't 0, that means unseen emails have already been found
@@ -200,7 +231,7 @@ package com.mailbrew.commands
 			if (this.newUnseenEmails == null || this.newUnseenEmails.length == 0)
 			{
 				db.aConn.commit();
-				this.checkEmailLoop();
+				this.updateAccountAndContinue(true, null);
 				return;
 			}
 			var unseenEmail:EmailHeader = this.newUnseenEmails.pop();

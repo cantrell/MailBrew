@@ -12,6 +12,11 @@
 			import com.mailbrew.events.PopulateAccountInfoEvent;
 			import com.mailbrew.model.ModelLocator;
 			
+			import flash.display.NativeMenu;
+			import flash.display.NativeMenuItem;
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			import mx.events.ListEvent;
@@ -23,7 +28,7 @@
 				this.ml = ModelLocator.getInstance();
 			}
 			
-			private function onRemoveAccount(e:MouseEvent):void
+			private function onRemoveAccount(e:Event):void
 			{
 				if (this.accountList.selectedItem == null) return;
 				Alert.show("Are you sure you want to delete " + this.accountList.selectedItem.label + "?",
@@ -68,9 +73,48 @@
 				this.ml.accountInfo = null;
 				this.ml.accountFormView = AccountTypes.IMAP;
 			}
+			
+			public function onRightClick(e:MouseEvent, item:Object):void
+			{
+				this.accountList.selectedItem = item;
+				var menu:NativeMenu = new NativeMenu();
+				if (!item.working)
+				{
+					var errorItem:NativeMenuItem = new NativeMenuItem("View Error");
+					errorItem.addEventListener(Event.SELECT, showErrorMessage);
+					menu.addItem(errorItem);
+				}
+				var deleteItem:NativeMenuItem = new NativeMenuItem("Delete");
+				deleteItem.addEventListener(Event.SELECT, onRemoveAccount);
+				menu.addItem(deleteItem);
+				menu.display(this.stage, e.stageX, e.stageY);
+			}
+			
+			private function showErrorMessage(e:Event):void
+			{
+				if (this.accountList.selectedItem == null) return;
+				var accountId:Number = this.accountList.selectedItem.accountId;
+				var db:Database = this.ml.db;
+				var responder:DatabaseResponder = new DatabaseResponder();
+				var listener:Function = function(e:DatabaseEvent):void
+				{
+					responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+					var errorViewer:ErrorViewer = new ErrorViewer();
+					errorViewer.errorMessage = e.data;
+					errorViewer.open();
+				};
+				responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
+				db.getErrorMessage(responder, accountId);
+			}
 		]]>
 	</mx:Script>
-	<mx:List id="accountList" width="100%" height="100%" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);"/>
+	<mx:List id="accountList" width="100%" height="100%" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);">
+		<mx:itemRenderer>
+			<mx:Component>
+				<mx:Label text="{data.label}" color="{(data.working) ? 0x000000 : 0xff0000}" rightClick="outerDocument.onRightClick(event, data);"/>
+			</mx:Component>
+		</mx:itemRenderer>
+	</mx:List>
 	<mx:HBox width="100%" horizontalAlign="center">
 		<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddClass}" click="onAddAccount();" width="40"/>
 		<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40"/>

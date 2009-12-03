@@ -23,7 +23,7 @@ package com.mailbrew.commands
 				var accountData:Array =  new Array();
 				for each (var o:Object in e.data)
 				{
-					accountData.push({label:o.name, accountId:o.id});
+					accountData.push({label:o.name, accountId:o.id, working:o.working});
 				}
 				ml.accounts = new ArrayCollection(accountData);
 			};

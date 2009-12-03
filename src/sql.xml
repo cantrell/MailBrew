@@ -72,7 +72,7 @@
                 accounts
             SET
                 working = :working,
-                working_reason = working_reason,
+                working_reason = :working_reason,
                 last_checked = :last_checked
             WHERE
                 id = :account_id;
@@ -84,15 +84,25 @@
                 accounts
             ORDER BY
             	id ASC;
-        </selectAll>   
-        <selectIdAndName>
+        </selectAll>
+        <selectForList>
             SELECT
-                id, name
+                id,
+                name,
+                working
             FROM
                 accounts
             ORDER BY
             	id ASC;
-        </selectIdAndName>   
+        </selectForList>   
+        <selectWorkingReason>
+            SELECT
+                working_reason
+            FROM
+                accounts
+            WHERE
+                id = :account_id;
+        </selectWorkingReason>
         <selectById>
             SELECT
                 *

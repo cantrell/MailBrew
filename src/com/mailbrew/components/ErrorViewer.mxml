@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="200" height="125" type="utility">
+	<mx:Script>
+		<![CDATA[
+			[Bindable] public var errorMessage:String;
+		]]>
+	</mx:Script>
+	<mx:TextArea width="100%" height="100%" text="{this.errorMessage}" editable="false"/>
+</mx:Window>

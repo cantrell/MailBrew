@@ -192,7 +192,7 @@ package com.mailbrew.database
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-			stmt.text = this.sql.accounts.selectIdAndName;
+			stmt.text = this.sql.accounts.selectForList;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
@@ -233,6 +233,24 @@ package com.mailbrew.database
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
 				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 				dbe.data = stmt.getResult().data[0];
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function getErrorMessage(responder:DatabaseResponder, accountId:Number):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.accounts.selectWorkingReason;
+			stmt.parameters[":account_id"] = accountId;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data[0].working_reason;
 				responder.dispatchEvent(dbe);
 			}
 			stmt.addEventListener(SQLEvent.RESULT, listener);
