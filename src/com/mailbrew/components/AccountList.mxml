@@ -106,12 +106,19 @@
 				responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				db.getErrorMessage(responder, accountId);
 			}
+			
+			public function determineFontColor(active:Boolean, working:Boolean):uint
+			{
+				if (!active) return 0xcccccc;
+				if (!working) return 0xff0000;
+				return 0x000000;
+			}
 		]]>
 	</mx:Script>
 	<mx:List id="accountList" width="100%" height="100%" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);">
 		<mx:itemRenderer>
 			<mx:Component>
-				<mx:Label text="{data.label}" color="{(data.working) ? 0x000000 : 0xff0000}" rightClick="outerDocument.onRightClick(event, data);"/>
+				<mx:Label text="{data.label}" color="{outerDocument.determineFontColor(data.active, data.working)}" rightClick="outerDocument.onRightClick(event, data);"/>
 			</mx:Component>
 		</mx:itemRenderer>
 	</mx:List>

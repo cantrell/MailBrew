@@ -48,6 +48,7 @@
 				sae.secure = this.secureCheckBox.selected;
 				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
 				sae.sound = null; // TBD: implement sounds
+				sae.active = this.activeCheckbox.selected;
 				sae.dispatch();
 			}
 			
@@ -61,6 +62,7 @@
 				this.portNumberInput.text = String(accountInfo.portNumber);
 				this.secureCheckBox.selected = accountInfo.secure;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
+				this.activeCheckbox.selected = accountInfo.active;
 				// TBD: implement sounds
 				this.saveButton.label = "Update";
 			}
@@ -76,6 +78,7 @@
 				this.secureCheckBox.selected = false;
 				this.notificationPositionInput.clearSelection();
 				// TBD: implement sounds
+				this.activeCheckbox.selected = true;
 				this.saveButton.label = "Save";
 			}
 			
@@ -102,6 +105,9 @@
 		</mx:FormItem>
 		<mx:FormItem label="Notification Position">
 			<c:PositionComboBox id="notificationPositionInput"/>
+		</mx:FormItem>
+		<mx:FormItem label="Active?">
+			<mx:CheckBox id="activeCheckbox" selected="true"/>
 		</mx:FormItem>
 	</mx:Form>
 	<mx:Button id="saveButton" label="Save" click="onSave();"/>

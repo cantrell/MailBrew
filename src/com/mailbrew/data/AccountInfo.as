@@ -11,5 +11,6 @@ package com.mailbrew.data
 		public var portNumber:Number
 		public var secure:Boolean
 		public var notificationPosition:String;
+		public var active:Boolean;
 	}
 }

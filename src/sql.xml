@@ -14,7 +14,8 @@
                 sound,
                 working BOOLEAN DEFAULT false NOT NULL,
                 working_reason TEXT,
-                last_checked DATE
+                last_checked DATE,
+                active BOOLEAN
             );
         </create>
         <insert>
@@ -31,7 +32,8 @@
                     sound,
                     working,
                     working_reason,
-                    last_checked
+                    last_checked,
+                    active
                 )
             VALUES (
                     :name,
@@ -45,7 +47,8 @@
                     :sound,
                     :working,
                     :working_reason,
-                    :last_checked
+                    :last_checked,
+                    :active
                 );
         </insert>
         <update>
@@ -63,7 +66,8 @@
                 sound = :sound,
                 working = :working,
                 working_reason = :working_reason,
-                last_checked = :last_checked
+                last_checked = :last_checked,
+                active = :active
             WHERE
                 id = :account_id;
         </update>
@@ -89,7 +93,8 @@
             SELECT
                 id,
                 name,
-                working
+                working,
+                active
             FROM
                 accounts
             ORDER BY

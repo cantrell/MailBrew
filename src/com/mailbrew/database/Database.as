@@ -9,16 +9,19 @@ package com.mailbrew.database
 	import flash.events.SQLEvent;
 	import flash.filesystem.*;
 	import flash.system.System;
+	import flash.utils.ByteArray;
 
 	public class Database
 	{
 		private var sql:XML;
 		private var dbFile:File;
 		public var aConn:SQLConnection;
+		public var encryptionKey:ByteArray;
 				
-		public function Database(sql:XML)
+		public function Database(sql:XML, encryptionKey:ByteArray)
 		{
 			this.sql = sql;
+			this.encryptionKey = encryptionKey;
 		}
 		
 		public function initialize(responder:DatabaseResponder):void
@@ -28,12 +31,22 @@ package com.mailbrew.database
 			var listener:Function = function(e:SQLEvent):void
 			{
 				aConn.removeEventListener(SQLEvent.OPEN, listener);
+				aConn.removeEventListener(SQLErrorEvent.ERROR, errorListener);
 				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 				responder.dispatchEvent(dbe);
 			};
 			
+			var errorListener:Function = function(ee:SQLErrorEvent):void
+			{
+				aConn.removeEventListener(SQLEvent.OPEN, listener);
+				aConn.removeEventListener(SQLErrorEvent.ERROR, errorListener);
+				dbFile.deleteFile();
+				initialize(responder);
+			};
+			
 			this.aConn.addEventListener(SQLEvent.OPEN, listener);
-			this.aConn.openAsync(dbFile, SQLMode.CREATE);
+			this.aConn.addEventListener(SQLErrorEvent.ERROR, errorListener);
+			this.aConn.openAsync(dbFile, SQLMode.CREATE, null, false, 1024, this.encryptionKey);
 		}
 				
 		public function shutdown():void
@@ -77,7 +90,8 @@ package com.mailbrew.database
 									  imapPort:Number,
 									  secure:Boolean,
 									  notificationLocation:String,
-									  sound:String):void
+									  sound:String,
+									  active:Boolean):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
@@ -95,6 +109,7 @@ package com.mailbrew.database
             stmt.parameters[":working"] = true;
             stmt.parameters[":working_reason"] = null;
             stmt.parameters[":last_checked"] = null;
+            stmt.parameters[":active"] = active;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
@@ -116,7 +131,8 @@ package com.mailbrew.database
 									  imapPort:Number,
 									  secure:Boolean,
 									  notificationLocation:String,
-									  sound:String):void
+									  sound:String,
+									  active:Boolean):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
@@ -135,6 +151,7 @@ package com.mailbrew.database
             stmt.parameters[":working"] = true;
             stmt.parameters[":working_reason"] = null;
             stmt.parameters[":last_checked"] = null;
+            stmt.parameters[":active"] = active;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);

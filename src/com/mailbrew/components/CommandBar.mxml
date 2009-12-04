@@ -3,6 +3,7 @@
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.events.CheckMailEvent;
+			import com.mailbrew.model.ModelLocator;
 			
 			private function onCheckNow():void
 			{
@@ -21,7 +22,7 @@
 		]]>
 	</mx:Script>
 	<mx:Label text="MailBrew" left="5" top="2"/>
-	<mx:Button id="checkNowButton" label="Check Now" top="2" right="155" click="onCheckNow();"/>
+	<mx:Button id="checkNowButton" label="Check Now" top="2" right="155" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
 	<mx:Button id="settingsButton" label="Settings" top="2" right="80" click="onOpenSettings();"/>
 	<mx:Button id="aboutButton" label="About" top="2" right="5" click="onOpenAbout();"/>
 </mx:Canvas>

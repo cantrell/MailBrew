@@ -39,7 +39,8 @@ package com.mailbrew.commands
 								 sae.portNumber,
 								 sae.secure,
 								 sae.notificationPosition,
-								 sae.sound);
+								 sae.sound,
+								 sae.active);
 			}
 			else
 			{
@@ -53,7 +54,8 @@ package com.mailbrew.commands
 								 sae.portNumber,
 								 sae.secure,
 								 sae.notificationPosition,
-								 sae.sound);
+								 sae.sound,
+								 sae.active);
 			}
 		}
 	}

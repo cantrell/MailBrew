@@ -1,6 +1,7 @@
 package com.mailbrew.model
 {
 	import com.adobe.air.notification.Purr;
+	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.MainAppViews;
@@ -34,6 +35,7 @@ package com.mailbrew.model
 		[Bindable] public var accountInfo:AccountInfo;
 		[Bindable] public var checkEmailLock:Boolean;
 		[Bindable] public var purr:Purr;
+		[Bindable] public var prefs:Preference;
 		
 		public var db:Database;
 

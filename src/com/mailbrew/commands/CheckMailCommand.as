@@ -94,6 +94,11 @@ package com.mailbrew.commands
 			this.newUnseenEmails = null;
 			this.oldUnseenEmails = null;
 			this.currentAccount = this.accountData.pop();
+			if (!this.currentAccount.active)
+			{
+				this.checkEmailLoop();
+				return;
+			}
 			var emailService:IEmailService;
 			if (this.currentAccount.account_type == AccountTypes.IMAP)
 			{
