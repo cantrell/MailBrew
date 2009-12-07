@@ -3,19 +3,42 @@
 <mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="335" height="280" type="utility" creationComplete="onCreationComplete();" title="MailBrew Preferences">
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.air.preferences.Preference;
+			import com.mailbrew.data.PreferenceKeys;
+			import com.mailbrew.events.SavePreferencesEvent;
+			import com.mailbrew.model.ModelLocator;
 			private function onCreationComplete():void
 			{
-				
+				var ml:ModelLocator = ModelLocator.getInstance();
+				var prefs:Preference = ml.prefs;
+				updateIntervalStepper.value = prefs.getValue(PreferenceKeys.UPDATE_INTERVAL);
+				notificationDisplayLengthStepper.value = prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL);
+				idlePeriodStepper.value = prefs.getValue(PreferenceKeys.IDLE_THRESHOLD);
+				try
+				{
+					startAtLoginCheckbox.selected = NativeApplication.nativeApplication.startAtLogin;
+				}
+				catch (e:Error)
+				{
+					if (e.errorID != 2014) throw e;
+				}
 			}
 			
 			private function onSave():void
 			{
-				
+				var spe:SavePreferencesEvent = new SavePreferencesEvent();
+				spe.updateInterval = this.updateIntervalStepper.value;
+				spe.idleThreshold = this.idlePeriodStepper.value;
+				spe.notificationDisplayInterval = this.notificationDisplayLengthStepper.value;
+				spe.startAtLogin = this.startAtLoginCheckbox.selected;
+				spe.dispatch();
+				ModelLocator.getInstance().statusMessage = "Preferences saved";
+				this.onCancel();
 			}
 
 			private function onCancel():void
 			{
-				
+				this.close();
 			}
 		]]>
 	</mx:Script>
@@ -26,7 +49,7 @@
 
 	<mx:Label text="Notification Display Length (seconds)" fontWeight="bold" left="4" y="60" width="215"/>
 	<mx:Text y="75" width="210" left="6"><mx:text><mx:String>How long should notifications be displayed?</mx:String></mx:text></mx:Text>
-	<mx:NumericStepper id="notificationDisplayLengthStepper" minimum="5" maximum="30" right="20" width="57" y="60"/>
+	<mx:NumericStepper id="notificationDisplayLengthStepper" minimum="2" maximum="30" right="20" width="57" y="60"/>
 
 	<mx:Label text="Idle Period (minutes)" y="115" fontWeight="bold" left="4"/>
 	<mx:Text y="130" width="210" left="6"><mx:text><mx:String>How long should you be idle (no keyboard input) before MailBrew starts queuing up notifications?</mx:String></mx:text></mx:Text>

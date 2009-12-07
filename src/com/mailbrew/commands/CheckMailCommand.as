@@ -4,6 +4,7 @@ package com.mailbrew.commands
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	import com.mailbrew.data.AccountTypes;
+	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
@@ -126,7 +127,7 @@ package com.mailbrew.commands
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			
-			this.ml.statusMessage = "Checking " + this.currentAccount.name + "...";
+			this.ml.statusMessage = "Checking " + this.currentAccount.name;
 			emailService.getUnseenEmailHeaders();
 		}
 		
@@ -240,7 +241,11 @@ package com.mailbrew.commands
 		private function addNotification(emailHeader:EmailHeader):void
 		{
 			var summary:String = (emailHeader.summary != null) ? emailHeader.summary : emailHeader.subject;
-			var notification:Notification = new Notification(emailHeader.from, summary, this.currentAccount.notification_location, 3, this.ml.notificationIcon);
+			var notification:Notification = new Notification(emailHeader.from,
+                                                             summary,
+															 this.currentAccount.notification_location,
+															 this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
+															 this.ml.notificationIcon);
 			notification.width = 250;
 			this.ml.purr.addNotification(notification);
 		}

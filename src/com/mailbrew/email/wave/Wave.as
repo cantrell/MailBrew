@@ -49,7 +49,7 @@ package com.mailbrew.email.wave
 		private function login():void
 		{
 			this.status = NaN;
-			this.internalMode = "login";
+			this.internalMode = InternalModes.LOGIN;
 			var urlLoader:URLLoader = new URLLoader();
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
@@ -70,7 +70,7 @@ package com.mailbrew.email.wave
 		private function getInbox():void
 		{
 			this.status = NaN;
-			this.internalMode = "inbox";
+			this.internalMode = InternalModes.INBOX;
 			var urlLoader:URLLoader = new URLLoader();
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
@@ -87,7 +87,7 @@ package com.mailbrew.email.wave
 		private function logout():void
 		{
 			this.status = NaN;
-			this.internalMode = "logout";
+			this.internalMode = InternalModes.LOGOUT;
 			var urlLoader:URLLoader = new URLLoader();
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
@@ -122,7 +122,7 @@ package com.mailbrew.email.wave
 			this.dispatchEvent(new EmailEvent(EmailEvent.CONNECTION_SUCCEEDED));
 			var urlLoader:URLLoader = e.target as URLLoader;
 			var response:String = urlLoader.data as String;
-			if (this.internalMode == "login")
+			if (this.internalMode == InternalModes.LOGIN)
 			{
 				var responseStrings:Array = response.split("\n");
 				var responseObj:Object = new Object();
@@ -158,7 +158,7 @@ package com.mailbrew.email.wave
 					return;
 				}
 			}
-			else if (this.internalMode == "inbox")
+			else if (this.internalMode == InternalModes.INBOX)
 			{
 				try
 				{
@@ -240,7 +240,7 @@ package com.mailbrew.email.wave
 				// Best to skip it until we have real API support.
 				//this.logout();
 			}
-			else if (this.internalMode == "logout")
+			else if (this.internalMode == InternalModes.LOGOUT)
 			{
 				// Not much to do. Bye.
 			}

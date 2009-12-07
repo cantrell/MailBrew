@@ -6,8 +6,11 @@ package com.mailbrew.model
 	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.MainAppViews;
 	import com.mailbrew.database.Database;
+	import com.mailbrew.events.CheckMailEvent;
 	
 	import flash.display.Bitmap;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
 
@@ -33,12 +36,18 @@ package com.mailbrew.model
 		[Bindable] public var mainAppView:String;
 		[Bindable] public var accountFormView:String;
 		[Bindable] public var accountInfo:AccountInfo;
-		[Bindable] public var checkEmailLock:Boolean;
-		[Bindable] public var purr:Purr;
-		[Bindable] public var prefs:Preference;
-		
+
+		public var checkEmailLock:Boolean;
+		public var purr:Purr;
+		public var prefs:Preference;
+		public var checkEmailTimer:Timer;
 		public var db:Database;
 
+		public function checkEmail(e:TimerEvent):void
+		{
+			new CheckMailEvent().dispatch();
+		}
+		
 		public function ModelLocator()
 		{
 		}

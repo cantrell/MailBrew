@@ -5,6 +5,7 @@ package com.mailbrew.commands
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
@@ -12,32 +13,59 @@ package com.mailbrew.commands
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	
+	import flash.desktop.NativeApplication;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.utils.ByteArray;
+	import flash.utils.Timer;
 	
 	public class InitCommand
 		implements ICommand
 	{
+		private var ml:ModelLocator;
+		
 		public function execute(e:CairngormEvent):void
 		{
-			var ml:ModelLocator = ModelLocator.getInstance();
+			this.ml = ModelLocator.getInstance();
 			
-			ml.prefs = new Preference();
-			ml.prefs.load();
+			this.ml.prefs = new Preference();
+			this.ml.prefs.load();
 			
-			ml.purr = new Purr(10);
+			// Set up preferences...
+			var defaultsSet:Boolean = false;
+			if (this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) == null)
+			{
+				this.ml.prefs.setValue(PreferenceKeys.UPDATE_INTERVAL, 5, false);
+				defaultsSet = true;
+			}
+
+			if (this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL) == null)
+			{
+				this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, 7, false);
+				defaultsSet = true;
+			}
+
+			if (this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD) == null)
+			{
+				this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, 10, false);
+				defaultsSet = true;
+			}
 			
-			ml.notificationIcon = new ml.NotificationIconClass();
+			if (defaultsSet) this.ml.prefs.save();
 			
-			var databasePassword:String = ml.prefs.getValue("databasePassword");
+			this.ml.purr = new Purr(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
+			
+			this.ml.notificationIcon = new this.ml.NotificationIconClass();
+			
+			var databasePassword:String = this.ml.prefs.getValue("databasePassword");
 			if (databasePassword == null)
 			{
 				databasePassword = this.generateStrongPassword();
-				ml.prefs.setValue("databasePassword", databasePassword, true);
-				ml.prefs.save();
+				this.ml.prefs.setValue("databasePassword", databasePassword, true);
+				this.ml.prefs.save();
 			}
 			var sqlFile:File = File.applicationDirectory.resolvePath("sql.xml");
 			var sqlFileStream:FileStream = new FileStream();
@@ -79,6 +107,10 @@ package com.mailbrew.commands
 			var oldResponder:DatabaseResponder = e.target as DatabaseResponder;
 			oldResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, start);
 			new PopulateAccountListEvent().dispatch();
+			this.ml.checkEmailTimer = new Timer(this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
+			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
+			this.ml.checkEmailTimer.start();
+			// TBD: Add this back in
 			//new CheckMailEvent().dispatch();
 		}
 		

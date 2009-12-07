@@ -23,6 +23,8 @@ package com.mailbrew.controller
 			this.addCommand(PopulateAccountInfoEvent.POPULATE_ACCOUNT_INFO_EVENT, PopulateAccountInfoCommand);
 			this.addCommand(CheckMailEvent.CHECK_MAIL_EVENT, CheckMailCommand);
 			this.addCommand(UpdateAppIconEvent.UPDATE_APP_ICON_EVENT, UpdateAppIconCommand);
+			this.addCommand(AppExitEvent.APP_EXIT_EVENT, AppExitCommand);
+			this.addCommand(SavePreferencesEvent.SAVE_PREFERENCES_EVENT, SavePreferencesCommand);
 		}
 	}
 }

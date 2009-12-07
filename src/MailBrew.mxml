@@ -9,15 +9,19 @@
 	<mx:Script>
 		<![CDATA[
 			import com.adobe.air.notification.AbstractNotification;
+			import com.mailbrew.commands.AppExitCommand;
 			import com.mailbrew.controller.Controller;
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.data.MainAppViews;
+			import com.mailbrew.events.AppExitEvent;
 			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			
 			import flash.events.Event;
+			import flash.events.InvokeEvent;
 			import flash.events.MouseEvent;
+			import flash.events.ScreenMouseEvent;
 			import flash.geom.Rectangle;
 			
 			import mx.binding.utils.ChangeWatcher;
@@ -36,6 +40,15 @@
 			private function onApplicationComplete():void
 			{
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
+				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);
+				if (NativeApplication.supportsDockIcon) // Mac
+				{
+					NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, onShowWindow);
+				}
+				else // Windows
+				{
+					SystemTrayIcon(NativeApplication.nativeApplication.icon).addEventListener(ScreenMouseEvent.CLICK, onShowWindow);
+				}
 				
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
@@ -101,18 +114,18 @@
 				this.visible = false;
 			}
 			
-			private function onApplicationExiting(e:Event):void
+			private function onShowWindow(e:Event):void
 			{
-				this.ml.purr.clear(AbstractNotification.TOP_RIGHT);
-				this.ml.purr.clear(AbstractNotification.TOP_LEFT);
-				this.ml.purr.clear(AbstractNotification.BOTTOM_RIGHT);
-				this.ml.purr.clear(AbstractNotification.BOTTOM_LEFT);
-				for (var i:int = NativeApplication.nativeApplication.openedWindows.length - 1; i >= 0; --i)
-				{
-					NativeWindow(NativeApplication.nativeApplication.openedWindows[i]).close();
-				}
+				this.visible = true;
+				this.nativeWindow.activate();
 			}
 			
+			private function onApplicationExiting(e:Event):void
+			{
+				e.preventDefault();
+				this.nativeApplication.removeEventListener(Event.EXITING, onApplicationExiting);
+				new AppExitEvent().dispatch();
+			}
 		]]>
 	</mx:Script>
 	<c:CommandBar left="0" right="0" top="0" height="30"/>
