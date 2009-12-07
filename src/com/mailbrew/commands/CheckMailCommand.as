@@ -12,6 +12,7 @@ package com.mailbrew.commands
 	import com.mailbrew.email.IEmailService;
 	import com.mailbrew.email.gmail.Gmail;
 	import com.mailbrew.email.imap.IMAP;
+	import com.mailbrew.email.wave.Wave;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
@@ -112,13 +113,31 @@ package com.mailbrew.commands
 			{
 				emailService = new Gmail(this.currentAccount.username, this.currentAccount.password);
 			}
+			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_WAVE)
+			{
+				emailService = new Wave(this.currentAccount.username, this.currentAccount.password);
+			}
 			
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+			emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			
 			this.ml.statusMessage = "Checking " + this.currentAccount.name + "...";
 			emailService.getUnseenEmailHeaders();
+		}
+		
+		private function onProtocolError(e:EmailEvent):void
+		{
+			trace("onProtocolError");
+			var emailService:IEmailService = e.target as IEmailService;
+			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+			var reason:String = "Protocol error.";
+			if (e.data != null)
+			{
+				reason += " [Error message: "+e.data+"]"; 
+			}
+			this.updateAccountAndContinue(false, reason);
 		}
 		
 		private function onAuthenticationFailed(e:EmailEvent):void

@@ -14,6 +14,7 @@ package com.mailbrew.email.gmail
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
 	import flash.net.URLStream;
+	import flash.system.System;
 	
 	import mx.utils.Base64Encoder;
 
@@ -23,6 +24,7 @@ package com.mailbrew.email.gmail
 	[Event(name="authenticationSucceeded", type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmailsCount",       type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmails",            type="com.mailbrew.email.EmailEvent")]
+	[Event(name="protocolError",           type="com.mailbrew.email.EmailEvent")]
 
 	public class Gmail extends EventDispatcher implements IEmailService
 	{
@@ -84,33 +86,43 @@ package com.mailbrew.email.gmail
 			}
 			this.dispatchEvent(new EmailEvent(EmailEvent.AUTHENTICATION_SUCCEEDED));
 			if (this.mode == EmailModes.AUTHENTICATION_TEST_MODE) return;
-			var urlLoader:URLLoader = e.target as URLLoader;
-			var response:XML = new XML(urlLoader.data);
-			if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
+			try
 			{
-				var unseenCount:Number = Number(response.PURL::fullcount);
-				var unseenCountEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS_COUNT);
-				var emailCounts:EmailCounts = new EmailCounts();
-				emailCounts.unseenEmails = unseenCount;
-				unseenCountEvent.data = emailCounts;
-				this.dispatchEvent(unseenCountEvent);
-			}
-			else if (this.mode == EmailModes.UNSEEN_EMAIL_HEADERS_MODE)
-			{
-				var unseenEmails:Vector.<EmailHeader> = new Vector.<EmailHeader>();
-				for each (var email:XML in response.PURL::entry)
+				var urlLoader:URLLoader = e.target as URLLoader;
+				var response:XML = new XML(urlLoader.data);
+				if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
 				{
-					var emailHeader:EmailHeader = new EmailHeader();
-					emailHeader.from = email.PURL::author.PURL::name;
-					emailHeader.id = email.PURL::id;
-					emailHeader.subject = email.PURL::title;
-					emailHeader.summary = email.PURL::summary;
-					emailHeader.url = email.PURL::link.@href;
-					unseenEmails.push(emailHeader);
+					var unseenCount:Number = Number(response.PURL::fullcount);
+					var unseenCountEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS_COUNT);
+					var emailCounts:EmailCounts = new EmailCounts();
+					emailCounts.unseenEmails = unseenCount;
+					unseenCountEvent.data = emailCounts;
+					this.dispatchEvent(unseenCountEvent);
 				}
-				var unseenEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS);
-				unseenEvent.data = unseenEmails;
-				this.dispatchEvent(unseenEvent);
+				else if (this.mode == EmailModes.UNSEEN_EMAIL_HEADERS_MODE)
+				{
+					var unseenEmails:Vector.<EmailHeader> = new Vector.<EmailHeader>();
+					for each (var email:XML in response.PURL::entry)
+					{
+						var emailHeader:EmailHeader = new EmailHeader();
+						emailHeader.from = email.PURL::author.PURL::name;
+						emailHeader.id = email.PURL::id;
+						emailHeader.subject = email.PURL::title;
+						emailHeader.summary = email.PURL::summary;
+						emailHeader.url = email.PURL::link.@href;
+						unseenEmails.push(emailHeader);
+					}
+					var unseenEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS);
+					unseenEvent.data = unseenEmails;
+					this.dispatchEvent(unseenEvent);
+				}
+				System.disposeXML(response);
+			}
+			catch (error:Error)
+			{
+				var protocolError:EmailEvent = new EmailEvent(EmailEvent.PROTOCOL_ERROR);
+				protocolError.data = "Something went wrong while parsing data from your Gmail account. [" + error.message + "]";
+				this.dispatchEvent(protocolError);
 			}
 		}
 		

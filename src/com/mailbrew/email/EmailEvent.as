@@ -10,6 +10,7 @@ package com.mailbrew.email
 		public static const AUTHENTICATION_SUCCEEDED:String = "authenticationSucceeded";
 		public static const UNSEEN_EMAILS_COUNT:String      = "unseenEmailsCount";
 		public static const UNSEEN_EMAILS:String            = "unseenEmails";
+		public static const PROTOCOL_ERROR:String           = "protocolError";
 		
 		public var data:*;
 		

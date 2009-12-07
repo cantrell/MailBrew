@@ -3,6 +3,7 @@ package com.mailbrew.email.imap
 	import com.mailbrew.email.EmailCounts;
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.EmailHeader;
+	import com.mailbrew.email.EmailModes;
 	import com.mailbrew.email.IEmailService;
 	
 	import flash.events.Event;
@@ -12,7 +13,6 @@ package com.mailbrew.email.imap
 	import flash.net.SecureSocket;
 	import flash.net.Socket;
 	import flash.utils.ByteArray;
-	import com.mailbrew.email.EmailModes;
 
 	[Event(name="connectionFailed",        type="com.mailbrew.email.EmailEvent")]
 	[Event(name="connectionSucceeded",     type="com.mailbrew.email.EmailEvent")]
@@ -20,6 +20,7 @@ package com.mailbrew.email.imap
 	[Event(name="authenticationSucceeded", type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmailsCount",       type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmails",            type="com.mailbrew.email.EmailEvent")]
+	[Event(name="protocolError",           type="com.mailbrew.email.EmailEvent")]
 
 	public class IMAP extends EventDispatcher implements IEmailService
 	{
@@ -178,30 +179,37 @@ package com.mailbrew.email.imap
 		
 		private function onGetStatus(bufferString:String):void
 		{
-			var statusData:String = bufferString.substring(bufferString.indexOf("(")+1, bufferString.indexOf(")"));
-			var dataArray:Array = statusData.split(" ");
-			var messages:Number = 0;
-			var unseen:Number = 0;
-			for (var i:uint = 0; i < dataArray.length; ++i)
+			try
 			{
-				if (dataArray[i] == "MESSAGES")
+				var statusData:String = bufferString.substring(bufferString.indexOf("(")+1, bufferString.indexOf(")"));
+				var dataArray:Array = statusData.split(" ");
+				var messages:Number = 0;
+				var unseen:Number = 0;
+				for (var i:uint = 0; i < dataArray.length; ++i)
 				{
-					messages = Number(dataArray[i+1]);
-					continue;
+					if (dataArray[i] == "MESSAGES")
+					{
+						messages = Number(dataArray[i+1]);
+						continue;
+					}
+					if (dataArray[i] == "UNSEEN")
+					{
+						unseen = Number(dataArray[i+1]);
+						continue;
+					}
 				}
-				if (dataArray[i] == "UNSEEN")
-				{
-					unseen = Number(dataArray[i+1]);
-					continue;
-				}
+				var emailEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS_COUNT);
+				var counts:EmailCounts = new EmailCounts();
+				counts.totalEmails = messages;
+				counts.unseenEmails = unseen;
+				emailEvent.data = counts;
+				this.dispatchEvent(emailEvent);
+				this.stop();
 			}
-			var emailEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS_COUNT);
-			var counts:EmailCounts = new EmailCounts();
-			counts.totalEmails = messages;
-			counts.unseenEmails = unseen;
-			emailEvent.data = counts;
-			this.dispatchEvent(emailEvent);
-			this.stop();
+			catch (error:Error)
+			{
+				this.dispatchProtocolError("Error getting status. [" + error.message+ "]");
+			}
 		}
 		
 		private function selectInbox():void
@@ -242,40 +250,47 @@ package com.mailbrew.email.imap
 
 		private function parseMessages(bufferString:String):Vector.<EmailHeader>
 		{
-			var rawMessages:Array = bufferString.split(CRLF+CRLF+")"+CRLF);
-			rawMessages.pop();
 			var messageData:Vector.<EmailHeader> = new Vector.<EmailHeader>();
-			for each (var rawMessage:String in rawMessages)
+			try
 			{
-				var messageParts:Array = rawMessage.split(CRLF);
-				var id:Number = NaN;
-				var from:String = null;
-				var subject:String = null;
-				for each (var messagePart:String in messageParts)
+				var rawMessages:Array = bufferString.split(CRLF+CRLF+")"+CRLF);
+				rawMessages.pop();
+				for each (var rawMessage:String in rawMessages)
 				{
-					if (messagePart.search(/^\*/) != -1)
+					var messageParts:Array = rawMessage.split(CRLF);
+					var id:Number = NaN;
+					var from:String = null;
+					var subject:String = null;
+					for each (var messagePart:String in messageParts)
 					{
-						id = Number(messagePart.substring(2, rawMessage.indexOf("FETCH")));
+						if (messagePart.search(/^\*/) != -1)
+						{
+							id = Number(messagePart.substring(2, rawMessage.indexOf("FETCH")));
+						}
+						else if (messagePart.search(/^From:/) != -1)
+						{
+							from = messagePart.substr(6, messagePart.length);
+							from = from.replace(/ <.+>/, "");
+							from = from.replace(/\"/g, "");
+						}
+						else if (messagePart.search(/^Subject:/) != -1)
+						{
+							subject = messagePart.substr(9, messagePart.length);
+						}
 					}
-					else if (messagePart.search(/^From:/) != -1)
+					if (!isNaN(id) && from != null && subject != null)
 					{
-						from = messagePart.substr(6, messagePart.length);
-						from = from.replace(/ <.+>/, "");
-						from = from.replace(/\"/g, "");
-					}
-					else if (messagePart.search(/^Subject:/) != -1)
-					{
-						subject = messagePart.substr(9, messagePart.length);
+						var email:EmailHeader = new EmailHeader();
+						email.id = String(id);
+						email.from = from;
+						email.subject = subject;
+						messageData.push(email);
 					}
 				}
-				if (!isNaN(id) && from != null && subject != null)
-				{
-					var email:EmailHeader = new EmailHeader();
-					email.id = String(id);
-					email.from = from;
-					email.subject = subject;
-					messageData.push(email);
-				}
+			}
+			catch (error:Error)
+			{
+				this.dispatchProtocolError("Unexpected error parsing message data. [" + error.message + "]");
 			}
 			return messageData;
 		}
@@ -284,6 +299,13 @@ package com.mailbrew.email.imap
 		{
 			this.tag = tag;
 			this.doneRegExp = new RegExp(tag + ".+\\r\\n");
+		}
+		
+		private function dispatchProtocolError(msg:String):void
+		{
+			var pe:EmailEvent = new EmailEvent(EmailEvent.PROTOCOL_ERROR);
+			pe.data = msg;
+			this.dispatchEvent(pe);
 		}
 	}
 }

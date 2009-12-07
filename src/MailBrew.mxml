@@ -29,7 +29,7 @@
 			import mx.events.PropertyChangeEvent;
 			import mx.messaging.events.ChannelEvent;
 			
-			[Bindable] private var accountTypes:Array = [AccountTypes.IMAP, AccountTypes.GMAIL];
+			[Bindable] private var accountTypes:Array = [AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE];
 			private var controller:Controller;
 			private var ml:ModelLocator;
 			
@@ -61,15 +61,20 @@
 
 			private function onAccountFormViewChange(e:PropertyChangeEvent):void
 			{
-				if (this.ml.accountFormView == AccountTypes.GMAIL)
+				if (this.ml.accountFormView == AccountTypes.IMAP)
+				{
+					accountType.selectedIndex = 0;
+					this.formView.selectedChild = imapForm;
+				}
+				else if (this.ml.accountFormView == AccountTypes.GMAIL)
 				{
 					accountType.selectedIndex = 1;
 					this.formView.selectedChild = gmailForm;
 				}
 				else
 				{
-					accountType.selectedIndex = 0;
-					this.formView.selectedChild = imapForm;
+					accountType.selectedIndex = 2;
+					this.formView.selectedChild = waveForm;
 				}
 			}
 
@@ -126,6 +131,7 @@
 					<mx:ViewStack id="formView" width="100%" height="100%" creationPolicy="all">
 						<c:IMAPForm id="imapForm"/>
 						<c:GmailForm id="gmailForm"/>
+						<c:WaveForm id="waveForm"/>
 					</mx:ViewStack>
 				</mx:VBox>
 			</mx:ViewStack>

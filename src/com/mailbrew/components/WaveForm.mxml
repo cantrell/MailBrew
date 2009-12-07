@@ -14,9 +14,8 @@
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.events.PropertyChangeEvent;
-			
 			private var accountId:Number;
-
+			
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
@@ -27,9 +26,9 @@
 				this.clearData();
 				var ml:ModelLocator = ModelLocator.getInstance();
 				if (ml.accountInfo == null) return;
-				if (ml.accountInfo.accountType == AccountTypes.IMAP)
+				if (ml.accountInfo.accountType == AccountTypes.GOOGLE_WAVE)
 				{
-					ml.accountFormView = AccountTypes.IMAP;
+					ml.accountFormView = AccountTypes.GOOGLE_WAVE;
 					this.setData(ml.accountInfo);
 				}
 			}
@@ -37,15 +36,12 @@
 			private function onSave():void
 			{
 				var sae:SaveAccountEvent = new SaveAccountEvent();
-				sae.accountType = AccountTypes.IMAP;
+				sae.accountType = AccountTypes.GOOGLE_WAVE;
 				sae.saveMode = (isNaN(this.accountId)) ? AccountSaveMode.INSERT : AccountSaveMode.UPDATE;
 				sae.accountId = this.accountId;
 				sae.accountName = this.accountNameInput.text;
 				sae.username = this.usernameInput.text;
 				sae.password = this.passwordInput.text;
-				sae.imapServer = this.imapServerInput.text;
-				sae.portNumber = Number(this.portNumberInput.text);
-				sae.secure = this.secureCheckBox.selected;
 				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
 				sae.sound = null; // TBD: implement sounds
 				sae.active = this.activeCheckbox.selected;
@@ -58,12 +54,9 @@
 				this.accountNameInput.text = accountInfo.accountName;
 				this.usernameInput.text = accountInfo.username;
 				this.passwordInput.text = accountInfo.password;
-				this.imapServerInput.text = accountInfo.imapServer;
-				this.portNumberInput.text = String(accountInfo.portNumber);
-				this.secureCheckBox.selected = accountInfo.secure;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
-				this.activeCheckbox.selected = accountInfo.active;
 				// TBD: implement sounds
+				this.activeCheckbox.selected = accountInfo.active;
 				this.saveButton.label = "Update";
 			}
 			
@@ -73,35 +66,28 @@
 				this.accountNameInput.text = "";
 				this.usernameInput.text = "";
 				this.passwordInput.text = "";
-				this.imapServerInput.text = "";
-				this.portNumberInput.text = "";
-				this.secureCheckBox.selected = false;
 				this.notificationPositionInput.clearSelection();
 				// TBD: implement sounds
 				this.activeCheckbox.selected = true;
 				this.saveButton.label = "Save";
 			}
-			
+
 		]]>
 	</mx:Script>
+	<mx:Text width="100%">
+		<mx:text>
+			<mx:String>Note: Google Wave support is currently experimental. If something breaks, expect an application update very soon.</mx:String>
+		</mx:text>
+	</mx:Text>
 	<mx:Form width="100%">
 		<mx:FormItem label="Account Name">
 			<mx:TextInput id="accountNameInput" width="200"/>
 		</mx:FormItem>
-		<mx:FormItem label="Username">
+		<mx:FormItem label="Google Username">
 			<mx:TextInput id="usernameInput" width="200"/>
 		</mx:FormItem>
-		<mx:FormItem label="Password">
+		<mx:FormItem label="Google Password">
 			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true"/>
-		</mx:FormItem>
-		<mx:FormItem label="IMAP Server">
-			<mx:TextInput id="imapServerInput" width="200"/>
-		</mx:FormItem>
-		<mx:FormItem label="Port Number">
-			<mx:TextInput id="portNumberInput" width="50"/>
-		</mx:FormItem>
-		<mx:FormItem label="Secure?">
-			<mx:CheckBox id="secureCheckBox"/>
 		</mx:FormItem>
 		<mx:FormItem label="Notification Position">
 			<c:PositionComboBox id="notificationPositionInput"/>

@@ -22,6 +22,7 @@ package com.mailbrew.email.wave
 	[Event(name="authenticationSucceeded", type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmailsCount",       type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmails",            type="com.mailbrew.email.EmailEvent")]
+	[Event(name="protocolError",           type="com.mailbrew.email.EmailEvent")]
 
 	public class Wave extends EventDispatcher implements IEmailService
 	{
@@ -68,7 +69,8 @@ package com.mailbrew.email.wave
 		
 		private function getInbox():void
 		{
-			this.internalMode = "getInbox";
+			this.status = NaN;
+			this.internalMode = "inbox";
 			var urlLoader:URLLoader = new URLLoader();
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
@@ -77,6 +79,22 @@ package com.mailbrew.email.wave
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.nouacheck = "";
+			urlVars.auth = this.authToken;
+			req.data = urlVars;
+			urlLoader.load(req);
+		}
+		
+		private function logout():void
+		{
+			this.status = NaN;
+			this.internalMode = "logout";
+			var urlLoader:URLLoader = new URLLoader();
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+			urlLoader.addEventListener(Event.COMPLETE, onComplete);
+			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+			var req:URLRequest = new URLRequest(LOGOUT_URL);
+			req.method = URLRequestMethod.GET;
+			var urlVars:URLVariables = new URLVariables();
 			urlVars.auth = this.authToken;
 			req.data = urlVars;
 			urlLoader.load(req);
@@ -96,10 +114,14 @@ package com.mailbrew.email.wave
 		
 		private function onComplete(e:Event):void
 		{
+			if (this.status != 200)
+			{
+				this.dispatchProtocolError("Unexpected response code: [" + this.status + "]");
+				return;
+			}
 			this.dispatchEvent(new EmailEvent(EmailEvent.CONNECTION_SUCCEEDED));
 			var urlLoader:URLLoader = e.target as URLLoader;
 			var response:String = urlLoader.data as String;
-			//trace(response);
 			if (this.internalMode == "login")
 			{
 				var responseStrings:Array = response.split("\n");
@@ -130,60 +152,73 @@ package com.mailbrew.email.wave
 						this.getInbox();
 					}
 				}
-			}
-			else if (this.internalMode == "getInbox")
-			{
-				var inboxString:String = INBOX_RE.exec(response)[1];
-				var inboxObj:Object = JSON.decode(inboxString, true);
-				var p:Object = inboxObj.p;
-				var inbox:Array = p[1]; // This is the entire inbox -- everything you see when you log into Wave
-				var messageTotal:Number = 0;
-				var unreadTotal:Number = 0;
-				var emailHeaders:Vector.<EmailHeader> = new Vector.<EmailHeader>();
-				for each (var thread:Object in inbox)
+				else
 				{
-					var i:uint;
-					var unread:Number = thread[7];
-					messageTotal += thread[6];
-					unreadTotal += unread;
-					if (unread == 0) continue;
-					var emailHeader:EmailHeader = new EmailHeader();
-					emailHeader.id = thread[1];
-					emailHeader.url = "https://wave.google.com/wave/#restored:wave:" + encodeURIComponent(encodeURIComponent(emailHeader.id)); // Encoded twice? Don't ask me, but it works.
-					var fromInformation:Array = thread[5];
-					var fromString:String = new String();
-					for (i = 0; i < fromInformation.length; ++i)
+					this.dispatchProtocolError("Login attempt failed. Request returned an unexpected response: [" + response + "]");
+					return;
+				}
+			}
+			else if (this.internalMode == "inbox")
+			{
+				try
+				{
+					var inboxString:String = INBOX_RE.exec(response)[1];
+					var inboxObj:Object = JSON.decode(inboxString, true);
+					var p:Object = inboxObj.p;
+					var inbox:Array = p[1]; // This is the entire inbox -- everything you see when you log into Wave
+					var messageTotal:Number = 0;
+					var unreadTotal:Number = 0;
+					var emailHeaders:Vector.<EmailHeader> = new Vector.<EmailHeader>();
+					for each (var thread:Object in inbox)
 					{
-						var fromStrTmp:String = fromInformation[i];
-						fromString += fromStrTmp.substring(0, fromStrTmp.indexOf("@"));
-						if (i == FROM_MAX - 1)
+						var i:uint;
+						var unread:Number = thread[7];
+						messageTotal += thread[6];
+						unreadTotal += unread;
+						if (unread == 0) continue;
+						var emailHeader:EmailHeader = new EmailHeader();
+						emailHeader.id = thread[1];
+						emailHeader.url = "https://wave.google.com/wave/#restored:wave:" + encodeURIComponent(encodeURIComponent(emailHeader.id)); // Must be encoded twice.
+						var fromInformation:Array = thread[5];
+						var fromString:String = new String();
+						for (i = 0; i < fromInformation.length; ++i)
 						{
-							if (fromInformation.length > FROM_MAX)
+							var fromStrTmp:String = fromInformation[i];
+							fromString += fromStrTmp.substring(0, fromStrTmp.indexOf("@"));
+							if (i == FROM_MAX - 1)
 							{
-								fromString += "...";
+								if (fromInformation.length > FROM_MAX)
+								{
+									fromString += "...";
+								}
+								break;
 							}
-							break;
+							if (i != fromInformation.length - 1) fromString += ", ";
 						}
-						if (i != fromInformation.length - 1) fromString += ", ";
-					}
-					var summaryInformation:Array = thread[10];
-					var summary:String = new String();
-					for (i = 0; i < summaryInformation.length; ++i)
-					{
-						summary += summaryInformation[i][1];
-						if (i == FROM_MAX - 1)
+						var summaryInformation:Array = thread[10];
+						var summary:String = new String();
+						for (i = 0; i < summaryInformation.length; ++i)
 						{
-							if (summaryInformation.length > FROM_MAX)
+							summary += summaryInformation[i][1];
+							if (i == FROM_MAX - 1)
 							{
-								summary += "...";
+								if (summaryInformation.length > FROM_MAX)
+								{
+									summary += "...";
+								}
+								break;
 							}
-							break;
+							if (i != summaryInformation.length - 1) summary += "...";
 						}
-						if (i != summaryInformation.length - 1) summary += "...";
+						emailHeader.from = fromString;
+						emailHeader.summary = summary;
+						emailHeaders.push(emailHeader);
 					}
-					emailHeader.from = fromString;
-					emailHeader.summary = summary;
-					emailHeaders.push(emailHeader);
+				}
+				catch (error:Error)
+				{
+					this.dispatchProtocolError("Error parsing inbox. Google might have changed something. Expect an update soon. [" +error.message+ "]");
+					return;
 				}
 				if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
 				{
@@ -200,8 +235,19 @@ package com.mailbrew.email.wave
 					unseenEmailEvent.data = emailHeaders;
 					this.dispatchEvent(unseenEmailEvent);
 				}
-				// TBD: Logout
+				this.logout();
 			}
+			else if (this.internalMode == "logout")
+			{
+				// Not much to do. Bye.
+			}
+		}
+		
+		private function dispatchProtocolError(msg:String):void
+		{
+			var pe:EmailEvent = new EmailEvent(EmailEvent.PROTOCOL_ERROR);
+			pe.data = msg;
+			this.dispatchEvent(pe);
 		}
 		
 		public function testAccount():void
@@ -221,6 +267,5 @@ package com.mailbrew.email.wave
 			this.mode = EmailModes.UNSEEN_EMAIL_HEADERS_MODE;
 			this.login();
 		}
-
 	}
 }
