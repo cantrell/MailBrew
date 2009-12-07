@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete();">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete();">
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.data.AccountInfo;
@@ -115,15 +115,13 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:List id="accountList" width="100%" height="100%" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);">
+	<mx:List id="accountList" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);" bottom="40" top="0" right="0" left="0">
 		<mx:itemRenderer>
 			<mx:Component>
 				<mx:Label text="{data.label}" color="{outerDocument.determineFontColor(data.active, data.working)}" rightClick="outerDocument.onRightClick(event, data);"/>
 			</mx:Component>
 		</mx:itemRenderer>
 	</mx:List>
-	<mx:HBox width="100%" horizontalAlign="center">
-		<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddClass}" click="onAddAccount();" width="40"/>
-		<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40"/>
-	</mx:HBox>
-</mx:VBox>
+	<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddClass}" click="onAddAccount();" width="40" bottom="5" left="5"/>
+	<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40" bottom="5" right="5"/>
+</mx:Canvas>

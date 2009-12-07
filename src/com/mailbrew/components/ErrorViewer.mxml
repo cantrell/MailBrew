@@ -6,5 +6,5 @@
 			[Bindable] public var errorMessage:String;
 		]]>
 	</mx:Script>
-	<mx:TextArea width="100%" height="100%" text="{this.errorMessage}" editable="false"/>
+	<mx:TextArea text="{this.errorMessage}" editable="false" top="0" right="0" bottom="0" left="0"/>
 </mx:Window>

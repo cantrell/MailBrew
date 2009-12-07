@@ -195,6 +195,8 @@ package com.mailbrew.email.wave
 							}
 							if (i != fromInformation.length - 1) fromString += ", ";
 						}
+						emailHeader.from = fromString;
+						emailHeader.subject = thread[9][1];
 						var summaryInformation:Array = thread[10];
 						var summary:String = new String();
 						for (i = 0; i < summaryInformation.length; ++i)
@@ -210,7 +212,6 @@ package com.mailbrew.email.wave
 							}
 							if (i != summaryInformation.length - 1) summary += "...";
 						}
-						emailHeader.from = fromString;
 						emailHeader.summary = summary;
 						emailHeaders.push(emailHeader);
 					}
@@ -235,7 +236,9 @@ package com.mailbrew.email.wave
 					unseenEmailEvent.data = emailHeaders;
 					this.dispatchEvent(unseenEmailEvent);
 				}
-				this.logout();
+				// Logging out logs out the browser client, as well.
+				// Best to skip it until we have real API support.
+				//this.logout();
 			}
 			else if (this.internalMode == "logout")
 			{

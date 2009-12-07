@@ -115,27 +115,20 @@
 			
 		]]>
 	</mx:Script>
-	<mx:VBox width="100%" height="100%">
-		<c:CommandBar width="100%"/>
-		<mx:HDividedBox width="100%" height="100%">
-			<c:AccountList width="30%" height="100%"/>
-			<mx:ViewStack id="mainAppView" width="100%" height="100%" creationPolicy="all">
-				<mx:Canvas id="instructionsView">
-					<mx:Label text="Instructions Here..."/>
-				</mx:Canvas>
-				<mx:VBox id="workingView" width="100%" height="100%" horizontalAlign="center">
-					<mx:VBox width="100%" horizontalAlign="center">
-						<mx:Label text="Account Data"/>
-						<mx:ToggleButtonBar id="accountType" dataProvider="{accountTypes}" itemClick="onAccountTypeChange(event);"/>
-					</mx:VBox>
-					<mx:ViewStack id="formView" width="100%" height="100%" creationPolicy="all">
-						<c:IMAPForm id="imapForm"/>
-						<c:GmailForm id="gmailForm"/>
-						<c:WaveForm id="waveForm"/>
-					</mx:ViewStack>
-				</mx:VBox>
+	<c:CommandBar left="0" right="0" top="0" height="30"/>
+	<c:AccountList left="0" top="30" bottom="30" width="100"/>
+	<mx:ViewStack id="mainAppView" creationPolicy="all" left="100" right="0" top="30" bottom="30">
+		<mx:Canvas id="instructionsView" left="0" right="0" top="0" bottom="0">
+			<mx:Label text="Instructions Here..."/>
+		</mx:Canvas>
+		<mx:Canvas id="workingView" left="0" right="0" top="0" bottom="0">
+			<mx:ToggleButtonBar id="accountType" dataProvider="{accountTypes}" itemClick="onAccountTypeChange(event);" top="0" left="50" right="50"/>
+			<mx:ViewStack id="formView" creationPolicy="all" top="20">
+				<c:IMAPForm id="imapForm"/>
+				<c:GmailForm id="gmailForm"/>
+				<c:WaveForm id="waveForm"/>
 			</mx:ViewStack>
-		</mx:HDividedBox>
-		<c:Status/>
-	</mx:VBox>
+		</mx:Canvas>
+	</mx:ViewStack>
+	<c:Status bottom="0" left="0" right="0" height="25"/>
 </mx:WindowedApplication>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
-		 xmlns:c="com.mailbrew.components.*"
-		 width="100%" height="100%"
-		 horizontalAlign="center" verticalAlign="middle"
-		 creationComplete="onCreationComplete();">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:c="com.mailbrew.components.*"
+		   creationComplete="onCreationComplete();">
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.data.AccountInfo;
@@ -74,7 +72,7 @@
 
 		]]>
 	</mx:Script>
-	<mx:Form width="100%">
+	<mx:Form left="0" right="0" top="0" bottom="30">
 		<mx:FormItem label="Account Name">
 			<mx:TextInput id="accountNameInput" width="200"/>
 		</mx:FormItem>
@@ -91,5 +89,5 @@
 			<mx:CheckBox id="activeCheckbox" selected="true"/>
 		</mx:FormItem>
 	</mx:Form>
-	<mx:Button id="saveButton" label="Save" click="onSave();"/>
-</mx:VBox>
+	<mx:Button id="saveButton" label="Save" click="onSave();" left="149" right="141" bottom="0"/>
+</mx:Canvas>

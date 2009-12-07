@@ -33,7 +33,8 @@ package com.mailbrew.commands
 		private var oldUnseenEmails:Array;
 		private var unseenTotal:Number;
 		private var ml:ModelLocator;
-		private var menu:NativeMenu;
+		private var topLevelMenu:NativeMenu;
+		private var serviceMenu:NativeMenu;
 		
 		public function execute(e:CairngormEvent):void
 		{
@@ -47,8 +48,7 @@ package com.mailbrew.commands
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				accountData = e.data;
 				unseenTotal = 0;
-				menu = new NativeMenu();
-				menu.addEventListener(Event.SELECT, onMenuItemSelected);
+				topLevelMenu = new NativeMenu();
 				checkEmailLoop();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
@@ -77,7 +77,7 @@ package com.mailbrew.commands
 				this.ml.checkEmailLock = false;
 				
 				// Set the menu
-				this.ml.purr.setMenu(this.menu);
+				this.ml.purr.setMenu(this.topLevelMenu);
 				
 				// Update the app icon
 				var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
@@ -100,6 +100,9 @@ package com.mailbrew.commands
 				this.checkEmailLoop();
 				return;
 			}
+			this.serviceMenu = new NativeMenu();
+			this.serviceMenu.addEventListener(Event.SELECT, onMenuItemSelected);
+			this.topLevelMenu.addSubmenuAt(this.serviceMenu, 0, this.currentAccount.name);
 			var emailService:IEmailService;
 			if (this.currentAccount.account_type == AccountTypes.IMAP)
 			{
@@ -176,15 +179,6 @@ package com.mailbrew.commands
 				this.updateAccountAndContinue(true, null);
 				return;
 			}
-			// If unseenTotal isn't 0, that means unseen emails have already been found
-			// in other accounts and added to the NativeMenu. And since we know that
-			// we just found more unseen email, this is a good time and place to add
-			// a separator to the NativeMenu.
-			if (this.unseenTotal > 0)
-			{
-				var separator:NativeMenuItem = new NativeMenuItem(null, true);
-				this.menu.addItem(separator);
-			}
 			this.unseenTotal += this.newUnseenEmails.length;
 			this.getOldUnseenEmails();
 		}
@@ -209,9 +203,25 @@ package com.mailbrew.commands
 			newEmailLoop: for (var i:uint = 0; i < this.newUnseenEmails.length; ++i)
 			{
 				var emailHeader:EmailHeader = this.newUnseenEmails[i];
-				var menuItem:NativeMenuItem = new NativeMenuItem(emailHeader.from + " - " + emailHeader.subject);
-				menuItem.data = emailHeader.url;
-				this.menu.addItem(menuItem);
+				var subject:String = new String();
+				if (emailHeader.subject != null)
+				{
+					subject = emailHeader.subject;
+				}
+				else if (emailHeader.summary != null)
+				{
+					subject = emailHeader.summary;
+				}
+				var menuItem:NativeMenuItem = new NativeMenuItem(emailHeader.from + " - " + subject);
+				if (emailHeader.url != null)
+				{
+					menuItem.data = emailHeader.url;
+				}
+				else
+				{
+					menuItem.enabled = false;
+				}
+				this.serviceMenu.addItem(menuItem);
 				oldEmailLoop: for (var j:uint = 0; j < this.oldUnseenEmails.length; ++j)
 				{
 					var oldEmail:Object = this.oldUnseenEmails[j];

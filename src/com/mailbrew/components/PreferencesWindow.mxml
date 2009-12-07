@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="335" height="280" type="utility" creationComplete="onCreationComplete();" title="MailBrew Preferences">
+	<mx:Script>
+		<![CDATA[
+			private function onCreationComplete():void
+			{
+				
+			}
+			
+			private function onSave():void
+			{
+				
+			}
+
+			private function onCancel():void
+			{
+				
+			}
+		]]>
+	</mx:Script>
+
+	<mx:Label text="Update Interval (minutes)" fontWeight="bold" left="4" y="5"/>
+	<mx:Text y="20" width="211" left="6"><mx:text><mx:String>How often should MailBrew check for new messages?</mx:String></mx:text></mx:Text>
+	<mx:NumericStepper id="updateIntervalStepper" minimum="1" maximum="60" right="20" width="57" y="5"/>
+
+	<mx:Label text="Notification Display Length (seconds)" fontWeight="bold" left="4" y="60" width="215"/>
+	<mx:Text y="75" width="210" left="6"><mx:text><mx:String>How long should notifications be displayed?</mx:String></mx:text></mx:Text>
+	<mx:NumericStepper id="notificationDisplayLengthStepper" minimum="5" maximum="30" right="20" width="57" y="60"/>
+
+	<mx:Label text="Idle Period (minutes)" y="115" fontWeight="bold" left="4"/>
+	<mx:Text y="130" width="210" left="6"><mx:text><mx:String>How long should you be idle (no keyboard input) before MailBrew starts queuing up notifications?</mx:String></mx:text></mx:Text>
+	<mx:NumericStepper id="idlePeriodStepper" minimum="5" maximum="60" y="115" right="20"/>
+
+	<mx:Label text="Start at Login" fontWeight="bold" y="185" left="4"/>
+	<mx:Text y="200" width="210" left="6"><mx:text><mx:String>Should MailBrew start automatically when you log in?</mx:String></mx:text></mx:Text>
+	<mx:CheckBox id="startAtLoginCheckbox" y="185" right="60"/>
+
+	<mx:Button id="saveButton" label="Save" click="onSave();" bottom="4" left="90"/>
+	<mx:Button id="cancelButton" label="Cancel" click="onCancel();" bottom="4" right="90"/>
+		
+</mx:Window>

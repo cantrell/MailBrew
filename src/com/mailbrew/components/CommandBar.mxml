@@ -2,6 +2,7 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.air.preferences.Preference;
 			import com.mailbrew.events.CheckMailEvent;
 			import com.mailbrew.model.ModelLocator;
 			
@@ -12,7 +13,8 @@
 
 			private function onOpenSettings():void
 			{
-				// TBD
+				var prefsWin:PreferencesWindow = new PreferencesWindow();
+				prefsWin.open();
 			}
 			
 			private function onOpenAbout():void
