@@ -35,7 +35,8 @@
 						   "Confirm",
 						   Alert.YES|Alert.NO,
 						   null,
-						   onRemoveAccountConfirm);
+						   onRemoveAccountConfirm,
+						   ml.faceSurpriseIconClass);
 			}
 			
 			private function onRemoveAccountConfirm(e:CloseEvent):void
@@ -122,6 +123,6 @@
 			</mx:Component>
 		</mx:itemRenderer>
 	</mx:List>
-	<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddClass}" click="onAddAccount();" width="40" bottom="5" left="5"/>
-	<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40" bottom="5" right="5"/>
+	<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddIconClass}" click="onAddAccount();" width="40" bottom="5" left="5"/>
+	<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40" bottom="5" right="5"/>
 </mx:Canvas>

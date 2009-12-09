@@ -114,6 +114,12 @@ package com.mailbrew.email.wave
 		
 		private function onComplete(e:Event):void
 		{
+			if (this.status == 403)
+			{
+				var authFailedEvent:EmailEvent = new EmailEvent(EmailEvent.AUTHENTICATION_FAILED);
+				this.dispatchEvent(authFailedEvent);
+				return;
+			}
 			if (this.status != 200)
 			{
 				this.dispatchProtocolError("Unexpected response code: [" + this.status + "]");
@@ -137,9 +143,9 @@ package com.mailbrew.email.wave
 				}
 				if (responseObj["Error"] != null)
 				{
-					var authFailedEvent:EmailEvent = new EmailEvent(EmailEvent.AUTHENTICATION_FAILED);
-					authFailedEvent.data = response.substring(response.indexOf("=") + 1, response.indexOf("\n"));
-					this.dispatchEvent(authFailedEvent);
+					var authFailedEvent2:EmailEvent = new EmailEvent(EmailEvent.AUTHENTICATION_FAILED);
+					authFailedEvent2.data = response.substring(response.indexOf("=") + 1, response.indexOf("\n"));
+					this.dispatchEvent(authFailedEvent2);
 				}
 				else if (responseObj["Auth"] != null)
 				{

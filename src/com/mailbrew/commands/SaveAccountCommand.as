@@ -25,7 +25,7 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				new PopulateAccountListEvent().dispatch();
-				Alert.show("Your account information has been saved.", "Account Saved", Alert.OK);
+				Alert.show("Your account information has been saved.", "Account Saved", Alert.OK, null, null, ml.faceSmileIconClass);
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			if (sae.saveMode == AccountSaveMode.INSERT)

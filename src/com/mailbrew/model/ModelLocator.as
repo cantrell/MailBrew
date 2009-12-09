@@ -19,8 +19,14 @@ package com.mailbrew.model
 	{
 		protected static var inst:ModelLocator;
 		
-		[Bindable] [Embed(source="assets/list-add.png")] public var listAddClass:Class;
-		[Bindable] [Embed(source="assets/list-remove.png")] public var listRemoveClass:Class;
+		[Bindable] [Embed(source="assets/list-add.png")] public var listAddIconClass:Class;
+		[Bindable] [Embed(source="assets/list-remove.png")] public var listRemoveIconClass:Class;
+		[Bindable] [Embed(source="assets/face-smile.png")] public var faceSmileIconClass:Class;
+		[Bindable] [Embed(source="assets/face-crying.png")] public var faceCryingIconClass:Class;
+		[Bindable] [Embed(source="assets/face-surprise.png")] public var faceSurpriseIconClass:Class;
+		[Bindable] [Embed(source="assets/emblem-system.png")] public var configureIconClass:Class;
+		[Bindable] [Embed(source="assets/help-browser.png")] public var aboutIconClass:Class;
+		[Bindable] [Embed(source="assets/view-refresh.png")] public var checkNowIconClass:Class;
 		
         [Embed(source="assets/dynamic_logo_128.png")]
         public var DynamicIconClass:Class;

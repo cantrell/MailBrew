@@ -8,6 +8,7 @@
 			import com.mailbrew.data.AccountSaveMode;
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.events.SaveAccountEvent;
+			import com.mailbrew.events.VerifyAccountEvent;
 			import com.mailbrew.model.ModelLocator;
 			
 			import mx.binding.utils.ChangeWatcher;
@@ -18,6 +19,7 @@
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
+				this.onFormChange();
 			}
 			
 			private function onAccountInfoChange(e:PropertyChangeEvent):void
@@ -63,6 +65,7 @@
 				this.activeCheckbox.selected = accountInfo.active;
 				// TBD: implement sounds
 				this.saveButton.label = "Update";
+				this.onFormChange();
 			}
 			
 			public function clearData():void
@@ -79,24 +82,50 @@
 				this.activeCheckbox.selected = true;
 				this.saveButton.label = "Save";
 			}
+
+			private function isFormComplete():Boolean
+			{
+				if (usernameInput.text.length > 0 && passwordInput.length > 0 && accountNameInput.text.length > 0 && imapServerInput.text.length > 0 && portNumberInput.text.length > 0) return true;
+				return false;
+			}
 			
+			private function onFormChange():void
+			{
+				var formComplete:Boolean = this.isFormComplete();
+				saveButton.enabled = formComplete;
+				verifyButton.enabled = formComplete;
+			}
+			
+			private function onVerify():void
+			{
+				if (!this.isFormComplete()) return;
+				var vae:VerifyAccountEvent = new VerifyAccountEvent();
+				vae.accountType = AccountTypes.IMAP;
+				vae.username = this.usernameInput.text;
+				vae.password = this.passwordInput.text;
+				vae.server = this.imapServerInput.text;
+				vae.portNumber = Number(this.portNumberInput.text);
+				vae.secure = this.secureCheckBox.selected;
+				vae.dispatch();
+			}
+
 		]]>
 	</mx:Script>
 	<mx:Form bottom="30" left="0" right="0" top="0">
 		<mx:FormItem label="Account Name">
-			<mx:TextInput id="accountNameInput" width="200"/>
+			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Username">
-			<mx:TextInput id="usernameInput" width="200"/>
+			<mx:TextInput id="usernameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Password">
-			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true"/>
+			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="IMAP Server">
-			<mx:TextInput id="imapServerInput" width="200"/>
+			<mx:TextInput id="imapServerInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Port Number">
-			<mx:TextInput id="portNumberInput" width="50"/>
+			<mx:TextInput id="portNumberInput" width="50" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Secure?">
 			<mx:CheckBox id="secureCheckBox"/>
@@ -108,5 +137,6 @@
 			<mx:CheckBox id="activeCheckbox" selected="true"/>
 		</mx:FormItem>
 	</mx:Form>
-	<mx:Button id="saveButton" label="Save" click="onSave();" bottom="0" left="147" right="143"/>
+	<mx:Button id="saveButton" label="Save" click="onSave();" left="100" bottom="0"/>
+	<mx:Button id="verifyButton" label="Verify" click="onVerify();" right="100" bottom="0"/>
 </mx:Canvas>

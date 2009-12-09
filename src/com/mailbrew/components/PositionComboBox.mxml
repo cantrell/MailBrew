@@ -14,7 +14,7 @@
 				this.dp.addItem({label:"Top Left", data:AbstractNotification.TOP_LEFT});
 				this.dp.addItem({label:"Top Right", data:AbstractNotification.TOP_RIGHT});
 				this.dp.addItem({label:"Bottom Left", data:AbstractNotification.BOTTOM_LEFT});
-				this.dp.addItem({label:"Bottm Right", data:AbstractNotification.BOTTOM_RIGHT});
+				this.dp.addItem({label:"Bottom Right", data:AbstractNotification.BOTTOM_RIGHT});
 				this.dataProvider = dp;
 			}
 			

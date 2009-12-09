@@ -7,6 +7,7 @@
 			import com.mailbrew.data.PreferenceKeys;
 			import com.mailbrew.events.SavePreferencesEvent;
 			import com.mailbrew.model.ModelLocator;
+			
 			private function onCreationComplete():void
 			{
 				var ml:ModelLocator = ModelLocator.getInstance();

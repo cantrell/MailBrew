@@ -8,6 +8,7 @@
 			import com.mailbrew.data.AccountSaveMode;
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.events.SaveAccountEvent;
+			import com.mailbrew.events.VerifyAccountEvent;
 			import com.mailbrew.model.ModelLocator;
 			
 			import mx.binding.utils.ChangeWatcher;
@@ -17,6 +18,7 @@
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
+				this.onFormChange();
 			}
 			
 			private function onAccountInfoChange(e:PropertyChangeEvent):void
@@ -56,6 +58,7 @@
 				// TBD: implement sounds
 				this.activeCheckbox.selected = accountInfo.active;
 				this.saveButton.label = "Update";
+				this.onFormChange();
 			}
 			
 			public function clearData():void
@@ -70,22 +73,44 @@
 				this.saveButton.label = "Save";
 			}
 
+			private function isFormComplete():Boolean
+			{
+				if (usernameInput.text.length > 0 && passwordInput.length > 0 && accountNameInput.text.length > 0) return true;
+				return false;
+			}
+			
+			private function onFormChange():void
+			{
+				var formComplete:Boolean = this.isFormComplete();
+				saveButton.enabled = formComplete;
+				verifyButton.enabled = formComplete;
+			}
+			
+			private function onVerify():void
+			{
+				if (!this.isFormComplete()) return;
+				var vae:VerifyAccountEvent = new VerifyAccountEvent();
+				vae.accountType = AccountTypes.GOOGLE_WAVE;
+				vae.username = this.usernameInput.text;
+				vae.password = this.passwordInput.text;
+				vae.dispatch();
+			}
 		]]>
 	</mx:Script>
-	<mx:Text height="46" width="360">
+	<mx:Text height="46" left="5" right="5" top="5">
 		<mx:text>
 			<mx:String>Note: Google Wave support is currently experimental. If something breaks, expect an application update very soon.</mx:String>
 		</mx:text>
 	</mx:Text>
 	<mx:Form top="40" bottom="30" right="0" left="0">
 		<mx:FormItem label="Account Name">
-			<mx:TextInput id="accountNameInput" width="200"/>
+			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Google Username">
-			<mx:TextInput id="usernameInput" width="200"/>
+			<mx:TextInput id="usernameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Google Password">
-			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true"/>
+			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem label="Notification Position">
 			<c:PositionComboBox id="notificationPositionInput"/>
@@ -94,5 +119,6 @@
 			<mx:CheckBox id="activeCheckbox" selected="true"/>
 		</mx:FormItem>
 	</mx:Form>
-	<mx:Button id="saveButton" label="Save" click="onSave();" x="160" bottom="30"/>
+	<mx:Button id="saveButton" label="Save" click="onSave();" left="100" bottom="0"/>
+	<mx:Button id="verifyButton" label="Verify" click="onVerify();" right="100" bottom="0"/>
 </mx:Canvas>

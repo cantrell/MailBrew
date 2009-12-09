@@ -42,6 +42,8 @@ package com.mailbrew.commands
 			this.ml = ModelLocator.getInstance();
 			if (this.ml.checkEmailLock) return;
 			this.ml.checkEmailLock = true;
+			this.ml.statusMessage = "Checking for new messages";
+			this.ml.showStatusProgressBar = true;
 			var db:Database = this.ml.db;
 			var responder:DatabaseResponder = new DatabaseResponder();
 			var listener:Function = function(e:DatabaseEvent):void
@@ -90,7 +92,8 @@ package com.mailbrew.commands
 				
 				// Update the status message
 				this.ml.statusMessage = "Done";
-				
+				this.ml.showStatusProgressBar = false;
+
 				return;
 			}
 			this.newUnseenEmails = null;
