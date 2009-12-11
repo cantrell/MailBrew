@@ -43,7 +43,7 @@
 				sae.username = this.usernameInput.text;
 				sae.password = this.passwordInput.text;
 				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
-				sae.sound = null; // TBD: implement sounds
+				sae.notificationSound = this.notificationSound.value;
 				sae.active = this.activeCheckbox.selected;
 				sae.dispatch();
 			}
@@ -55,7 +55,7 @@
 				this.usernameInput.text = accountInfo.username;
 				this.passwordInput.text = accountInfo.password;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
-				// TBD: implement sounds
+				this.notificationSound.value = accountInfo.notificationSound;
 				this.activeCheckbox.selected = accountInfo.active;
 				this.saveButton.label = "Update";
 				this.onFormChange();
@@ -68,7 +68,7 @@
 				this.usernameInput.text = "";
 				this.passwordInput.text = "";
 				this.notificationPositionInput.clearSelection();
-				// TBD: implement sounds
+				this.notificationSound.clearSelection();
 				this.activeCheckbox.selected = true;
 				this.saveButton.label = "Save";
 			}
@@ -109,6 +109,9 @@
 		</mx:FormItem>
 		<mx:FormItem label="Notification Position">
 			<c:PositionComboBox id="notificationPositionInput"/>
+		</mx:FormItem>
+		<mx:FormItem label="Notification Sound">
+			<c:SoundPicker id="notificationSound"/>
 		</mx:FormItem>
 		<mx:FormItem label="Active?">
 			<mx:CheckBox id="activeCheckbox" selected="true"/>

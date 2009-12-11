@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+		 creationComplete="onCreationComplete();">
+	<mx:Script>
+		<![CDATA[
+			import com.mailbrew.model.ModelLocator;
+			
+			import flash.media.Sound;
+			
+			import mx.collections.ArrayCollection;
+
+			private var dp:ArrayCollection;
+			
+			private function onCreationComplete():void
+			{
+				this.soundList.dataProvider = ModelLocator.getInstance().notificationSounds.soundData;
+			}
+			
+			public function get value():String
+			{
+				if (this.soundList.selectedItem.soundClass == null) return null;
+				return this.soundList.selectedItem.label;
+			}
+			
+			public function set value(value:String):void
+			{
+				for each (var o:Object in this.dp)
+				{
+					if (o.label == value)
+					{
+						this.soundList.selectedItem = o;
+						break;
+					}
+				}
+			}
+			
+			public function clearSelection():void
+			{
+				for each (var o:Object in this.dp)
+				{
+					if (o.soundClass == null)
+					{
+						this.soundList.selectedItem = o;
+						break;
+					}
+				}
+			}
+			
+			private function onPlay():void
+			{
+				if (this.soundList.selectedItem == null || this.soundList.selectedItem.soundClass == null) return;
+				var SoundClass:Class = soundList.selectedItem.soundClass as Class;
+				var sound:Sound = new SoundClass();
+				sound.play();
+			}
+		]]>
+	</mx:Script>
+	<mx:ComboBox id="soundList" x="0" y="0"/>
+	<mx:Button label="Play" icon="{ModelLocator.getInstance().audioIconClass}" x="100" y="0" click="onPlay();" enabled="{(this.soundList.selectedItem.soundClass == null) ? false : true}"/>
+</mx:Canvas>

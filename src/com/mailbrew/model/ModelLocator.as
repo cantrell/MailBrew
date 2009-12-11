@@ -5,6 +5,7 @@ package com.mailbrew.model
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.MainAppViews;
+	import com.mailbrew.data.NotificationSounds;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.events.CheckMailEvent;
 	
@@ -27,6 +28,7 @@ package com.mailbrew.model
 		[Bindable] [Embed(source="assets/emblem-system.png")] public var configureIconClass:Class;
 		[Bindable] [Embed(source="assets/help-browser.png")] public var aboutIconClass:Class;
 		[Bindable] [Embed(source="assets/view-refresh.png")] public var checkNowIconClass:Class;
+		[Bindable] [Embed(source="assets/audio-x-generic.png")] public var audioIconClass:Class;
 		
         [Embed(source="assets/dynamic_logo_128.png")]
         public var DynamicIconClass:Class;
@@ -48,6 +50,7 @@ package com.mailbrew.model
 		public var prefs:Preference;
 		public var checkEmailTimer:Timer;
 		public var db:Database;
+		public var notificationSounds:NotificationSounds = new NotificationSounds();
 
 		public function checkEmail(e:TimerEvent):void
 		{

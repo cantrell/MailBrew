@@ -90,7 +90,7 @@ package com.mailbrew.database
 									  imapPort:Number,
 									  secure:Boolean,
 									  notificationLocation:String,
-									  sound:String,
+									  notificationSound:String,
 									  active:Boolean):void
 		{
 			if (!this.aConn.connected) return;
@@ -102,7 +102,7 @@ package com.mailbrew.database
             stmt.parameters[":username"] = username;
             stmt.parameters[":password"] = password;
             stmt.parameters[":notification_location"] = notificationLocation;
-            stmt.parameters[":sound"] = sound;
+            stmt.parameters[":notification_sound"] = notificationSound;
             stmt.parameters[":imap_server"] = imapServer;
             stmt.parameters[":port_number"] = imapPort;
             stmt.parameters[":secure"] = secure;
@@ -131,7 +131,7 @@ package com.mailbrew.database
 									  imapPort:Number,
 									  secure:Boolean,
 									  notificationLocation:String,
-									  sound:String,
+									  notificationSound:String,
 									  active:Boolean):void
 		{
 			if (!this.aConn.connected) return;
@@ -144,7 +144,7 @@ package com.mailbrew.database
             stmt.parameters[":username"] = username;
             stmt.parameters[":password"] = password;
             stmt.parameters[":notification_location"] = notificationLocation;
-            stmt.parameters[":sound"] = sound;
+            stmt.parameters[":notification_sound"] = notificationSound;
             stmt.parameters[":imap_server"] = imapServer;
             stmt.parameters[":port_number"] = imapPort;
             stmt.parameters[":secure"] = secure;
