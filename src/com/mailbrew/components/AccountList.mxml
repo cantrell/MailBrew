@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete();">
-	<mx:Script>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+         xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 creationComplete="onCreationComplete();">
+	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.components.skins.AccountListSkin;
 			import com.mailbrew.data.AccountInfo;
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.data.MainAppViews;
@@ -20,6 +24,9 @@
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			import mx.events.ListEvent;
+			
+			import spark.components.Label;
+			import spark.events.IndexChangeEvent;
 			
 			private var ml:ModelLocator;
 			
@@ -50,7 +57,7 @@
 				}
 			}
 			
-			private function onAccountListChange(e:ListEvent):void
+			private function onAccountListChange(e:IndexChangeEvent):void
 			{
 				if (this.ml.mainAppView == MainAppViews.INSTRUCTIONS)
 				{
@@ -75,11 +82,13 @@
 				this.ml.accountFormView = AccountTypes.IMAP;
 			}
 			
-			public function onRightClick(e:MouseEvent, item:Object):void
+			public function onRightClick(e:MouseEvent):void
 			{
-				this.accountList.selectedItem = item;
+				var data:Object = this.getData(e.target);
+				if (data == null) return;
+				this.accountList.selectedItem = data;
 				var menu:NativeMenu = new NativeMenu();
-				if (!item.working)
+				if (!data.working)
 				{
 					var errorItem:NativeMenuItem = new NativeMenuItem("View Error");
 					errorItem.addEventListener(Event.SELECT, showErrorMessage);
@@ -89,6 +98,13 @@
 				deleteItem.addEventListener(Event.SELECT, onRemoveAccount);
 				menu.addItem(deleteItem);
 				menu.display(this.stage, e.stageX, e.stageY);
+			}
+			
+			private function getData(o:Object):Object
+			{
+				if (o == null) return null;
+				if (o is AccountListSkin) return o.data;
+				return getData(o.parent);
 			}
 			
 			private function showErrorMessage(e:Event):void
@@ -107,22 +123,15 @@
 				responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				db.getErrorMessage(responder, accountId);
 			}
-			
-			public function determineFontColor(active:Boolean, working:Boolean):uint
-			{
-				if (!active) return 0xcccccc;
-				if (!working) return 0xff0000;
-				return 0x000000;
-			}
 		]]>
-	</mx:Script>
-	<mx:List id="accountList" dataProvider="{ModelLocator.getInstance().accounts}" change="onAccountListChange(event);" bottom="40" top="0" right="0" left="0">
-		<mx:itemRenderer>
-			<mx:Component>
-				<mx:Label text="{data.label}" color="{outerDocument.determineFontColor(data.active, data.working)}" rightClick="outerDocument.onRightClick(event, data);"/>
-			</mx:Component>
-		</mx:itemRenderer>
-	</mx:List>
+	</fx:Script>
+	
+	<s:List id="accountList"
+			dataProvider="{ModelLocator.getInstance().accounts}"
+			change="onAccountListChange(event);" rightClick="onRightClick(event);"
+			bottom="40" top="0" right="0" left="0"
+			itemRenderer="com.mailbrew.components.skins.AccountListSkin"/>
+
 	<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddIconClass}" click="onAddAccount();" width="40" bottom="5" left="5"/>
 	<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40" bottom="5" right="5"/>
-</mx:Canvas>
+</s:Group>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
-	<mx:Script>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+         xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/halo">
+	<fx:Script>
 		<![CDATA[
 			import com.adobe.air.preferences.Preference;
 			import com.mailbrew.events.CheckMailEvent;
@@ -22,9 +24,9 @@
 				// TBD
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 	<mx:Label text="MailBrew" left="5" top="2"/>
 	<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().checkNowIconClass}" top="2" right="170" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
 	<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().configureIconClass}" top="2" right="82" click="onOpenSettings();"/>
 	<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().aboutIconClass}" top="2" right="5" click="onOpenAbout();"/>
-</mx:Canvas>
+</s:Group>

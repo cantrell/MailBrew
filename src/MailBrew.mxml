@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml"
+<s:WindowedApplication
+		   xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/halo"
 		   xmlns:c="com.mailbrew.components.*"
-		   layout="absolute"
 		   width="500" height="400"
 		   showStatusBar="false"
 		   applicationComplete="onApplicationComplete();">
 
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import com.adobe.air.notification.AbstractNotification;
 			import com.mailbrew.commands.AppExitCommand;
@@ -25,6 +27,7 @@
 			import flash.geom.Rectangle;
 			
 			import mx.binding.utils.ChangeWatcher;
+			import mx.collections.ArrayCollection;
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
@@ -32,7 +35,9 @@
 			import mx.events.PropertyChangeEvent;
 			import mx.messaging.events.ChannelEvent;
 			
-			[Bindable] private var accountTypes:Array = [AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE];
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE]);
 			private var controller:Controller;
 			private var ml:ModelLocator;
 			
@@ -102,9 +107,9 @@
 				}
 			}
 			
-			private function onAccountTypeChange(e:ItemClickEvent):void
+			private function onAccountTypeChange(e:IndexChangeEvent):void
 			{
-				this.ml.accountFormView = e.label;
+				this.ml.accountFormView = ButtonBar(e.target).selectedItem;
 			}
 			
 			private function onWindowClosing(e:Event):void
@@ -126,21 +131,24 @@
 				new AppExitEvent().dispatch();
 			}
 		]]>
-	</mx:Script>
+	</fx:Script>
 	<c:CommandBar left="0" right="0" top="0" height="30"/>
 	<c:AccountList left="0" top="30" bottom="30" width="100"/>
 	<mx:ViewStack id="mainAppView" creationPolicy="all" left="100" right="0" top="30" bottom="30">
-		<mx:Canvas id="instructionsView" left="0" right="0" top="0" bottom="0">
-			<mx:Label text="Instructions Here..."/>
-		</mx:Canvas>
-		<mx:Canvas id="workingView" left="0" right="0" top="0" bottom="0">
-			<mx:ToggleButtonBar id="accountType" dataProvider="{accountTypes}" itemClick="onAccountTypeChange(event);" top="0" left="50" right="50"/>
+		<s:NavigatorContent id="instructionsView">
+			<s:layout>
+				<s:BasicLayout/>
+			</s:layout>
+			<s:Label text="Instructions Here..."/>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="workingView" left="0" right="0" top="0" bottom="0">
+			<s:ButtonBar id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" top="0" left="50" right="50"/>
 			<mx:ViewStack id="formView" creationPolicy="all" top="20">
 				<c:IMAPForm id="imapForm"/>
 				<c:GmailForm id="gmailForm"/>
 				<c:WaveForm id="waveForm"/>
 			</mx:ViewStack>
-		</mx:Canvas>
+		</s:NavigatorContent>
 	</mx:ViewStack>
 	<c:Status bottom="0" left="0" right="0" height="25"/>
-</mx:WindowedApplication>
+</s:WindowedApplication>

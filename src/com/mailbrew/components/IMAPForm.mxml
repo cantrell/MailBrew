@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/halo"
 		   xmlns:c="com.mailbrew.components.*"
 		   creationComplete="onCreationComplete();">
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import com.mailbrew.data.AccountInfo;
 			import com.mailbrew.data.AccountSaveMode;
@@ -62,8 +64,8 @@
 				this.portNumberInput.text = String(accountInfo.portNumber);
 				this.secureCheckBox.selected = accountInfo.secure;
 				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
-				this.activeCheckbox.selected = accountInfo.active;
 				this.notificationSound.value = accountInfo.notificationSound;
+				this.activeCheckbox.selected = accountInfo.active;
 				this.saveButton.label = "Update";
 				this.onFormChange();
 			}
@@ -110,7 +112,7 @@
 			}
 
 		]]>
-	</mx:Script>
+	</fx:Script>
 	<mx:Form bottom="30" left="0" right="0" top="0">
 		<mx:FormItem label="Account Name">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>

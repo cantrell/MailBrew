@@ -11,8 +11,8 @@ package com.mailbrew.data
 		public function NotificationSounds()
 		{
 			this.soundData = new ArrayCollection();
-			this.soundData.addItem({label:"None", soundClass:null});
-			this.soundData.addItem({label:"Four", soundClass:fourSoundClass});
+			soundData.addItem({label:"None", soundClass:null});
+			soundData.addItem({label:"Four", soundClass:fourSoundClass});
 		}
 	}
 }

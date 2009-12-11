@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 xmlns:c="com.mailbrew.components.*"
 		 creationComplete="onCreationComplete();">
-	<mx:Script>
+	<fx:Script>
 		<![CDATA[
 			import com.mailbrew.model.ModelLocator;
 			
@@ -13,7 +16,7 @@
 			
 			private function onCreationComplete():void
 			{
-				this.soundList.dataProvider = ModelLocator.getInstance().notificationSounds.soundData;
+				soundList.dataProvider = ModelLocator.getInstance().notificationSounds.soundData;
 			}
 			
 			public function get value():String
@@ -54,7 +57,7 @@
 				sound.play();
 			}
 		]]>
-	</mx:Script>
-	<mx:ComboBox id="soundList" x="0" y="0"/>
-	<mx:Button label="Play" icon="{ModelLocator.getInstance().audioIconClass}" x="100" y="0" click="onPlay();" enabled="{(this.soundList.selectedItem.soundClass == null) ? false : true}"/>
-</mx:Canvas>
+	</fx:Script>
+	<s:DropDownList id="soundList" x="0" y="0"/>
+	<mx:Button label="Play" icon="{ModelLocator.getInstance().audioIconClass}" x="120" y="0" click="onPlay();" enabled="{(this.soundList.selectedItem.soundClass == null) ? false : true}"/>
+</s:Group>
