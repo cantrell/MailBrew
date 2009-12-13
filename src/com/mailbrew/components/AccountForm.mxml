@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 xmlns:c="com.mailbrew.components.*"
+		 creationComplete="onCreationComplete();">
+	<fx:Script>
+		<![CDATA[
+			import com.mailbrew.data.AccountInfo;
+			import com.mailbrew.data.AccountSaveMode;
+			import com.mailbrew.data.AccountTypes;
+			import com.mailbrew.events.SaveAccountEvent;
+			import com.mailbrew.events.VerifyAccountEvent;
+			import com.mailbrew.model.ModelLocator;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.collections.ArrayCollection;
+			import mx.events.PropertyChangeEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			private var accountId:Number;
+			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE]);
+			
+			private function onCreationComplete():void
+			{
+				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
+				this.changeState(AccountTypes.IMAP);
+				this.onFormChange();
+			}
+			
+			private function onAccountInfoChange(e:PropertyChangeEvent):void
+			{
+				var ml:ModelLocator = ModelLocator.getInstance();
+				if (ml.accountInfo == null)
+				{
+					this.clearData();
+					this.accountType.enabled = true;
+					this.changeState(AccountTypes.IMAP);
+					return;
+				}
+				this.changeState(ml.accountInfo.accountType);
+				this.accountType.enabled = false;
+				this.setData(ml.accountInfo);
+			}
+			
+			private function onAccountTypeChange(e:IndexChangeEvent):void
+			{
+				this.changeState(this.accountType.selectedItem);
+				this.onFormChange();
+			}
+			
+			private function changeState(newState:String):void
+			{
+				if (newState == null) newState = AccountTypes.IMAP;
+				this.accountType.selectedItem = newState;
+				if (newState == AccountTypes.IMAP)
+				{
+					this.currentState = "imap";
+				}
+				else if (newState == AccountTypes.GMAIL)
+				{
+					this.currentState = "gmail";
+				}
+				else if (newState == AccountTypes.GOOGLE_WAVE)
+				{
+					this.currentState = "wave";
+				}
+			}
+			
+			private function onSave():void
+			{
+				var sae:SaveAccountEvent = new SaveAccountEvent();
+				sae.accountType = this.accountType.selectedItem;
+				sae.saveMode = (isNaN(this.accountId)) ? AccountSaveMode.INSERT : AccountSaveMode.UPDATE;
+				sae.accountId = this.accountId;
+				sae.accountName = this.accountNameInput.text;
+				sae.username = this.usernameInput.text;
+				sae.password = this.passwordInput.text;
+				if (accountType.selectedItem == AccountTypes.IMAP)
+				{
+					sae.imapServer = this.imapServerInput.text;
+					sae.portNumber = Number(this.portNumberInput.text);
+					sae.secure = this.secureCheckBox.selected;
+				}
+				sae.notificationPosition = this.notificationPositionInput.selectedItem.data;
+				sae.notificationSound = this.notificationSound.value;
+				sae.active = this.activeCheckbox.selected;
+				sae.dispatch();
+				this.accountType.enabled = false;
+			}
+			
+			public function setData(accountInfo:AccountInfo):void
+			{
+				this.accountId = accountInfo.accountId;
+				this.accountNameInput.text = accountInfo.accountName;
+				this.usernameInput.text = accountInfo.username;
+				this.passwordInput.text = accountInfo.password;
+				if (accountInfo.accountType == AccountTypes.IMAP)
+				{
+					this.imapServerInput.text = accountInfo.imapServer;
+					this.portNumberInput.text = String(accountInfo.portNumber);
+					this.secureCheckBox.selected = accountInfo.secure;
+				}
+				this.notificationPositionInput.setSelectionByData(accountInfo.notificationPosition);
+				this.notificationSound.value = accountInfo.notificationSound;
+				this.activeCheckbox.selected = accountInfo.active;
+				this.saveButton.label = "Update";
+				this.onFormChange();
+			}
+			
+			public function clearData():void
+			{
+				this.accountId = NaN;
+				this.accountNameInput.text = "";
+				this.usernameInput.text = "";
+				this.passwordInput.text = "";
+				this.imapServerInput.text = "";
+				this.portNumberInput.text = "";
+				this.secureCheckBox.selected = false;
+				this.notificationPositionInput.clearSelection();
+				this.notificationSound.clearSelection();
+				this.activeCheckbox.selected = true;
+				this.saveButton.label = "Save";
+			}
+			
+			private function isFormComplete():Boolean
+			{
+				if (this.currentState == "imap")
+				{
+					if (usernameInput.text.length > 0 && passwordInput.length > 0 && accountNameInput.text.length > 0 && imapServerInput.text.length > 0 && portNumberInput.text.length > 0) return true;
+				}
+				else
+				{
+					if (usernameInput.text.length > 0 && passwordInput.length > 0 && accountNameInput.text.length > 0) return true;
+				}
+				return false;
+			}
+			
+			private function onFormChange():void
+			{
+				var formComplete:Boolean = this.isFormComplete();
+				saveButton.enabled = formComplete;
+				verifyButton.enabled = formComplete;
+			}
+			
+			private function onVerify():void
+			{
+				if (!this.isFormComplete()) return;
+				var vae:VerifyAccountEvent = new VerifyAccountEvent();
+				vae.accountType = this.accountType.selectedItem;
+				vae.username = this.usernameInput.text;
+				vae.password = this.passwordInput.text;
+				vae.server = this.imapServerInput.text;
+				vae.portNumber = Number(this.portNumberInput.text);
+				vae.secure = this.secureCheckBox.selected;
+				vae.dispatch();
+			}
+			
+		]]>
+	</fx:Script>
+
+	<s:states>
+		<s:State name="imap"/>
+		<s:State name="gmail"/>
+		<s:State name="wave"/>
+	</s:states>
+
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"/>
+	</s:layout>
+	
+	<s:ButtonBar id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" top="0" left="50" right="50"/>
+
+	<s:Label includeIn="wave" width="300">
+		<s:text>Note: Google Wave support is currently experimental. If something breaks, expect an application update very soon.</s:text>
+	</s:Label>
+	
+	<mx:Form>
+		<mx:FormItem label="Account Name" includeIn="imap, gmail, wave">
+			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
+		</mx:FormItem>
+		<mx:FormItem label="Username" includeIn="imap, gmail, wave">
+			<mx:TextInput id="usernameInput" width="200" change="onFormChange();"/>
+		</mx:FormItem>
+		<mx:FormItem label="Password" includeIn="imap, gmail, wave">
+			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true" change="onFormChange();"/>
+		</mx:FormItem>
+		<mx:FormItem id="imapServerLabel" label="IMAP Server" includeIn="imap">
+			<mx:TextInput id="imapServerInput" width="200" change="onFormChange();"/>
+		</mx:FormItem>
+		<mx:FormItem id="portNumberLabel" label="Port Number" includeIn="imap">
+			<mx:TextInput id="portNumberInput" width="50" change="onFormChange();"/>
+		</mx:FormItem>
+		<mx:FormItem id="secureLabel" label="Secure?" includeIn="imap">
+			<mx:CheckBox id="secureCheckBox"/>
+		</mx:FormItem>
+		<mx:FormItem label="Notification Position" includeIn="imap, gmail, wave">
+			<c:PositionComboBox id="notificationPositionInput"/>
+		</mx:FormItem>
+		<mx:FormItem label="Notification Sound" includeIn="imap, gmail, wave">
+			<c:SoundPicker id="notificationSound"/>
+		</mx:FormItem>
+		<mx:FormItem label="Active?" includeIn="imap, gmail, wave">
+			<mx:CheckBox id="activeCheckbox" selected="true"/>
+		</mx:FormItem>
+	</mx:Form>
+
+	<s:Group>
+		<s:layout>
+			<s:HorizontalLayout verticalAlign="top"/>
+		</s:layout>
+		<s:Button id="saveButton" label="Save" click="onSave();"/>
+		<s:Button id="verifyButton" label="Verify" click="onVerify();"/>
+	</s:Group>
+</s:Group>
