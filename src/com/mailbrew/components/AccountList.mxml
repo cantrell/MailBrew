@@ -59,12 +59,12 @@
 			
 			private function onAccountListChange(e:IndexChangeEvent):void
 			{
-				if (this.ml.mainAppView == MainAppViews.INSTRUCTIONS)
-				{
-					this.ml.mainAppView = MainAppViews.WORKING;
-				}
 				var list:List = e.target as List;
 				if (list.selectedItem == null) return;
+				if (this.ml.mainAppView == MainAppViews.INTRO)
+				{
+					this.ml.mainAppView = MainAppViews.STARTED;
+				}
 				var paie:PopulateAccountInfoEvent = new PopulateAccountInfoEvent();
 				paie.accountId = list.selectedItem.accountId;
 				paie.dispatch();
@@ -74,12 +74,11 @@
 			{
 				this.accountList.selectedItem = null;
 				this.removeAccountButton.enabled = false;
-				if (this.ml.mainAppView == MainAppViews.INSTRUCTIONS)
+				if (this.ml.mainAppView == MainAppViews.INTRO)
 				{
-					this.ml.mainAppView = MainAppViews.WORKING;
+					this.ml.mainAppView = MainAppViews.STARTED;
 				}
 				this.ml.accountInfo = null;
-				this.ml.accountFormView = AccountTypes.IMAP;
 			}
 			
 			public function onRightClick(e:MouseEvent):void
@@ -126,12 +125,22 @@
 		]]>
 	</fx:Script>
 	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center"/>
+	</s:layout>
+	
 	<s:List id="accountList"
+			width="100%" height="100%"
 			dataProvider="{ModelLocator.getInstance().accounts}"
 			change="onAccountListChange(event);" rightClick="onRightClick(event);"
-			bottom="40" top="0" right="0" left="0"
 			itemRenderer="com.mailbrew.components.skins.AccountListSkin"/>
 
-	<mx:Button id="addAccountButton" icon="{ModelLocator.getInstance().listAddIconClass}" click="onAddAccount();" width="40" bottom="5" left="5"/>
-	<mx:Button id="removeAccountButton" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}" width="40" bottom="5" right="5"/>
+	<s:Group bottom="0">
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		<mx:Button id="addAccountButton" width="40" icon="{ModelLocator.getInstance().listAddIconClass}" click="onAddAccount();"/>
+		<mx:Button id="removeAccountButton" width="40" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}"/>
+	</s:Group>	
+	
 </s:Group>

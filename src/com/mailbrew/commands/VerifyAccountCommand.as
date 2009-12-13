@@ -5,11 +5,12 @@ package com.mailbrew.commands
 	import com.mailbrew.data.AccountTypes;
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.IEmailService;
-	import com.mailbrew.email.gmail.Gmail;
+	import com.mailbrew.email.google.Gmail;
+	import com.mailbrew.email.google.Wave;
 	import com.mailbrew.email.imap.IMAP;
-	import com.mailbrew.email.wave.Wave;
 	import com.mailbrew.events.VerifyAccountEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.util.EmailServiceFactory;
 	
 	import mx.controls.Alert;
 	
@@ -19,19 +20,7 @@ package com.mailbrew.commands
 		public function execute(e:CairngormEvent):void
 		{
 			var vae:VerifyAccountEvent = e as VerifyAccountEvent;
-			var emailService:IEmailService;
-			if (vae.accountType == AccountTypes.GMAIL)
-			{
-				emailService = new Gmail(vae.username, vae.password);
-			}
-			else if (vae.accountType == AccountTypes.GOOGLE_WAVE)
-			{
-				emailService = new Wave(vae.username, vae.password);
-			}
-			else if (vae.accountType == AccountTypes.IMAP)
-			{
-				emailService = new IMAP(vae.username, vae.password, vae.server, vae.portNumber, vae.secure);
-			}
+			var emailService:IEmailService = EmailServiceFactory.getEmailService(vae.accountType, vae.username, vae.password, vae.server, vae.portNumber, vae.secure);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);

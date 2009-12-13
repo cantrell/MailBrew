@@ -4,7 +4,8 @@
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/halo"
 		  width="335" height="280"
-		  type="utility"
+		  minWidth="335" minHeight="280"
+		  type="utility" showStatusBar="false"
 		  creationComplete="onCreationComplete();"
 		  title="MailBrew Preferences">
 	<fx:Script>
@@ -51,22 +52,24 @@
 	</fx:Script>
 
 	<s:Label text="Update Interval (minutes)" fontWeight="bold" left="4" y="5"/>
-	<s:TextArea y="20" width="211" left="6"><s:div>How often should MailBrew check for new messages?</s:div></s:TextArea>
+	<s:Label y="20" width="211" left="6">How often should MailBrew check for new messages?</s:Label>
 	<s:NumericStepper id="updateIntervalStepper" minimum="1" maximum="60" right="20" width="57" y="5"/>
 
-	<s:Label text="Notification Display Length (seconds)" fontWeight="bold" left="4" y="60" width="215"/>
-	<s:TextArea y="75" width="210" left="6"><s:div>How long should notifications be displayed?</s:div></s:TextArea>
+	<s:Label text="Notification Display Length (seconds)" fontWeight="bold" left="4" y="60" width="220"/>
+	<s:Label y="75" width="210" left="6">How long should notifications be displayed?</s:Label>
 	<s:NumericStepper id="notificationDisplayLengthStepper" minimum="2" maximum="30" right="20" width="57" y="60"/>
 
 	<s:Label text="Idle Period (minutes)" y="115" fontWeight="bold" left="4"/>
-	<s:TextArea y="130" width="210" left="6"><s:div>How long should you be idle (no keyboard input) before MailBrew starts queuing up notifications?</s:div></s:TextArea>
+	<s:Label y="130" width="210" left="6">How long should you be idle (no keyboard input) before MailBrew starts queuing up notifications?</s:Label>
 	<s:NumericStepper id="idlePeriodStepper" minimum="5" maximum="60" y="115" right="20"/>
 
 	<s:Label text="Start at Login" fontWeight="bold" y="185" left="4"/>
-	<s:TextArea y="200" width="210" left="6"><s:div>Should MailBrew start automatically when you log in?</s:div></s:TextArea>
+	<s:Label y="200" width="210" left="6">Should MailBrew start automatically when you log in?</s:Label>
 	<s:CheckBox id="startAtLoginCheckbox" y="185" right="60"/>
-
-	<s:Button id="saveButton" label="Save" click="onSave();" bottom="4" left="90"/>
-	<s:Button id="cancelButton" label="Cancel" click="onCancel();" bottom="4" right="90"/>
+	
+	<s:HGroup bottom="5">
+		<s:Button id="saveButton" label="Save" click="onSave();"/>
+		<s:Button id="cancelButton" label="Cancel" click="onCancel();"/>
+	</s:HGroup>
 		
 </s:Window>

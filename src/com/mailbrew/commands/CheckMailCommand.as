@@ -11,16 +11,19 @@ package com.mailbrew.commands
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.EmailHeader;
 	import com.mailbrew.email.IEmailService;
-	import com.mailbrew.email.gmail.Gmail;
+	import com.mailbrew.email.google.Gmail;
+	import com.mailbrew.email.google.Voice;
+	import com.mailbrew.email.google.Wave;
 	import com.mailbrew.email.imap.IMAP;
-	import com.mailbrew.email.wave.Wave;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.util.EmailServiceFactory;
 	
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
 	import flash.events.Event;
+	import flash.media.Sound;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
@@ -107,23 +110,34 @@ package com.mailbrew.commands
 			this.serviceMenu = new NativeMenu();
 			this.serviceMenu.addEventListener(Event.SELECT, onMenuItemSelected);
 			this.topLevelMenu.addSubmenuAt(this.serviceMenu, 0, this.currentAccount.name);
-			var emailService:IEmailService;
-			if (this.currentAccount.account_type == AccountTypes.IMAP)
-			{
-				emailService = new IMAP(this.currentAccount.username,
-										this.currentAccount.password,
-										this.currentAccount.imap_server,
-										Number(this.currentAccount.port_number),
-										Boolean(this.currentAccount.secure));
-			}
-			else if (this.currentAccount.account_type == AccountTypes.GMAIL)
-			{
-				emailService = new Gmail(this.currentAccount.username, this.currentAccount.password);
-			}
-			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_WAVE)
-			{
-				emailService = new Wave(this.currentAccount.username, this.currentAccount.password);
-			}
+			var emailService:IEmailService = EmailServiceFactory.getEmailService(this.currentAccount.account_type,
+																				 this.currentAccount.username,
+																				 this.currentAccount.password,
+																				 this.currentAccount.imap_server,
+																				 Number(this.currentAccount.port_number),
+																				 Boolean(this.currentAccount.secure));
+			
+//			var emailService:IEmailService;
+//			if (this.currentAccount.account_type == AccountTypes.IMAP)
+//			{
+//				emailService = new IMAP(this.currentAccount.username,
+//										this.currentAccount.password,
+//										this.currentAccount.imap_server,
+//										Number(this.currentAccount.port_number),
+//										Boolean(this.currentAccount.secure));
+//			}
+//			else if (this.currentAccount.account_type == AccountTypes.GMAIL)
+//			{
+//				emailService = new Gmail(this.currentAccount.username, this.currentAccount.password);
+//			}
+//			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_WAVE)
+//			{
+//				emailService = new Wave(this.currentAccount.username, this.currentAccount.password);
+//			}
+//			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_VOICE)
+//			{
+//				emailService = new Voice(this.currentAccount.username, this.currentAccount.password);
+//			}
 			
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
@@ -136,7 +150,6 @@ package com.mailbrew.commands
 		
 		private function onProtocolError(e:EmailEvent):void
 		{
-			trace("onProtocolError");
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			var reason:String = "Protocol error.";
@@ -149,7 +162,6 @@ package com.mailbrew.commands
 		
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
-			trace("onAuthenticationFailed");
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			var reason:String = "Authentication failed. Your credentials were not accepted. Please update your username and password.";
@@ -162,7 +174,6 @@ package com.mailbrew.commands
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
-			trace("onConnectionFailed", e.data);
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			var reason:String = "Unable to connect to email service.";
@@ -204,6 +215,7 @@ package com.mailbrew.commands
 		
 		private function compareOldAndNew():void
 		{
+			var notificationSoundPlayed:Boolean = false;
 			newEmailLoop: for (var i:uint = 0; i < this.newUnseenEmails.length; ++i)
 			{
 				var emailHeader:EmailHeader = this.newUnseenEmails[i];
@@ -236,6 +248,11 @@ package com.mailbrew.commands
 				}
 				// This has to happen in real-time while the currentAccount is in scope and we
 				// know the location of the notifications. Don't move to the end of the process.
+				if (!notificationSoundPlayed)
+				{
+					this.playNotificationSound();
+					notificationSoundPlayed = true;
+				}
 				this.addNotification(emailHeader);
 			}
 			this.deleteOldMessages();
@@ -251,6 +268,15 @@ package com.mailbrew.commands
 															 this.ml.notificationIcon);
 			notification.width = 250;
 			this.ml.purr.addNotification(notification);
+		}
+		
+		private function playNotificationSound():void
+		{
+			var soundName:String = this.currentAccount.notification_sound;
+			if (soundName == null) return;
+			var SoundClass:Class = this.ml.notificationSounds.getSound(soundName);
+			var sound:Sound = new SoundClass();
+			sound.play();
 		}
 		
 		private function deleteOldMessages():void

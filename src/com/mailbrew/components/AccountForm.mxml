@@ -20,7 +20,7 @@
 			import spark.events.IndexChangeEvent;
 			
 			private var accountId:Number;
-			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE]);
+			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE, AccountTypes.GOOGLE_VOICE]);
 			
 			private function onCreationComplete():void
 			{
@@ -65,6 +65,10 @@
 				else if (newState == AccountTypes.GOOGLE_WAVE)
 				{
 					this.currentState = "wave";
+				}
+				else if (newState == AccountTypes.GOOGLE_VOICE)
+				{
+					this.currentState = "voice";
 				}
 			}
 			
@@ -164,6 +168,7 @@
 		<s:State name="imap"/>
 		<s:State name="gmail"/>
 		<s:State name="wave"/>
+		<s:State name="voice"/>
 	</s:states>
 
 	<s:layout>
@@ -173,17 +178,21 @@
 	<s:ButtonBar id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" top="0" left="50" right="50"/>
 
 	<s:Label includeIn="wave" width="300">
-		<s:text>Note: Google Wave support is currently experimental. If something breaks, expect an application update very soon.</s:text>
+		<s:text>Note: Due to lack of official APIs, Google Wave support is experimental. If it breaks, expect an application update soon.</s:text>
+	</s:Label>
+
+	<s:Label includeIn="voice" width="300">
+		<s:text>Note: Due to lack of official APIs, Google Voice support is experimental. If it breaks, expect an application update soon.</s:text>
 	</s:Label>
 	
 	<mx:Form>
-		<mx:FormItem label="Account Name" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Account Name" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem label="Username" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Username" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="usernameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem label="Password" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Password" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem id="imapServerLabel" label="IMAP Server" includeIn="imap">
@@ -195,13 +204,13 @@
 		<mx:FormItem id="secureLabel" label="Secure?" includeIn="imap">
 			<mx:CheckBox id="secureCheckBox"/>
 		</mx:FormItem>
-		<mx:FormItem label="Notification Position" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Notification Position" includeIn="imap, gmail, wave, voice">
 			<c:PositionComboBox id="notificationPositionInput"/>
 		</mx:FormItem>
-		<mx:FormItem label="Notification Sound" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Notification Sound" includeIn="imap, gmail, wave, voice">
 			<c:SoundPicker id="notificationSound"/>
 		</mx:FormItem>
-		<mx:FormItem label="Active?" includeIn="imap, gmail, wave">
+		<mx:FormItem label="Active?" includeIn="imap, gmail, wave, voice">
 			<mx:CheckBox id="activeCheckbox" selected="true"/>
 		</mx:FormItem>
 	</mx:Form>

@@ -1,4 +1,4 @@
-package com.mailbrew.email.wave
+package com.mailbrew.email.google
 {
 	public class InternalModes
 	{

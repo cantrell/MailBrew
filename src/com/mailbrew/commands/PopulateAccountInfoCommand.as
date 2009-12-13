@@ -33,6 +33,7 @@ package com.mailbrew.commands
 				accountInfo.portNumber = Number(e.data.port_number);
 				accountInfo.secure = Boolean(e.data.secure);
 				accountInfo.notificationPosition = e.data.notification_location;
+				accountInfo.notificationSound = e.data.notification_sound;
 				accountInfo.active = e.data.active;
 				ModelLocator.getInstance().accountInfo = accountInfo;
 			};

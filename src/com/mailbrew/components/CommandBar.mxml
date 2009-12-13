@@ -26,7 +26,12 @@
 		]]>
 	</fx:Script>
 	<mx:Label text="MailBrew" left="5" top="2"/>
-	<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().checkNowIconClass}" top="2" right="170" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
-	<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().configureIconClass}" top="2" right="82" click="onOpenSettings();"/>
-	<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().aboutIconClass}" top="2" right="5" click="onOpenAbout();"/>
+	<s:Group right="5" top="2">
+		<s:layout>
+			<s:HorizontalLayout/>
+		</s:layout>
+		<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().checkNowIconClass}" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
+		<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().configureIconClass}" click="onOpenSettings();"/>
+		<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().aboutIconClass}" click="onOpenAbout();"/>
+	</s:Group>
 </s:Group>

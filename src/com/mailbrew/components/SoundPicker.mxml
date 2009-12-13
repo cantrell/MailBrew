@@ -12,11 +12,11 @@
 			
 			import mx.collections.ArrayCollection;
 
-			private var dp:ArrayCollection;
 			
 			private function onCreationComplete():void
 			{
 				soundList.dataProvider = ModelLocator.getInstance().notificationSounds.soundData;
+				soundList.selectedIndex = 0;
 			}
 			
 			public function get value():String
@@ -27,7 +27,7 @@
 			
 			public function set value(value:String):void
 			{
-				for each (var o:Object in this.dp)
+				for each (var o:Object in this.soundList.dataProvider)
 				{
 					if (o.label == value)
 					{
@@ -39,7 +39,7 @@
 			
 			public function clearSelection():void
 			{
-				for each (var o:Object in this.dp)
+				for each (var o:Object in this.soundList.dataProvider)
 				{
 					if (o.soundClass == null)
 					{

@@ -1,4 +1,4 @@
-package com.mailbrew.email.gmail
+package com.mailbrew.email.google
 {
 	import com.mailbrew.email.EmailCounts;
 	import com.mailbrew.email.EmailEvent;

@@ -1,9 +1,6 @@
-package com.mailbrew.email.wave
+package com.mailbrew.email.google
 {
-	import com.adobe.serialization.json.JSON;
-	import com.mailbrew.email.EmailCounts;
 	import com.mailbrew.email.EmailEvent;
-	import com.mailbrew.email.EmailHeader;
 	import com.mailbrew.email.EmailModes;
 	import com.mailbrew.email.IEmailService;
 	
@@ -15,7 +12,7 @@ package com.mailbrew.email.wave
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
-
+	
 	[Event(name="connectionFailed",        type="com.mailbrew.email.EmailEvent")]
 	[Event(name="connectionSucceeded",     type="com.mailbrew.email.EmailEvent")]
 	[Event(name="authenticationFailed",    type="com.mailbrew.email.EmailEvent")]
@@ -23,27 +20,31 @@ package com.mailbrew.email.wave
 	[Event(name="unseenEmailsCount",       type="com.mailbrew.email.EmailEvent")]
 	[Event(name="unseenEmails",            type="com.mailbrew.email.EmailEvent")]
 	[Event(name="protocolError",           type="com.mailbrew.email.EmailEvent")]
-
-	public class Wave extends EventDispatcher implements IEmailService
+	
+	public class UnsupportedService extends EventDispatcher implements IEmailService
 	{
 		private const APP_NAME:String = "MailBrew";
-		private const INBOX_URL:String = "https://wave.google.com/wave/";
 		private const LOGIN_URL:String = "https://www.google.com/accounts/ClientLogin";
-		private const LOGOUT_URL:String = "https://wave.google.com/wave/logout";
 		private const INBOX_RE:RegExp = new RegExp(/var json = (\{"r":"\^d1".*});/);
 		private const FROM_MAX:uint = 3;
-
+		
 		private var username:String;
 		private var password:String;
-		private var mode:String;
+		private var serviceName:String;
+		private var inboxUrl:String;
+		private var logoutUrl:String;
+		protected var mode:String;
 		private var internalMode:String;
 		private var status:Number;
 		private var authToken:String;
-
-		public function Wave(username:String, password:String)
+		
+		public function UnsupportedService(username:String, password:String, serviceName:String, inboxUrl:String, logoutUrl:String)
 		{
 			this.username = username;
 			this.password = password;
+			this.serviceName = serviceName;
+			this.inboxUrl = inboxUrl;
+			this.logoutUrl = logoutUrl;
 		}
 		
 		private function login():void
@@ -59,7 +60,7 @@ package com.mailbrew.email.wave
 			req.contentType = "application/x-www-form-urlencoded";
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.accountType = "GOOGLE";
-			urlVars.service = "wave";
+			urlVars.service = this.serviceName;
 			urlVars.source = APP_NAME;
 			urlVars.Email = this.username;
 			urlVars.Passwd = this.password;
@@ -75,7 +76,7 @@ package com.mailbrew.email.wave
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
 			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
-			var req:URLRequest = new URLRequest(INBOX_URL);
+			var req:URLRequest = new URLRequest(this.inboxUrl);
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.nouacheck = "";
@@ -92,7 +93,7 @@ package com.mailbrew.email.wave
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
 			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
-			var req:URLRequest = new URLRequest(LOGOUT_URL);
+			var req:URLRequest = new URLRequest(this.logoutUrl);
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.auth = this.authToken;
@@ -166,82 +167,7 @@ package com.mailbrew.email.wave
 			}
 			else if (this.internalMode == InternalModes.INBOX)
 			{
-				try
-				{
-					var inboxString:String = INBOX_RE.exec(response)[1];
-					var inboxObj:Object = JSON.decode(inboxString, true);
-					var p:Object = inboxObj.p;
-					var inbox:Array = p[1]; // This is the entire inbox -- everything you see when you log into Wave
-					var messageTotal:Number = 0;
-					var unreadTotal:Number = 0;
-					var emailHeaders:Vector.<EmailHeader> = new Vector.<EmailHeader>();
-					for each (var thread:Object in inbox)
-					{
-						var i:uint;
-						var unread:Number = thread[7];
-						messageTotal += thread[6];
-						unreadTotal += unread;
-						if (unread == 0) continue;
-						var emailHeader:EmailHeader = new EmailHeader();
-						emailHeader.id = thread[1];
-						emailHeader.url = "https://wave.google.com/wave/#restored:wave:" + encodeURIComponent(encodeURIComponent(emailHeader.id)); // Must be encoded twice.
-						var fromInformation:Array = thread[5];
-						var fromString:String = new String();
-						for (i = 0; i < fromInformation.length; ++i)
-						{
-							var fromStrTmp:String = fromInformation[i];
-							fromString += fromStrTmp.substring(0, fromStrTmp.indexOf("@"));
-							if (i == FROM_MAX - 1)
-							{
-								if (fromInformation.length > FROM_MAX)
-								{
-									fromString += "...";
-								}
-								break;
-							}
-							if (i != fromInformation.length - 1) fromString += ", ";
-						}
-						emailHeader.from = fromString;
-						emailHeader.subject = thread[9][1];
-						var summaryInformation:Array = thread[10];
-						var summary:String = new String();
-						for (i = 0; i < summaryInformation.length; ++i)
-						{
-							summary += summaryInformation[i][1];
-							if (i == FROM_MAX - 1)
-							{
-								if (summaryInformation.length > FROM_MAX)
-								{
-									summary += "...";
-								}
-								break;
-							}
-							if (i != summaryInformation.length - 1) summary += "...";
-						}
-						emailHeader.summary = summary;
-						emailHeaders.push(emailHeader);
-					}
-				}
-				catch (error:Error)
-				{
-					this.dispatchProtocolError("Error parsing inbox. Google might have changed something. Expect an update soon. [" +error.message+ "]");
-					return;
-				}
-				if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
-				{
-					var emailCounts:EmailCounts = new EmailCounts();
-					emailCounts.totalEmails = messageTotal;
-					emailCounts.unseenEmails = unreadTotal;
-					var unseenCountEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS_COUNT);
-					unseenCountEvent.data = emailCounts;
-					this.dispatchEvent(unseenCountEvent);
-				}
-				else if (this.mode == EmailModes.UNSEEN_EMAIL_HEADERS_MODE)
-				{
-					var unseenEmailEvent:EmailEvent = new EmailEvent(EmailEvent.UNSEEN_EMAILS);
-					unseenEmailEvent.data = emailHeaders;
-					this.dispatchEvent(unseenEmailEvent);
-				}
+				this.doInbox(response);
 				// Logging out logs out the browser client, as well.
 				// Best to skip it until we have real API support.
 				//this.logout();
@@ -252,7 +178,12 @@ package com.mailbrew.email.wave
 			}
 		}
 		
-		private function dispatchProtocolError(msg:String):void
+		protected function doInbox(response:String):void
+		{
+			// Override me!
+		}
+		
+		protected function dispatchProtocolError(msg:String):void
 		{
 			var pe:EmailEvent = new EmailEvent(EmailEvent.PROTOCOL_ERROR);
 			pe.data = msg;
@@ -264,7 +195,7 @@ package com.mailbrew.email.wave
 			this.mode = EmailModes.AUTHENTICATION_TEST_MODE;
 			this.login();
 		}
-
+		
 		public function getUnseenEmailCount():void
 		{
 			this.mode = EmailModes.UNSEEN_COUNT_MODE;

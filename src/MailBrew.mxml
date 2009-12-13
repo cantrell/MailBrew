@@ -37,7 +37,6 @@
 			
 			import spark.events.IndexChangeEvent;
 			
-			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE]);
 			private var controller:Controller;
 			private var ml:ModelLocator;
 			
@@ -54,15 +53,14 @@
 					SystemTrayIcon(NativeApplication.nativeApplication.icon).addEventListener(ScreenMouseEvent.CLICK, onShowWindow);
 				}
 				
+
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
 				this.ml.statusMessage = "Welcome to MailBrew!";
 
-				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onAppViewChange);
-				ChangeWatcher.watch(ModelLocator.getInstance(), "accountFormView", onAccountFormViewChange);
-
-				this.ml.mainAppView = MainAppViews.INSTRUCTIONS;
-				this.ml.accountFormView = AccountTypes.IMAP;
+				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
+				ml.mainAppView = MainAppViews.INTRO;
 
 				var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (this.width/2)), (Screen.mainScreen.bounds.height / 2 - (this.height/2)), this.width, this.height);
 				this.nativeWindow.bounds = initialBounds;
@@ -70,48 +68,7 @@
 				
 				new InitEvent().dispatch();
 			}
-			
-			private function onAppViewChange(e:PropertyChangeEvent):void
-			{
-				this.toggleMainView(ModelLocator.getInstance().mainAppView);
-			}
-
-			private function onAccountFormViewChange(e:PropertyChangeEvent):void
-			{
-				if (this.ml.accountFormView == AccountTypes.IMAP)
-				{
-					accountType.selectedIndex = 0;
-					this.formView.selectedChild = imapForm;
-				}
-				else if (this.ml.accountFormView == AccountTypes.GMAIL)
-				{
-					accountType.selectedIndex = 1;
-					this.formView.selectedChild = gmailForm;
-				}
-				else
-				{
-					accountType.selectedIndex = 2;
-					this.formView.selectedChild = waveForm;
-				}
-			}
-
-			private function toggleMainView(view:String):void
-			{
-				if (view == MainAppViews.INSTRUCTIONS)
-				{
-					this.mainAppView.selectedChild = instructionsView;
-				}
-				else if (view == MainAppViews.WORKING)
-				{
-					this.mainAppView.selectedChild = workingView;
-				}
-			}
-			
-			private function onAccountTypeChange(e:IndexChangeEvent):void
-			{
-				this.ml.accountFormView = ButtonBar(e.target).selectedItem;
-			}
-			
+						
 			private function onWindowClosing(e:Event):void
 			{
 				e.preventDefault();
@@ -130,25 +87,46 @@
 				this.nativeApplication.removeEventListener(Event.EXITING, onApplicationExiting);
 				new AppExitEvent().dispatch();
 			}
+			
+			private function onMainAppViewChange(e:PropertyChangeEvent):void
+			{
+				trace("onMainAppViewChange");
+				if (ModelLocator.getInstance().mainAppView == MainAppViews.INTRO)
+				{
+					this.currentState = "intro";
+				}
+				else
+				{
+					this.currentState = "started";
+				}
+			}
+
+			private function onAccountsChange(e:PropertyChangeEvent):void
+			{
+				var accounts:ArrayCollection = this.ml.accounts;
+				if (accounts == null || accounts.length == 0)
+				{
+					ml.mainAppView = MainAppViews.INTRO;
+				}
+			}
+
 		]]>
 	</fx:Script>
+	
+	<s:states>
+		<s:State name="intro"/>
+		<s:State name="started"/>
+	</s:states>
+	
+	<s:transitions>
+		<s:Transition fromState="intro" toState="started">
+			<s:Fade targets="{[introComp, accountFormComp]}"/>
+		</s:Transition>
+	</s:transitions>
+	
 	<c:CommandBar left="0" right="0" top="0" height="30"/>
-	<c:AccountList left="0" top="30" bottom="30" width="100"/>
-	<mx:ViewStack id="mainAppView" creationPolicy="all" left="100" right="0" top="30" bottom="30">
-		<s:NavigatorContent id="instructionsView">
-			<s:layout>
-				<s:BasicLayout/>
-			</s:layout>
-			<s:Label text="Instructions Here..."/>
-		</s:NavigatorContent>
-		<s:NavigatorContent id="workingView" left="0" right="0" top="0" bottom="0">
-			<s:ButtonBar id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" top="0" left="50" right="50"/>
-			<mx:ViewStack id="formView" creationPolicy="all" top="20">
-				<c:IMAPForm id="imapForm"/>
-				<c:GmailForm id="gmailForm"/>
-				<c:WaveForm id="waveForm"/>
-			</mx:ViewStack>
-		</s:NavigatorContent>
-	</mx:ViewStack>
-	<c:Status bottom="0" left="0" right="0" height="25"/>
+	<c:AccountList left="5" right="385" top="50" bottom="30"/>
+	<c:Intro id="introComp" top="30" left="130" includeIn="intro"/>
+	<c:AccountForm id="accountFormComp" top="30" left="120" includeIn="started"/>
+	<c:Status bottom="0" left="0" right="0" height="20"/>
 </s:WindowedApplication>

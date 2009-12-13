@@ -156,6 +156,7 @@ package com.mailbrew.database
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
 				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = accountId;
 				responder.dispatchEvent(dbe);
 			};
 			stmt.addEventListener(SQLEvent.RESULT, listener);
@@ -180,6 +181,7 @@ package com.mailbrew.database
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
 				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = accountId;
 				responder.dispatchEvent(dbe);
 			};
 			stmt.addEventListener(SQLEvent.RESULT, listener);
@@ -198,6 +200,7 @@ package com.mailbrew.database
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
 				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = accountId;
 				responder.dispatchEvent(dbe);
 			};
 			stmt.addEventListener(SQLEvent.RESULT, listener);

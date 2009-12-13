@@ -41,9 +41,8 @@ package com.mailbrew.model
 		[Bindable] public var statusMessage:String;
 		[Bindable] public var showStatusProgressBar:Boolean;
 		[Bindable] public var accounts:ArrayCollection;
-		[Bindable] public var mainAppView:String;
-		[Bindable] public var accountFormView:String;
 		[Bindable] public var accountInfo:AccountInfo;
+		[Bindable] public var mainAppView:String;
 
 		public var checkEmailLock:Boolean;
 		public var purr:Purr;

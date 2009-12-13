@@ -19,6 +19,7 @@
 				this.dp.addItem({label:"Bottom Left", data:AbstractNotification.BOTTOM_LEFT});
 				this.dp.addItem({label:"Bottom Right", data:AbstractNotification.BOTTOM_RIGHT});
 				this.dataProvider = dp;
+				this.selectedIndex = 0;
 			}
 			
 			public function setSelectionByData(data:String):void

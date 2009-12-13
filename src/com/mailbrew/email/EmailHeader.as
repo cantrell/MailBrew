@@ -7,5 +7,6 @@ package com.mailbrew.email
 		public var subject:String;
 		public var summary:String;
 		public var url:String;
+		public var type:String;
 	}
 }

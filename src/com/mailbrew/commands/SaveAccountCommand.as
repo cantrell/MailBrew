@@ -6,6 +6,7 @@ package com.mailbrew.commands
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
+	import com.mailbrew.events.PopulateAccountInfoEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.SaveAccountEvent;
 	import com.mailbrew.model.ModelLocator;
@@ -26,6 +27,9 @@ package com.mailbrew.commands
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				new PopulateAccountListEvent().dispatch();
 				Alert.show("Your account information has been saved.", "Account Saved", Alert.OK, null, null, ml.faceSmileIconClass);
+				var paie:PopulateAccountInfoEvent = new PopulateAccountInfoEvent();
+				paie.accountId = e.data;
+				paie.dispatch();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			if (sae.saveMode == AccountSaveMode.INSERT)
@@ -39,7 +43,7 @@ package com.mailbrew.commands
 								 sae.portNumber,
 								 sae.secure,
 								 sae.notificationPosition,
-								 sae.sound,
+								 sae.notificationSound,
 								 sae.active);
 			}
 			else
@@ -54,7 +58,7 @@ package com.mailbrew.commands
 								 sae.portNumber,
 								 sae.secure,
 								 sae.notificationPosition,
-								 sae.sound,
+								 sae.notificationSound,
 								 sae.active);
 			}
 		}
