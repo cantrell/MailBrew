@@ -21,6 +21,9 @@ package com.mailbrew.commands
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.util.EmailServiceFactory;
 	
+	import flash.desktop.DockIcon;
+	import flash.desktop.NativeApplication;
+	import flash.desktop.SystemTrayIcon;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
 	import flash.events.Event;
@@ -36,7 +39,6 @@ package com.mailbrew.commands
 		private var currentAccount:Object;
 		private var newUnseenEmails:Vector.<EmailHeader>;
 		private var oldUnseenEmails:Array;
-		private var unseenTotal:Number;
 		private var ml:ModelLocator;
 		private var topLevelMenu:NativeMenu;
 		private var serviceMenu:NativeMenu;
@@ -55,8 +57,19 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				accountData = e.data;
-				unseenTotal = 0;
-				topLevelMenu = new NativeMenu();
+				if (NativeApplication.supportsDockIcon)
+				{
+					topLevelMenu = DockIcon(NativeApplication.nativeApplication.icon).menu;
+				}
+				else
+				{
+					topLevelMenu = SystemTrayIcon(NativeApplication.nativeApplication.icon).menu;
+				}
+				if (topLevelMenu == null)
+				{
+					topLevelMenu = new NativeMenu();
+					ml.purr.setMenu(topLevelMenu);
+				}
 				checkEmailLoop();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
@@ -91,12 +104,14 @@ package com.mailbrew.commands
 				// Remove the lock
 				this.ml.checkEmailLock = false;
 				
-				// Set the menu
-				this.ml.purr.setMenu(this.topLevelMenu);
-				
 				// Update the app icon
 				var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
-				uaie.unseenCount = this.unseenTotal;
+				var unseenCount:uint = 0;
+				for each (var nmi:NativeMenuItem in this.topLevelMenu.items)
+				{
+					unseenCount += nmi.submenu.numItems;
+				}
+				uaie.unseenCount = unseenCount;
 				uaie.dispatch();
 				
 				// Refresh the account list to show or clear errors
@@ -116,9 +131,16 @@ package com.mailbrew.commands
 				this.checkEmailLoop();
 				return;
 			}
+			if (this.topLevelMenu.getItemByName(this.currentAccount.id) != null)
+			{
+				this.topLevelMenu.removeItem(this.topLevelMenu.getItemByName(this.currentAccount.id));
+			}
 			this.serviceMenu = new NativeMenu();
 			this.serviceMenu.addEventListener(Event.SELECT, onMenuItemSelected);
-			this.topLevelMenu.addSubmenuAt(this.serviceMenu, 0, this.currentAccount.name);
+			var menuItem:NativeMenuItem = new NativeMenuItem(this.currentAccount.name);
+			menuItem.name = this.currentAccount.id;
+			menuItem.submenu = this.serviceMenu;
+			this.topLevelMenu.addItemAt(menuItem, 0);
 			var emailService:IEmailService = EmailServiceFactory.getEmailService(this.currentAccount.account_type,
 																				 this.currentAccount.username,
 																				 this.currentAccount.password,
@@ -129,7 +151,6 @@ package com.mailbrew.commands
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
-			
 			this.ml.statusMessage = "Checking " + this.currentAccount.name;
 			emailService.getUnseenEmailHeaders();
 		}
@@ -180,7 +201,6 @@ package com.mailbrew.commands
 				this.updateAccountAndContinue(true, null);
 				return;
 			}
-			this.unseenTotal += this.newUnseenEmails.length;
 			this.getOldUnseenEmails();
 		}
 		

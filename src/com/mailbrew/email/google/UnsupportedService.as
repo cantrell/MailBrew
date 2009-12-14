@@ -25,8 +25,6 @@ package com.mailbrew.email.google
 	{
 		private const APP_NAME:String = "MailBrew";
 		private const LOGIN_URL:String = "https://www.google.com/accounts/ClientLogin";
-		private const INBOX_RE:RegExp = new RegExp(/var json = (\{"r":"\^d1".*});/);
-		private const FROM_MAX:uint = 3;
 		
 		private var username:String;
 		private var password:String;
