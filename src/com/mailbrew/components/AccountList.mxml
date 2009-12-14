@@ -12,6 +12,7 @@
 			import com.mailbrew.database.Database;
 			import com.mailbrew.database.DatabaseEvent;
 			import com.mailbrew.database.DatabaseResponder;
+			import com.mailbrew.events.CheckMailEvent;
 			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.PopulateAccountInfoEvent;
 			import com.mailbrew.model.ModelLocator;
@@ -56,6 +57,15 @@
 					dae.dispatch();
 				}
 			}
+
+			private function onCheckNow(e:Event):void
+			{
+				if (this.accountList.selectedItem == null) return;
+				var accountId:Number = this.accountList.selectedItem.accountId;
+				var cme:CheckMailEvent = new CheckMailEvent();
+				cme.accountIds = [accountId];
+				cme.dispatch();
+			}
 			
 			private function onAccountListChange(e:IndexChangeEvent):void
 			{
@@ -87,6 +97,10 @@
 				if (data == null) return;
 				this.accountList.selectedItem = data;
 				var menu:NativeMenu = new NativeMenu();
+				var checkItem:NativeMenuItem = new NativeMenuItem("Check Now");
+				checkItem.addEventListener(Event.SELECT, onCheckNow);
+				checkItem.enabled = (data.active && data.working);
+				menu.addItem(checkItem);
 				if (!data.working)
 				{
 					var errorItem:NativeMenuItem = new NativeMenuItem("View Error");

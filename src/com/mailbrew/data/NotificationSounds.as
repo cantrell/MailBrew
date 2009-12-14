@@ -4,7 +4,8 @@ package com.mailbrew.data
 
 	public class NotificationSounds
 	{
-		[Embed(source="assets/sounds/four.mp3")] public var fourSoundClass:Class;
+		[Embed(source="assets/sounds/nice_nav_01.mp3")] public var fluteClass:Class;
+		[Embed(source="assets/sounds/nice_nav_02.mp3")] public var transporterClass:Class;
 		
 		public var soundData:ArrayCollection;
 		private var soundMap:Object;
@@ -16,8 +17,11 @@ package com.mailbrew.data
 
 			soundData.addItem({label:"None", soundClass:null});
 
-			soundData.addItem({label:"Four", soundClass:fourSoundClass});
-			soundMap["Four"] = fourSoundClass;
+			soundData.addItem({label:"Flute", soundClass:fluteClass});
+			soundMap["Flute"] = fluteClass;
+
+			soundData.addItem({label:"Transporter", soundClass:transporterClass});
+			soundMap["Transporter"] = transporterClass;
 		}
 		
 		public function getSound(name:String):Class

@@ -15,6 +15,7 @@ package com.mailbrew.commands
 	import com.mailbrew.email.google.Voice;
 	import com.mailbrew.email.google.Wave;
 	import com.mailbrew.email.imap.IMAP;
+	import com.mailbrew.events.CheckMailEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
@@ -42,6 +43,7 @@ package com.mailbrew.commands
 		
 		public function execute(e:CairngormEvent):void
 		{
+			var cme:CheckMailEvent = e as CheckMailEvent;
 			this.ml = ModelLocator.getInstance();
 			if (this.ml.checkEmailLock) return;
 			this.ml.checkEmailLock = true;
@@ -58,7 +60,14 @@ package com.mailbrew.commands
 				checkEmailLoop();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
-			db.getAccounts(responder);
+			if (cme.accountIds == null)
+			{
+				db.getAccounts(responder);
+			}
+			else
+			{
+				db.getAccountsByIds(responder, cme.accountIds);
+			}
 		}
 		
 		private function updateAccountAndContinue(working:Boolean, workingReason:String):void
@@ -116,29 +125,6 @@ package com.mailbrew.commands
 																				 this.currentAccount.imap_server,
 																				 Number(this.currentAccount.port_number),
 																				 Boolean(this.currentAccount.secure));
-			
-//			var emailService:IEmailService;
-//			if (this.currentAccount.account_type == AccountTypes.IMAP)
-//			{
-//				emailService = new IMAP(this.currentAccount.username,
-//										this.currentAccount.password,
-//										this.currentAccount.imap_server,
-//										Number(this.currentAccount.port_number),
-//										Boolean(this.currentAccount.secure));
-//			}
-//			else if (this.currentAccount.account_type == AccountTypes.GMAIL)
-//			{
-//				emailService = new Gmail(this.currentAccount.username, this.currentAccount.password);
-//			}
-//			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_WAVE)
-//			{
-//				emailService = new Wave(this.currentAccount.username, this.currentAccount.password);
-//			}
-//			else if (this.currentAccount.account_type == AccountTypes.GOOGLE_VOICE)
-//			{
-//				emailService = new Voice(this.currentAccount.username, this.currentAccount.password);
-//			}
-			
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);

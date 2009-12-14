@@ -90,7 +90,6 @@
 			
 			private function onMainAppViewChange(e:PropertyChangeEvent):void
 			{
-				trace("onMainAppViewChange");
 				if (ModelLocator.getInstance().mainAppView == MainAppViews.INTRO)
 				{
 					this.currentState = "intro";

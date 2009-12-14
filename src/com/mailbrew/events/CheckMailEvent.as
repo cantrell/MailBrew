@@ -6,6 +6,8 @@ package com.mailbrew.events
 	{
 		public static var CHECK_MAIL_EVENT:String = "checkMailEvent";
 		
+		public var accountIds:Array;
+		
 		public function CheckMailEvent()
 		{
 			super(CHECK_MAIL_EVENT);

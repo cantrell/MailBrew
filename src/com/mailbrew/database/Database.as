@@ -259,6 +259,30 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		/**
+		 * Unfortunately I have to build the SQL string my hand rather than
+		 * using a prepared statement because prepared statements are not
+		 * compatible with SELECT IN statements. You would never do this on
+		 * the web, but on the desktop, I think I can get away wit it.
+		 **/
+		public function getAccountsByIds(responder:DatabaseResponder, accountIds:Array):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			var sql:String = "SELECT * FROM accounts WHERE id IN (" + accountIds.toString() + ")";
+			stmt.text = sql;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data;
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
 		public function getErrorMessage(responder:DatabaseResponder, accountId:Number):void
 		{
 			if (!this.aConn.connected) return;
