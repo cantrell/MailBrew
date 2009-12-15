@@ -4,7 +4,7 @@
 		   xmlns:s="library://ns.adobe.com/flex/spark" 
 		   xmlns:mx="library://ns.adobe.com/flex/halo"
 		   xmlns:c="com.mailbrew.components.*"
-		   width="500" height="400"
+		   width="500" height="400" minWidth="500" minHeight="400"
 		   showStatusBar="false"
 		   applicationComplete="onApplicationComplete();">
 
@@ -19,6 +19,7 @@
 			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.util.StatusBarManager;
 			
 			import flash.events.Event;
 			import flash.events.InvokeEvent;
@@ -53,10 +54,8 @@
 					SystemTrayIcon(NativeApplication.nativeApplication.icon).addEventListener(ScreenMouseEvent.CLICK, onShowWindow);
 				}
 				
-
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
-				this.ml.statusMessage = "Welcome to MailBrew!";
 
 				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
@@ -67,6 +66,8 @@
 				this.visible = true;
 				
 				new InitEvent().dispatch();
+				
+				StatusBarManager.showMessage("Welcome to MailBrew");
 			}
 						
 			private function onWindowClosing(e:Event):void

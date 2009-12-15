@@ -11,6 +11,7 @@ package com.mailbrew.commands
 	import com.mailbrew.events.VerifyAccountEvent;
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.util.EmailServiceFactory;
+	import com.mailbrew.util.StatusBarManager;
 	
 	import mx.controls.Alert;
 	
@@ -20,6 +21,7 @@ package com.mailbrew.commands
 		public function execute(e:CairngormEvent):void
 		{
 			var vae:VerifyAccountEvent = e as VerifyAccountEvent;
+			StatusBarManager.showMessage("Verifying acount " + vae.accountName, true);
 			var emailService:IEmailService = EmailServiceFactory.getEmailService(vae.accountType, vae.username, vae.password, vae.server, vae.portNumber, vae.secure);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
@@ -30,6 +32,7 @@ package com.mailbrew.commands
 		
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
+			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			Alert.show("Unable to log in. Please check your username and password, then try again.",
@@ -41,6 +44,7 @@ package com.mailbrew.commands
 
 		private function onAuthenticationSucceeded(e:EmailEvent):void
 		{
+			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
 			Alert.show("Login successful! Everything appears to be in order!",
@@ -52,6 +56,7 @@ package com.mailbrew.commands
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
+			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			Alert.show("Unable to connect. Please check your network settings and try again.",
@@ -63,6 +68,7 @@ package com.mailbrew.commands
 		
 		private function onProtocolError(e:EmailEvent):void
 		{
+			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			Alert.show("Protocol error, which means you might have found a bug. Could you email this error to christian.cantrell@gmail.com? " + e.data,

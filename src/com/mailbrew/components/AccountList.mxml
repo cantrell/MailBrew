@@ -55,6 +55,7 @@
 					var dae:DeleteAccountEvent = new DeleteAccountEvent();
 					dae.accountId = this.accountList.selectedItem.accountId;
 					dae.dispatch();
+					this.accountList.selectedItem = null;
 				}
 			}
 

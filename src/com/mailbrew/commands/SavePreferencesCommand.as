@@ -5,6 +5,7 @@ package com.mailbrew.commands
 	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.events.SavePreferencesEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.util.StatusBarManager;
 	
 	import flash.desktop.NativeApplication;
 	import flash.events.TimerEvent;
@@ -20,6 +21,7 @@ package com.mailbrew.commands
 			this.ml.prefs.setValue(PreferenceKeys.UPDATE_INTERVAL, spe.updateInterval);
 			this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, spe.notificationDisplayInterval);
 			this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, spe.idleThreshold);
+			this.ml.prefs.setValue(PreferenceKeys.BOUNCE_DOCK_ICON, spe.bounceDockIcon);
 			this.ml.prefs.save();
 			try
 			{
@@ -33,6 +35,7 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer.delay = (this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
 			this.ml.checkEmailTimer.start();
 			this.ml.purr.setIdleThreshold(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
+			StatusBarManager.showMessage("Preferences saved", false);
 		}
 	}
 }

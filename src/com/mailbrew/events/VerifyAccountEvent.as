@@ -6,6 +6,7 @@ package com.mailbrew.events
 	{
 		public static var VERIFY_ACCOUNT_EVENT:String = "verifyAccountEvent";
 		
+		public var accountName:String;
 		public var accountType:String;
 		public var username:String;
 		public var password:String;

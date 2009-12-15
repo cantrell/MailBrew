@@ -97,6 +97,7 @@
 			public function setData(accountInfo:AccountInfo):void
 			{
 				this.accountId = accountInfo.accountId;
+				this.accountType.selectedItem = accountInfo.accountType;
 				this.accountNameInput.text = accountInfo.accountName;
 				this.usernameInput.text = accountInfo.username;
 				this.passwordInput.text = accountInfo.password;
@@ -152,6 +153,7 @@
 			{
 				if (!this.isFormComplete()) return;
 				var vae:VerifyAccountEvent = new VerifyAccountEvent();
+				vae.accountName = this.accountNameInput.text;
 				vae.accountType = this.accountType.selectedItem;
 				vae.username = this.usernameInput.text;
 				vae.password = this.passwordInput.text;
@@ -170,22 +172,15 @@
 		<s:State name="wave"/>
 		<s:State name="voice"/>
 	</s:states>
-
+	
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center"/>
+		<s:VerticalLayout horizontalAlign="center" gap="0"/>
 	</s:layout>
 	
-	<s:ButtonBar id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" top="0" left="50" right="50"/>
-
-	<s:Label includeIn="wave" width="300">
-		<s:text>Note: Due to lack of official APIs, Google Wave support is experimental. If it breaks, expect an application update soon.</s:text>
-	</s:Label>
-
-	<s:Label includeIn="voice" width="300">
-		<s:text>Note: Due to lack of official APIs, Google Voice support is experimental. If it breaks, expect an application update soon.</s:text>
-	</s:Label>
-	
 	<mx:Form>
+		<mx:FormItem label="Account Type" includeIn="imap, gmail, wave, voice">
+			<s:DropDownList id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);"/>
+		</mx:FormItem>
 		<mx:FormItem label="Account Name" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
@@ -215,11 +210,15 @@
 		</mx:FormItem>
 	</mx:Form>
 
-	<s:Group>
-		<s:layout>
-			<s:HorizontalLayout verticalAlign="top"/>
-		</s:layout>
+	<s:HGroup>
 		<s:Button id="saveButton" label="Save" click="onSave();"/>
 		<s:Button id="verifyButton" label="Verify" click="onVerify();"/>
-	</s:Group>
+	</s:HGroup>
+	
+	<s:HGroup width="300" includeIn="wave, voice" paddingTop="15">
+		<s:Label fontWeight="bold" text="Note:"/>
+		<s:Label text="Due to lack of official APIs, Google Wave support is experimental. If it breaks, expect an application update soon." width="300" includeIn="wave"/>
+		<s:Label text="Due to lack of official APIs, Google Voice support is experimental. If it breaks, expect an application update soon." width="300" includeIn="voice"/>
+	</s:HGroup>
+
 </s:Group>

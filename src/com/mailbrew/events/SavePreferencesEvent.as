@@ -9,6 +9,7 @@ package com.mailbrew.events
 		public var updateInterval:uint;
 		public var notificationDisplayInterval:uint;
 		public var idleThreshold:uint;
+		public var bounceDockIcon:Boolean;
 		public var startAtLogin:Boolean;
 		
 		public function SavePreferencesEvent()

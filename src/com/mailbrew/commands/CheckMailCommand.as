@@ -20,9 +20,11 @@ package com.mailbrew.commands
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.util.EmailServiceFactory;
+	import com.mailbrew.util.StatusBarManager;
 	
 	import flash.desktop.DockIcon;
 	import flash.desktop.NativeApplication;
+	import flash.desktop.NotificationType;
 	import flash.desktop.SystemTrayIcon;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
@@ -30,6 +32,7 @@ package com.mailbrew.commands
 	import flash.media.Sound;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
+	import flash.system.System;
 	
 	import mx.collections.ArrayCollection;
 	
@@ -49,8 +52,7 @@ package com.mailbrew.commands
 			this.ml = ModelLocator.getInstance();
 			if (this.ml.checkEmailLock) return;
 			this.ml.checkEmailLock = true;
-			this.ml.statusMessage = "Checking for new messages";
-			this.ml.showStatusProgressBar = true;
+			StatusBarManager.showMessage("Checking for new messages", true);
 			var db:Database = this.ml.db;
 			var responder:DatabaseResponder = new DatabaseResponder();
 			var listener:Function = function(e:DatabaseEvent):void
@@ -96,31 +98,41 @@ package com.mailbrew.commands
 			db.updateLastChecked(responder, this.currentAccount.id, working, workingReason, new Date());
 		}
 		
-		public function checkEmailLoop():void
+		private function finish():void
+		{
+			// Remove the lock
+			this.ml.checkEmailLock = false;
+			
+			// Update the app icon
+			var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
+			var unseenCount:uint = 0;
+			for each (var nmi:NativeMenuItem in this.topLevelMenu.items)
+			{
+				unseenCount += nmi.submenu.numItems;
+			}
+			uaie.unseenCount = unseenCount;
+			uaie.dispatch();
+			
+			// Refresh the account list to show or clear errors
+			new PopulateAccountListEvent().dispatch();
+			
+			// Update the status message
+			StatusBarManager.showMessage("Done", false);
+
+			// Do some memory management
+			this.accountData = null;
+			this.currentAccount = null;
+			this.newUnseenEmails = null;
+			this.oldUnseenEmails = null;
+			System.gc();
+		}
+		
+		private function checkEmailLoop():void
 		{
 			// The loop is finished
 			if (this.accountData == null || this.accountData.length == 0)
 			{
-				// Remove the lock
-				this.ml.checkEmailLock = false;
-				
-				// Update the app icon
-				var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
-				var unseenCount:uint = 0;
-				for each (var nmi:NativeMenuItem in this.topLevelMenu.items)
-				{
-					unseenCount += nmi.submenu.numItems;
-				}
-				uaie.unseenCount = unseenCount;
-				uaie.dispatch();
-				
-				// Refresh the account list to show or clear errors
-				new PopulateAccountListEvent().dispatch();
-				
-				// Update the status message
-				this.ml.statusMessage = "Done";
-				this.ml.showStatusProgressBar = false;
-
+				this.finish();
 				return;
 			}
 			this.newUnseenEmails = null;
@@ -151,7 +163,7 @@ package com.mailbrew.commands
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
-			this.ml.statusMessage = "Checking " + this.currentAccount.name;
+			StatusBarManager.showMessage("Checking " + this.currentAccount.name, true);
 			emailService.getUnseenEmailHeaders();
 		}
 		
@@ -222,6 +234,7 @@ package com.mailbrew.commands
 		private function compareOldAndNew():void
 		{
 			var notificationSoundPlayed:Boolean = false;
+			var dockIconBounced:Boolean = false;
 			newEmailLoop: for (var i:uint = 0; i < this.newUnseenEmails.length; ++i)
 			{
 				var emailHeader:EmailHeader = this.newUnseenEmails[i];
@@ -259,6 +272,11 @@ package com.mailbrew.commands
 					this.playNotificationSound();
 					notificationSoundPlayed = true;
 				}
+				if (!dockIconBounced)
+				{
+					this.bounceDockIcon();
+					dockIconBounced = true;
+				}
 				this.addNotification(emailHeader);
 			}
 			this.deleteOldMessages();
@@ -283,6 +301,15 @@ package com.mailbrew.commands
 			var SoundClass:Class = this.ml.notificationSounds.getSound(soundName);
 			var sound:Sound = new SoundClass();
 			sound.play();
+		}
+		
+		private function bounceDockIcon():void
+		{
+			if (!this.ml.prefs.getValue(PreferenceKeys.BOUNCE_DOCK_ICON, false)) return;
+			if (NativeApplication.supportsDockIcon)
+			{
+				DockIcon(NativeApplication.nativeApplication.icon).bounce(NotificationType.INFORMATIONAL);
+			}
 		}
 		
 		private function deleteOldMessages():void
