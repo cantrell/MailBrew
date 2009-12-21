@@ -93,6 +93,7 @@
             SELECT
                 id,
                 name,
+                account_type,
                 working,
                 active
             FROM

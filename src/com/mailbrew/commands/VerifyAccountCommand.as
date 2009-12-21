@@ -2,6 +2,7 @@ package com.mailbrew.commands
 {
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.IconAlert;
 	import com.mailbrew.data.AccountTypes;
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.IEmailService;
@@ -12,8 +13,6 @@ package com.mailbrew.commands
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.util.EmailServiceFactory;
 	import com.mailbrew.util.StatusBarManager;
-	
-	import mx.controls.Alert;
 	
 	public class VerifyAccountCommand
 		implements ICommand
@@ -35,11 +34,7 @@ package com.mailbrew.commands
 			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
-			Alert.show("Unable to log in. Please check your username and password, then try again.",
-					   "Login Failed",
-					   Alert.OK,
-					   null, null,
-					   ModelLocator.getInstance().faceCryingIconClass);
+			IconAlert.showFailure("Login Failed", "Unable to log in. Please check your username and password, then try again.");
 		}
 
 		private function onAuthenticationSucceeded(e:EmailEvent):void
@@ -47,11 +42,7 @@ package com.mailbrew.commands
 			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
-			Alert.show("Login successful! Everything appears to be in order!",
-					   "Login Successful",
-					   Alert.OK,
-					   null, null,
-					   ModelLocator.getInstance().faceSmileIconClass);
+			IconAlert.showInformation("Login Successful", "Everything appears to be in order!");
 		}
 		
 		private function onConnectionFailed(e:EmailEvent):void
@@ -59,11 +50,7 @@ package com.mailbrew.commands
 			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
-			Alert.show("Unable to connect. Please check your network settings and try again.",
-					   "Connection Failure",
-					   Alert.OK,
-					   null, null,
-					   ModelLocator.getInstance().faceCryingIconClass);
+			IconAlert.showFailure("Connection Failure", "Unable to connect. Please check your network settings and try again.");
 		}
 		
 		private function onProtocolError(e:EmailEvent):void
@@ -71,11 +58,7 @@ package com.mailbrew.commands
 			StatusBarManager.clearMessage();
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
-			Alert.show("Protocol error, which means you might have found a bug. Could you email this error to christian.cantrell@gmail.com? " + e.data,
-					   "Protocol Error",
-					   Alert.OK,
-					   null, null,
-					   ModelLocator.getInstance().faceCryingIconClass);
+			IconAlert.showFailure("Protocol Error", "You might have found a bug. Could you email this error to christian.cantrell@gmail.com? [" + e.data + "]");
 		}
 	}
 }

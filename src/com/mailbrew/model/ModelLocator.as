@@ -20,31 +20,44 @@ package com.mailbrew.model
 	{
 		protected static var inst:ModelLocator;
 		
-		[Bindable] [Embed(source="assets/list-add.png")] public var listAddIconClass:Class;
-		[Bindable] [Embed(source="assets/list-remove.png")] public var listRemoveIconClass:Class;
-		[Bindable] [Embed(source="assets/face-smile.png")] public var faceSmileIconClass:Class;
-		[Bindable] [Embed(source="assets/face-crying.png")] public var faceCryingIconClass:Class;
-		[Bindable] [Embed(source="assets/face-surprise.png")] public var faceSurpriseIconClass:Class;
-		[Bindable] [Embed(source="assets/emblem-system.png")] public var configureIconClass:Class;
-		[Bindable] [Embed(source="assets/help-browser.png")] public var aboutIconClass:Class;
-		[Bindable] [Embed(source="assets/view-refresh.png")] public var checkNowIconClass:Class;
-		[Bindable] [Embed(source="assets/audio-x-generic.png")] public var audioIconClass:Class;
+		public static const DEFAULT_FRAME_RATE:uint = 24;
 		
-        [Embed(source="assets/dynamic_logo_128.png")]
+		// Buttons
+		[Bindable] [Embed(source="assets/buttons/list_add.png")] public var listAddIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/list_remove.png")] public var listRemoveIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/configure.png")] public var configureIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/about.png")] public var aboutIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/refresh.png")] public var checkNowIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/play.png")] public var audioIconClass:Class;
+		
+		// Services (small)
+		[Bindable] [Embed(source="assets/services/imap_24x24.png")] public var ImapIconClassSmall:Class;
+		[Bindable] [Embed(source="assets/services/gmail_24x24.png")] public var GmailIconClassSmall:Class;
+		[Bindable] [Embed(source="assets/services/wave_24x24.png")] public var WaveIconClassSmall:Class;
+		[Bindable] [Embed(source="assets/services/voice_24x24.png")] public var VoiceIconClassSmall:Class;
+
+		// Services (large)
+		[Bindable] [Embed(source="assets/services/imap_64x64.png")] public var ImapIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/gmail_64x64.png")] public var GmailIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/wave_64x64.png")] public var WaveIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/voice_64x64.png")] public var VoiceIconClassLarge:Class;
+
+		public var imapIconBitmapLarge:Bitmap;		
+		public var gmailIconBitmapLarge:Bitmap;		
+		public var waveIconBitmapLarge:Bitmap;		
+		public var voiceIconBitmapLarge:Bitmap;		
+		
+        [Embed(source="assets/logos/dynamic_logo_128x128.png")]
         public var DynamicIconClass:Class;
 		public var dynamicAppIcon:Bitmap;
-		
-		[Embed(source="assets/notification_icon.png")]
-		public var NotificationIconClass:Class;
-		public var notificationIcon:Bitmap;
 
 		[Bindable] public var statusMessage:String;
 		[Bindable] public var showStatusProgressBar:Boolean;
 		[Bindable] public var accounts:ArrayCollection;
 		[Bindable] public var accountInfo:AccountInfo;
 		[Bindable] public var mainAppView:String;
-
-		public var checkEmailLock:Boolean;
+		[Bindable] public var checkEmailLock:Boolean;
+		[Bindable] public var frameRate:uint;
 		public var purr:Purr;
 		public var prefs:Preference;
 		public var checkEmailTimer:Timer;

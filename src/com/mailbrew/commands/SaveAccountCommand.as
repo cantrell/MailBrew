@@ -2,6 +2,7 @@ package com.mailbrew.commands
 {
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.IconAlert;
 	import com.mailbrew.data.AccountSaveMode;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
@@ -11,8 +12,6 @@ package com.mailbrew.commands
 	import com.mailbrew.events.SaveAccountEvent;
 	import com.mailbrew.model.ModelLocator;
 	
-	import mx.controls.Alert;
-		
 	public class SaveAccountCommand
 		implements ICommand
 	{
@@ -26,7 +25,14 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				new PopulateAccountListEvent().dispatch();
-				Alert.show("Your account information has been saved.", "Account Saved", Alert.OK, null, null, ml.faceSmileIconClass);
+				if (sae.saveMode == AccountSaveMode.INSERT)
+				{
+					IconAlert.showSuccess("Account Created", "Your new account has been created.");
+				}
+				else
+				{
+					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
+				}
 				var paie:PopulateAccountInfoEvent = new PopulateAccountInfoEvent();
 				paie.accountId = e.data;
 				paie.dispatch();

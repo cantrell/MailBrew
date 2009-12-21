@@ -3,6 +3,7 @@ package com.mailbrew.commands
 	import com.adobe.air.notification.Notification;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.IconAlert;
 	import com.mailbrew.data.AccountTypes;
 	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
@@ -26,6 +27,7 @@ package com.mailbrew.commands
 	import flash.desktop.NativeApplication;
 	import flash.desktop.NotificationType;
 	import flash.desktop.SystemTrayIcon;
+	import flash.display.Bitmap;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
 	import flash.events.Event;
@@ -50,7 +52,11 @@ package com.mailbrew.commands
 		{
 			var cme:CheckMailEvent = e as CheckMailEvent;
 			this.ml = ModelLocator.getInstance();
-			if (this.ml.checkEmailLock) return;
+			if (this.ml.checkEmailLock)
+			{
+				IconAlert.showInformation("Bad Timing", "You can't delete an account while checking for new messages. Please wait a second, then try again.");
+				return;
+			}
 			this.ml.checkEmailLock = true;
 			StatusBarManager.showMessage("Checking for new messages", true);
 			var db:Database = this.ml.db;
@@ -59,14 +65,7 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				accountData = e.data;
-				if (NativeApplication.supportsDockIcon)
-				{
-					topLevelMenu = DockIcon(NativeApplication.nativeApplication.icon).menu;
-				}
-				else
-				{
-					topLevelMenu = SystemTrayIcon(NativeApplication.nativeApplication.icon).menu;
-				}
+				topLevelMenu = ml.purr.getMenu();
 				if (topLevelMenu == null)
 				{
 					topLevelMenu = new NativeMenu();
@@ -99,32 +98,25 @@ package com.mailbrew.commands
 		}
 		
 		private function finish():void
-		{
-			// Remove the lock
-			this.ml.checkEmailLock = false;
-			
+		{			
 			// Update the app icon
-			var uaie:UpdateAppIconEvent = new UpdateAppIconEvent();
-			var unseenCount:uint = 0;
-			for each (var nmi:NativeMenuItem in this.topLevelMenu.items)
-			{
-				unseenCount += nmi.submenu.numItems;
-			}
-			uaie.unseenCount = unseenCount;
-			uaie.dispatch();
+			new UpdateAppIconEvent().dispatch();
 			
 			// Refresh the account list to show or clear errors
 			new PopulateAccountListEvent().dispatch();
 			
 			// Update the status message
 			StatusBarManager.showMessage("Done", false);
-
+			
 			// Do some memory management
 			this.accountData = null;
 			this.currentAccount = null;
 			this.newUnseenEmails = null;
 			this.oldUnseenEmails = null;
 			System.gc();
+			
+			// Remove the lock
+			this.ml.checkEmailLock = false;
 		}
 		
 		private function checkEmailLoop():void
@@ -135,6 +127,8 @@ package com.mailbrew.commands
 				this.finish();
 				return;
 			}
+			
+			// Reset some stuff
 			this.newUnseenEmails = null;
 			this.oldUnseenEmails = null;
 			this.currentAccount = this.accountData.pop();
@@ -143,6 +137,8 @@ package com.mailbrew.commands
 				this.checkEmailLoop();
 				return;
 			}
+			
+			// Manage the Dock or System Tray menu
 			if (this.topLevelMenu.getItemByName(this.currentAccount.id) != null)
 			{
 				this.topLevelMenu.removeItem(this.topLevelMenu.getItemByName(this.currentAccount.id));
@@ -208,9 +204,14 @@ package com.mailbrew.commands
 			var emailService:IEmailService = e.target as IEmailService;
 			emailService.removeEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			this.newUnseenEmails = e.data;
-			if (this.newUnseenEmails == null || this.newUnseenEmails.length == 0)
+			if (this.newUnseenEmails == null)
 			{
 				this.updateAccountAndContinue(true, null);
+				return;
+			}
+			else if (this.newUnseenEmails.length == 0)
+			{
+				this.deleteOldMessages();
 				return;
 			}
 			this.getOldUnseenEmails();
@@ -289,9 +290,41 @@ package com.mailbrew.commands
                                                              summary,
 															 this.currentAccount.notification_location,
 															 this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
-															 this.ml.notificationIcon);
+															 this.getServiceIcon(this.currentAccount.account_type));
+			notification.addEventListener(Event.CLOSE, onNotificationClosed);
 			notification.width = 250;
+			if (this.ml.frameRate == 1) this.ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 			this.ml.purr.addNotification(notification);
+		}
+		
+		private function onNotificationClosed(e:Event):void
+		{
+			var notification:Notification = e.target as Notification;
+			notification.removeEventListener(Event.CLOSE, onNotificationClosed);
+			if (this.ml.purr.length == 0)
+			{
+				// All done showing notifications
+				if (NativeApplication.nativeApplication.activeWindow == null) // App isn't open or active
+				{
+					this.ml.frameRate = 1;
+				}
+			}
+		}
+		
+		private function getServiceIcon(accountType:String):Bitmap
+		{
+			switch (accountType)
+			{
+				case(AccountTypes.IMAP):
+					return this.ml.imapIconBitmapLarge;
+				case(AccountTypes.GMAIL):
+					return this.ml.gmailIconBitmapLarge;
+				case(AccountTypes.GOOGLE_WAVE):
+					return this.ml.waveIconBitmapLarge;
+				case(AccountTypes.GOOGLE_VOICE):
+					return this.ml.voiceIconBitmapLarge;
+			}
+			return null;
 		}
 		
 		private function playNotificationSound():void

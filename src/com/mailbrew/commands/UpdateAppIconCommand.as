@@ -5,9 +5,14 @@ package com.mailbrew.commands
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
 	
+	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.NativeMenu;
+	import flash.display.NativeMenuItem;
 	import flash.display.Sprite;
+	import flash.filters.BevelFilter;
+	import flash.filters.DropShadowFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.engine.ElementFormat;
@@ -21,7 +26,13 @@ package com.mailbrew.commands
 	{
 		public function execute(e:CairngormEvent):void
 		{
-			var uaie:UpdateAppIconEvent = UpdateAppIconEvent(e);
+			if (NativeApplication.supportsSystemTrayIcon) return;
+			var unseenCount:uint = 0;
+			var menu:NativeMenu = ModelLocator.getInstance().purr.getMenu();
+			for each (var nmi:NativeMenuItem in menu.items)
+			{
+				unseenCount += nmi.submenu.numItems;
+			}
 			var ml:ModelLocator = ModelLocator.getInstance();
 			var unreadCountSprite:Sprite = new Sprite();
 			unreadCountSprite.width = 128;
@@ -31,15 +42,18 @@ package com.mailbrew.commands
 			var padding:uint = 10;
 			var fontDesc:FontDescription = new FontDescription("Arial", "bold");
 			var elementFormat:ElementFormat = new ElementFormat(fontDesc, 30, 0xFFFFFF);
-			var textElement:TextElement = new TextElement(String(uaie.unseenCount), elementFormat);
+			var textElement:TextElement = new TextElement(String(unseenCount), elementFormat);
 			var textBlock:TextBlock = new TextBlock(textElement);
 			var textLine:TextLine = textBlock.createTextLine();
 			textLine.x = (((128 - textLine.textWidth) - padding) + 2);
-			textLine.y = 30;
-			unreadCountSprite.graphics.beginFill(0xAA0000);
-			unreadCountSprite.graphics.drawEllipse((((128 - textLine.textWidth) - padding) - 3), 0, textLine.textWidth + padding, textLine.textHeight + padding);
+			textLine.y = 32;
+			unreadCountSprite.graphics.beginFill(0xe92200);
+			unreadCountSprite.graphics.drawEllipse((((128 - textLine.textWidth) - padding) - 3), 2, textLine.textWidth + padding, textLine.textHeight + padding);
 			unreadCountSprite.graphics.endFill();
 			unreadCountSprite.addChild(textLine);
+			var shadow:DropShadowFilter = new DropShadowFilter(3, 45, 0, .75);
+			var bevel:BevelFilter = new BevelFilter(1);
+			unreadCountSprite.filters = [shadow,bevel];
 			var unreadCountData:BitmapData = new BitmapData(128, 128, true, 0x00000000);
 			unreadCountData.draw(unreadCountSprite);
 			var appData:BitmapData = new ml.DynamicIconClass().bitmapData;

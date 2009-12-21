@@ -5,7 +5,7 @@
 		   xmlns:mx="library://ns.adobe.com/flex/halo"
 		   xmlns:c="com.mailbrew.components.*"
 		   width="500" height="400" minWidth="500" minHeight="400"
-		   showStatusBar="false"
+		   showStatusBar="false" backgroundFrameRate="-1"
 		   applicationComplete="onApplicationComplete();">
 
 	<fx:Script>
@@ -45,6 +45,8 @@
 			{
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
 				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);
+				this.nativeApplication.addEventListener(Event.ACTIVATE, onApplicationActivate);
+				this.nativeApplication.addEventListener(Event.DEACTIVATE, onApplicationDeactivate);
 				if (NativeApplication.supportsDockIcon) // Mac
 				{
 					NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, onShowWindow);
@@ -59,8 +61,11 @@
 
 				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "frameRate", onFrameRateChange);
 				ml.mainAppView = MainAppViews.INTRO;
 
+				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
+				
 				var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (this.width/2)), (Screen.mainScreen.bounds.height / 2 - (this.height/2)), this.width, this.height);
 				this.nativeWindow.bounds = initialBounds;
 				this.visible = true;
@@ -74,11 +79,13 @@
 			{
 				e.preventDefault();
 				this.visible = false;
+				ml.frameRate = 1;
 			}
 			
 			private function onShowWindow(e:Event):void
 			{
 				this.visible = true;
+				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 				this.nativeWindow.activate();
 			}
 			
@@ -101,6 +108,22 @@
 				}
 			}
 
+			private function onFrameRateChange(e:PropertyChangeEvent):void
+			{
+				trace("Frame Rate:", ml.frameRate);
+				this.stage.frameRate = ml.frameRate;
+			}
+			
+			private function onApplicationActivate(e:Event):void
+			{
+				this.ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
+			}
+			
+			private function onApplicationDeactivate(e:Event):void
+			{
+				this.ml.frameRate = 1;
+			}
+			
 			private function onAccountsChange(e:PropertyChangeEvent):void
 			{
 				var accounts:ArrayCollection = this.ml.accounts;

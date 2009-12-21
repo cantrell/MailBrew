@@ -15,6 +15,7 @@
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
@@ -177,23 +178,32 @@
 		<s:VerticalLayout horizontalAlign="center" gap="0"/>
 	</s:layout>
 	
-	<mx:Form>
+	
+	<fx:Declarations>
+		<mx:StringValidator source="{accountNameInput}" property="text" minLength="1" requiredFieldError="Account name is required"/>
+		<mx:StringValidator source="{usernameInput}" property="text" minLength="1" requiredFieldError="User name is required"/>
+		<mx:StringValidator source="{passwordInput}" property="text" minLength="1" requiredFieldError="Password is required"/>
+		<mx:StringValidator source="{imapServerInput}" property="text" minLength="1" requiredFieldError="IMAP server is required"/>
+		<mx:NumberValidator source="{portNumberInput}" property="text" integerError="Port numbers must be positive whole numbers" invalidCharError="Ports are numeric" requiredFieldError="A port number is required" domain="int"/>
+	</fx:Declarations>
+	
+	<mx:Form id="accountForm">
 		<mx:FormItem label="Account Type" includeIn="imap, gmail, wave, voice">
 			<s:DropDownList id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);"/>
 		</mx:FormItem>
-		<mx:FormItem label="Account Name" includeIn="imap, gmail, wave, voice">
+		<mx:FormItem label="Account Name" required="true" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem label="Username" includeIn="imap, gmail, wave, voice">
+		<mx:FormItem label="User Name" required="true" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="usernameInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem label="Password" includeIn="imap, gmail, wave, voice">
+		<mx:FormItem label="Password" required="true" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="passwordInput" width="200" displayAsPassword="true" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem id="imapServerLabel" label="IMAP Server" includeIn="imap">
+		<mx:FormItem id="imapServerLabel" required="true" label="IMAP Server" includeIn="imap">
 			<mx:TextInput id="imapServerInput" width="200" change="onFormChange();"/>
 		</mx:FormItem>
-		<mx:FormItem id="portNumberLabel" label="Port Number" includeIn="imap">
+		<mx:FormItem id="portNumberLabel" required="true" label="Port Number" includeIn="imap">
 			<mx:TextInput id="portNumberInput" width="50" change="onFormChange();"/>
 		</mx:FormItem>
 		<mx:FormItem id="secureLabel" label="Secure?" includeIn="imap">

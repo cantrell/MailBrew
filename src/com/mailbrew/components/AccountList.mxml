@@ -22,8 +22,8 @@
 			import flash.events.Event;
 			import flash.events.MouseEvent;
 			
-			import mx.controls.Alert;
 			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			
 			import spark.components.Label;
@@ -39,18 +39,13 @@
 			private function onRemoveAccount(e:Event):void
 			{
 				if (this.accountList.selectedItem == null) return;
-				Alert.show("Are you sure you want to delete " + this.accountList.selectedItem.label + "?",
-						   "Confirm",
-						   Alert.YES|Alert.NO,
-						   null,
-						   onRemoveAccountConfirm,
-						   ml.faceSurpriseIconClass);
+				IconAlert.showQuestion("Last Chance", "Are you sure you want to delete " + this.accountList.selectedItem.label + "?", onRemoveAccountConfirm);
 			}
 			
 			private function onRemoveAccountConfirm(e:CloseEvent):void
 			{
 				if (this.accountList.selectedItem == null) return;
-				if (e.detail == Alert.YES)
+				if (e.detail == IconAlert.YES)
 				{
 					var dae:DeleteAccountEvent = new DeleteAccountEvent();
 					dae.accountId = this.accountList.selectedItem.accountId;
@@ -110,6 +105,7 @@
 				}
 				var deleteItem:NativeMenuItem = new NativeMenuItem("Delete");
 				deleteItem.addEventListener(Event.SELECT, onRemoveAccount);
+				deleteItem.enabled = (this.ml.checkEmailLock) ? false : true;
 				menu.addItem(deleteItem);
 				menu.display(this.stage, e.stageX, e.stageY);
 			}
@@ -155,7 +151,7 @@
 			<s:HorizontalLayout/>
 		</s:layout>
 		<mx:Button id="addAccountButton" width="40" icon="{ModelLocator.getInstance().listAddIconClass}" click="onAddAccount();"/>
-		<mx:Button id="removeAccountButton" width="40" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null) ? false : true}"/>
+		<mx:Button id="removeAccountButton" width="40" icon="{ModelLocator.getInstance().listRemoveIconClass}" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null || ModelLocator.getInstance().checkEmailLock) ? false : true}"/>
 	</s:Group>	
 	
 </s:Group>

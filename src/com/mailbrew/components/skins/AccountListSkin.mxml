@@ -4,6 +4,9 @@
 				xmlns:mx="library://ns.adobe.com/flex/halo">
 	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.data.AccountTypes;
+			import com.mailbrew.model.ModelLocator;
+			
 			import flash.events.MouseEvent;
 			
 			public function determineFontColor(active:Boolean, working:Boolean):uint
@@ -11,6 +14,22 @@
 				if (!active) return 0xcccccc;
 				if (!working) return 0xff0000;
 				return 0x000000;
+			}
+
+			public function determineServiceIcon(accountType:String):Class
+			{
+				switch (accountType)
+				{
+					case(AccountTypes.IMAP):
+						return ModelLocator.getInstance().ImapIconClassSmall;
+					case(AccountTypes.GMAIL):
+						return ModelLocator.getInstance().GmailIconClassSmall;
+					case(AccountTypes.GOOGLE_WAVE):
+						return ModelLocator.getInstance().WaveIconClassSmall;
+					case(AccountTypes.GOOGLE_VOICE):
+						return ModelLocator.getInstance().VoiceIconClassSmall;
+				}
+				return null;
 			}
 		]]>
 	</fx:Script>
@@ -30,10 +49,13 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Label color="{determineFontColor(data.active, data.working)}"
-			 text="{data.label}"
-			 paddingBottom="2" paddingTop="2" paddingLeft="2"
-			 width="100%">
-	</s:Label>
-	
+	<s:HGroup verticalAlign="middle" paddingLeft="3">
+		<s:BitmapImage source="{determineServiceIcon(data.accountType)}"/>
+		<s:Label color="{determineFontColor(data.active, data.working)}"
+				 text="{data.label}"
+				 paddingBottom="2" paddingTop="2" paddingLeft="2"
+				 width="100%">
+		</s:Label>
+	</s:HGroup>
+
 </s:ItemRenderer>

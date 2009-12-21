@@ -6,8 +6,6 @@ package com.mailbrew.events
 	{
 		public static var UPDATE_APP_ICON_EVENT:String = "updateAppIconEvent";
 		
-		public var unseenCount:Number;
-		
 		public function UpdateAppIconEvent()
 		{
 			super(UPDATE_APP_ICON_EVENT);

@@ -58,7 +58,10 @@ package com.mailbrew.commands
 			
 			this.ml.purr = new Purr(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
 			
-			this.ml.notificationIcon = new this.ml.NotificationIconClass();
+			this.ml.imapIconBitmapLarge = new this.ml.ImapIconClassLarge();
+			this.ml.gmailIconBitmapLarge = new this.ml.GmailIconClassLarge();
+			this.ml.waveIconBitmapLarge = new this.ml.WaveIconClassLarge();
+			this.ml.voiceIconBitmapLarge = new this.ml.VoiceIconClassLarge();
 			
 			var databasePassword:String = this.ml.prefs.getValue("databasePassword");
 			if (databasePassword == null)
