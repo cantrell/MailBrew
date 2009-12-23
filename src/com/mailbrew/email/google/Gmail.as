@@ -53,7 +53,17 @@ package com.mailbrew.email.google
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			urlLoader.addEventListener(Event.COMPLETE, onComplete);
 			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
-			var req:URLRequest = new URLRequest("https://mail.google.com/mail/feed/atom");
+			var req:URLRequest;
+			// Decide if this is a straight-up Gmail account, or a Google Apps for My Domain account.
+			if (this.username.search(/@gmail\.com$/) != -1)
+			{
+				req = new URLRequest("https://mail.google.com/mail/feed/atom");
+			}
+			else
+			{
+				var domain:String = this.username.substring(this.username.indexOf("@") + 1, this.username.length);
+				req = new URLRequest("https://mail.google.com/a/" + domain + "/feed/atom");
+			}
 			req.authenticate = false;
 			var authString:String = this.username + ":" + this.password;
 			var b64:Base64Encoder = new Base64Encoder();

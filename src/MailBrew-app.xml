@@ -16,7 +16,7 @@
 		<visible>false</visible>
 		<!-- <minimizable></minimizable> -->
 		<!-- <maximizable></maximizable> -->
-		<!-- <resizable></resizable> -->
+		<resizable>false</resizable>
 		<width>500</width>
 		<height>400</height>
 		<!-- <x></x> -->

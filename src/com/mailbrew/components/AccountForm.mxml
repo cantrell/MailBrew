@@ -116,6 +116,7 @@
 			
 			public function clearData():void
 			{
+				this.enableValidators(false);
 				this.accountId = NaN;
 				this.accountNameInput.text = "";
 				this.usernameInput.text = "";
@@ -127,6 +128,7 @@
 				this.notificationSound.clearSelection();
 				this.activeCheckbox.selected = true;
 				this.saveButton.label = "Save";
+				this.enableValidators(true);
 			}
 			
 			private function isFormComplete():Boolean
@@ -163,6 +165,15 @@
 				vae.dispatch();
 			}
 			
+			private function enableValidators(enabled:Boolean):void
+			{
+				this.accountNameValidator.enabled = enabled;
+				this.usernameValidator.enabled = enabled;
+				this.passwordValidator.enabled = enabled;
+				this.imapServerValidator.enabled = enabled;
+				this.portNumberValidator.enabled = enabled;
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -179,11 +190,11 @@
 	
 	
 	<fx:Declarations>
-		<mx:StringValidator source="{accountNameInput}" property="text" minLength="1" requiredFieldError="Account name is required"/>
-		<mx:StringValidator source="{usernameInput}" property="text" minLength="1" requiredFieldError="User name is required"/>
-		<mx:StringValidator source="{passwordInput}" property="text" minLength="1" requiredFieldError="Password is required"/>
-		<mx:StringValidator source="{imapServerInput}" property="text" minLength="1" requiredFieldError="IMAP server is required"/>
-		<mx:NumberValidator source="{portNumberInput}" property="text" integerError="Port numbers must be positive whole numbers" invalidCharError="Ports are numeric" requiredFieldError="A port number is required" domain="int"/>
+		<mx:StringValidator id="accountNameValidator" source="{accountNameInput}" property="text" minLength="1" requiredFieldError="Account name is required"/>
+		<mx:StringValidator id="usernameValidator" source="{usernameInput}" property="text" minLength="1" requiredFieldError="User name is required"/>
+		<mx:StringValidator id="passwordValidator" source="{passwordInput}" property="text" minLength="1" requiredFieldError="Password is required"/>
+		<mx:StringValidator id="imapServerValidator" source="{imapServerInput}" property="text" minLength="1" requiredFieldError="IMAP server is required"/>
+		<mx:NumberValidator id="portNumberValidator" source="{portNumberInput}" property="text" integerError="Port numbers must be positive whole numbers" invalidCharError="Ports are numeric" requiredFieldError="A port number is required" domain="int"/>
 	</fx:Declarations>
 	
 	<mx:Form id="accountForm">
@@ -224,8 +235,9 @@
 		<s:Button id="verifyButton" label="Verify" click="onVerify();"/>
 	</s:HGroup>
 	
-	<s:HGroup width="300" includeIn="wave, voice" paddingTop="15">
+	<s:HGroup width="300" includeIn="gmail, wave, voice" paddingTop="15">
 		<s:Label fontWeight="bold" text="Note:"/>
+		<s:Label text="Both Gmail and Google Apps email accounts are supported." width="300" includeIn="gmail"/>
 		<s:Label text="Due to lack of official APIs, Google Wave support is experimental. If it breaks, expect an application update soon." width="300" includeIn="wave"/>
 		<s:Label text="Due to lack of official APIs, Google Voice support is experimental. If it breaks, expect an application update soon." width="300" includeIn="voice"/>
 	</s:HGroup>

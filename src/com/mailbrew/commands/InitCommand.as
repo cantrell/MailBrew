@@ -13,6 +13,9 @@ package com.mailbrew.commands
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	
+	import flash.desktop.NativeApplication;
+	import flash.display.NativeMenu;
+	import flash.display.NativeMenuItem;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.filesystem.File;
@@ -68,6 +71,22 @@ package com.mailbrew.commands
 			appIcons.push(new this.ml.Dynamic16IconClass());
 			this.ml.purr.setIcons(appIcons);
 			
+			// Exit option on Windows
+			var topLevelMenu:NativeMenu = ml.purr.getMenu();
+			if (topLevelMenu == null)
+			{
+				topLevelMenu = new NativeMenu();
+				this.ml.purr.setMenu(topLevelMenu);
+			}
+			if (NativeApplication.supportsSystemTrayIcon)
+			{
+				var exitMenuItem:NativeMenuItem = new NativeMenuItem("Exit");
+				exitMenuItem.addEventListener(Event.SELECT, onExitApplication);
+				topLevelMenu.addItemAt(exitMenuItem, 0);
+				var seperator:NativeMenuItem = new NativeMenuItem(null, true);
+				topLevelMenu.addItemAt(seperator, 0);
+			}
+			
 			var databasePassword:String = this.ml.prefs.getValue("databasePassword");
 			if (databasePassword == null)
 			{
@@ -119,6 +138,11 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
 			this.ml.checkEmailTimer.start();
 			new CheckMailEvent().dispatch();
+		}
+		
+		private function onExitApplication(e:Event):void
+		{
+			NativeApplication.nativeApplication.exit(0);
 		}
 		
 		private static const POSSIBLE_CHARS:Array = ["abcdefghijklmnopqrstuvwxyz","ABCDEFGHIJKLMNOPQRSTUVWXYZ","0123456789","~`!@#$%^&*()_-+=[{]}|;:'\"\\,<.>/?"];

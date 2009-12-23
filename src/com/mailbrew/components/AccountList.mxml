@@ -20,7 +20,9 @@
 			import flash.events.Event;
 			import flash.events.MouseEvent;
 			
+			import mx.binding.utils.ChangeWatcher;
 			import mx.events.CloseEvent;
+			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
 			
@@ -28,7 +30,22 @@
 			
 			private function onCreationComplete():void
 			{
+				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
 				this.ml = ModelLocator.getInstance();
+			}
+			
+			private function onAccountsChange(e:PropertyChangeEvent):void
+			{
+				this.accountList.selectedItem = null;
+				for each (var accountInfo:Object in ml.accounts)
+				{
+					if (accountInfo.selected)
+					{
+						trace(accountInfo.label);
+						this.accountList.selectedItem = accountInfo;
+						break;
+					}
+				}
 			}
 			
 			private function onRemoveAccount(e:Event):void
@@ -40,10 +57,8 @@
 			private function onRemoveAccountConfirm(e:CloseEvent):void
 			{
 				if (this.accountList.selectedItem == null) return;
-				trace(e.detail, IconAlert.YES);
 				if (e.detail == IconAlert.YES)
 				{
-					trace("HERE");
 					var dae:DeleteAccountEvent = new DeleteAccountEvent();
 					dae.accountId = this.accountList.selectedItem.accountId;
 					dae.dispatch();
@@ -92,7 +107,7 @@
 				var menu:NativeMenu = new NativeMenu();
 				var checkItem:NativeMenuItem = new NativeMenuItem("Check Now");
 				checkItem.addEventListener(Event.SELECT, onCheckNow);
-				checkItem.enabled = (data.active && data.working);
+				checkItem.enabled = (data.active);
 				menu.addItem(checkItem);
 				if (!data.working)
 				{

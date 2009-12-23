@@ -43,7 +43,6 @@
 		<s:BitmapImage source="{determineServiceIcon(data.accountType)}"/>
 		<s:Label color="{determineFontColor(data.active, data.working)}"
 				 text="{data.label}"
-				 paddingBottom="2" paddingTop="5" paddingLeft="2"
 				 width="100%">
 		</s:Label>
 	</s:HGroup>

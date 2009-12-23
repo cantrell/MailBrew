@@ -25,8 +25,8 @@
 				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
 			
 				//emailService.testAccount();
-				emailService.getUnseenEmailCount();
-				//emailService.getUnseenEmailHeaders();
+				//emailService.getUnseenEmailCount();
+				emailService.getUnseenEmailHeaders();
 			}
 			
 			private function onAuthenticationFailed(e:EmailEvent):void

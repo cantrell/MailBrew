@@ -6,6 +6,8 @@ package com.mailbrew.events
 	{
 		public static var POPULATE_ACCOUNT_LIST_EVENT:String = "populateAccountListEvent";
 		
+		public var selectedId:Number;
+		
 		public function PopulateAccountListEvent()
 		{
 			super(POPULATE_ACCOUNT_LIST_EVENT);

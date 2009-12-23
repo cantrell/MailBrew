@@ -5,6 +5,7 @@ package com.mailbrew.commands
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
+	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
@@ -14,6 +15,7 @@ package com.mailbrew.commands
 	{
 		public function execute(e:CairngormEvent):void
 		{
+			var pale:PopulateAccountListEvent = e as PopulateAccountListEvent;
 			var ml:ModelLocator = ModelLocator.getInstance();
 			var db:Database = ml.db;
 			var responder:DatabaseResponder = new DatabaseResponder();
@@ -23,7 +25,14 @@ package com.mailbrew.commands
 				var accountData:Array =  new Array();
 				for each (var o:Object in e.data)
 				{
-					accountData.push({label:o.name, accountId:o.id, working:o.working, active:o.active, accountType:o.account_type});
+					var accountInfo:Object = new Object();
+					accountInfo.label = o.name;
+					accountInfo.accountId = o.id;
+					accountInfo.working = o.working;
+					accountInfo.active = o.active;
+					accountInfo.accountType = o.account_type;
+					accountInfo.selected = (o.id == pale.selectedId) ? true : false;
+					accountData.push(accountInfo);
 				}
 				ml.accounts = new ArrayCollection(accountData);
 			};

@@ -24,7 +24,9 @@ package com.mailbrew.commands
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
-				new PopulateAccountListEvent().dispatch();
+				var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
+				pale.selectedId = e.data;
+				pale.dispatch();
 				if (sae.saveMode == AccountSaveMode.INSERT)
 				{
 					IconAlert.showSuccess("Account Created", "Your new account has been created.");
@@ -33,9 +35,6 @@ package com.mailbrew.commands
 				{
 					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
 				}
-				var paie:PopulateAccountInfoEvent = new PopulateAccountInfoEvent();
-				paie.accountId = e.data;
-				paie.dispatch();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			if (sae.saveMode == AccountSaveMode.INSERT)
