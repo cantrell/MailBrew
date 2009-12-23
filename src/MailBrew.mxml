@@ -10,39 +10,30 @@
 
 	<fx:Script>
 		<![CDATA[
-			import com.adobe.air.notification.AbstractNotification;
-			import com.mailbrew.commands.AppExitCommand;
+			import com.mailbrew.components.UncaughtExceptionWindow;
 			import com.mailbrew.controller.Controller;
-			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.data.MainAppViews;
 			import com.mailbrew.events.AppExitEvent;
-			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.StatusBarManager;
 			
+			import flash.events.ErrorEvent;
 			import flash.events.Event;
 			import flash.events.InvokeEvent;
-			import flash.events.MouseEvent;
 			import flash.events.ScreenMouseEvent;
 			import flash.geom.Rectangle;
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
-			import mx.events.CloseEvent;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.events.ListEvent;
 			import mx.events.PropertyChangeEvent;
-			import mx.messaging.events.ChannelEvent;
-			
-			import spark.events.IndexChangeEvent;
 			
 			private var controller:Controller;
 			private var ml:ModelLocator;
 			
 			private function onApplicationComplete():void
 			{
+				this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
 				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);
 				this.nativeApplication.addEventListener(Event.ACTIVATE, onApplicationActivate);
@@ -110,7 +101,6 @@
 
 			private function onFrameRateChange(e:PropertyChangeEvent):void
 			{
-				trace("Frame Rate:", ml.frameRate);
 				this.stage.frameRate = ml.frameRate;
 			}
 			
@@ -133,9 +123,36 @@
 				}
 			}
 
+			private function onUncaughtError(e:UncaughtErrorEvent):void
+			{
+				e.preventDefault();
+				var id:int = -1;
+				var name:String;
+				var message:String;
+				if (e.error is Error)
+				{
+					var error:Error = e.error as Error;
+					id = error.errorID;
+					name = error.name;
+					message = error.message;
+				}
+				else
+				{
+					var errorEvent:ErrorEvent = e.error as ErrorEvent;
+					id = errorEvent.errorID;
+					name = errorEvent.type;
+					message = errorEvent.text;
+				}
+				var exceptionWindow:UncaughtExceptionWindow = new UncaughtExceptionWindow();
+				exceptionWindow.setData(id, name, message);
+				exceptionWindow.open(true);
+			}
+
 		]]>
 	</fx:Script>
 	
+	
+
 	<s:states>
 		<s:State name="intro"/>
 		<s:State name="started"/>
@@ -146,10 +163,18 @@
 			<s:Fade targets="{[introComp, accountFormComp]}"/>
 		</s:Transition>
 	</s:transitions>
+
+	<fx:DesignLayer>
+		<s:Rect height="100%" width="100%" x="0" y="0">
+			<s:fill>
+				<s:SolidColor color="0xd2d2d2"/>
+			</s:fill>
+		</s:Rect>
+	</fx:DesignLayer>
 	
 	<c:CommandBar left="0" right="0" top="0" height="30"/>
-	<c:AccountList left="5" top="50" bottom="30"/>
-	<c:Intro id="introComp" top="30" left="130" includeIn="intro"/>
-	<c:AccountForm id="accountFormComp" top="30" left="120" includeIn="started"/>
+	<c:AccountList left="5" top="40" bottom="25" width="130"/>
+	<c:Intro id="introComp" top="30" left="140" includeIn="intro"/>
+	<c:AccountForm id="accountFormComp" top="30" left="130" includeIn="started"/>
 	<c:Status bottom="0" left="0" right="0" height="20"/>
 </s:WindowedApplication>

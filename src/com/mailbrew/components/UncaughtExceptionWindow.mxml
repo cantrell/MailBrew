@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/halo"
+		  width="450" height="250" title="Application Error"
+		  showStatusBar="false" type="utility"
+		  creationComplete="onCreationComplete();">
+
+	<fx:Script>
+		<![CDATA[
+			
+			private var errorId:int;
+			private var errorName:String;
+			private var errorMessage:String;
+			
+			public function setData(id:int, name:String, message:String):void
+			{
+				this.errorId = id;
+				this.errorName = name;
+				this.errorMessage = message;
+			}
+
+			public function onCreationComplete():void
+			{
+				errorData.text = ("Error ID: " + this.errorId + "\n\nError Name: " + this.errorName + "\n\nError Message: " + this.errorMessage) + "\n\n" + errorData.text;
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%" paddingLeft="4" paddingRight="4" paddingBottom="4" paddingTop="4">
+		<s:RichEditableText width="100%" focusEnabled="false" editable="false">
+			<s:textFlow>
+				<s:TextFlow>
+					<s:p>
+						An unexpected error has occurred.
+						You may need to restart the application for it to function properly.
+						Before you do, however, it would be very helpful if you could email
+						the information below to <s:a href="mailto:christian.cantrell@gmail.com?subject=MailBrew Error">christian.cantrell@gmail.com</s:a>. Thanks!</s:p>
+				</s:TextFlow>
+			</s:textFlow>
+		</s:RichEditableText>
+		<s:TextArea id="errorData" width="100%" height="100%" textAlign="start">
+			<s:text>What was happening when this error occurred?</s:text>
+		</s:TextArea>
+	</s:VGroup>
+</s:Window>

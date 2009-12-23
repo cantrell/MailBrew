@@ -13,7 +13,6 @@ package com.mailbrew.commands
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	
-	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.filesystem.File;
@@ -62,6 +61,12 @@ package com.mailbrew.commands
 			this.ml.gmailIconBitmapLarge = new this.ml.GmailIconClassLarge();
 			this.ml.waveIconBitmapLarge = new this.ml.WaveIconClassLarge();
 			this.ml.voiceIconBitmapLarge = new this.ml.VoiceIconClassLarge();
+			
+			// Dock and system tray icons
+			var appIcons:Array = new Array();
+			appIcons.push(new this.ml.Dynamic128IconClass());
+			appIcons.push(new this.ml.Dynamic16IconClass());
+			this.ml.purr.setIcons(appIcons);
 			
 			var databasePassword:String = this.ml.prefs.getValue("databasePassword");
 			if (databasePassword == null)
@@ -113,8 +118,7 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer = new Timer(this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
 			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
 			this.ml.checkEmailTimer.start();
-			// TBD: Add this back in
-			//new CheckMailEvent().dispatch();
+			new CheckMailEvent().dispatch();
 		}
 		
 		private static const POSSIBLE_CHARS:Array = ["abcdefghijklmnopqrstuvwxyz","ABCDEFGHIJKLMNOPQRSTUVWXYZ","0123456789","~`!@#$%^&*()_-+=[{]}|;:'\"\\,<.>/?"];

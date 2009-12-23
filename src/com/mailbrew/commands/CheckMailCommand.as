@@ -12,10 +12,6 @@ package com.mailbrew.commands
 	import com.mailbrew.email.EmailEvent;
 	import com.mailbrew.email.EmailHeader;
 	import com.mailbrew.email.IEmailService;
-	import com.mailbrew.email.google.Gmail;
-	import com.mailbrew.email.google.Voice;
-	import com.mailbrew.email.google.Wave;
-	import com.mailbrew.email.imap.IMAP;
 	import com.mailbrew.events.CheckMailEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
@@ -26,7 +22,6 @@ package com.mailbrew.commands
 	import flash.desktop.DockIcon;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.NotificationType;
-	import flash.desktop.SystemTrayIcon;
 	import flash.display.Bitmap;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
@@ -35,8 +30,6 @@ package com.mailbrew.commands
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	import flash.system.System;
-	
-	import mx.collections.ArrayCollection;
 	
 	public class CheckMailCommand implements ICommand
 	{

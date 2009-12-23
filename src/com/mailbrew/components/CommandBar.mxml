@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
          xmlns:s="library://ns.adobe.com/flex/spark"
-		 xmlns:mx="library://ns.adobe.com/flex/halo">
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
 	<fx:Script>
 		<![CDATA[
-			import com.adobe.air.preferences.Preference;
 			import com.mailbrew.events.CheckMailEvent;
 			import com.mailbrew.model.ModelLocator;
 			
@@ -21,12 +20,21 @@
 			
 			private function onOpenAbout():void
 			{
-				// TBD
+				var about:About = new About();
+				about.open(true);
 			}
 		]]>
 	</fx:Script>
-	<mx:Label text="MailBrew" left="5" top="2"/>
-	<s:Group right="5" top="2">
+	<fx:DesignLayer>
+		<s:Rect height="100%" width="100%" x="0" y="0">
+			<s:fill>
+				<s:SolidColor color="0x252525"/>
+			</s:fill>
+		</s:Rect>
+	</fx:DesignLayer>
+	<s:BitmapImage source="{ModelLocator.getInstance().TopLeftLogo}" left="4" top="3"/>
+	<mx:Label text="MailBrew" left="30" top="6" fontSize="20" fontWeight="bold" color="0xf2f2f2"/>
+	<s:Group right="5" top="5">
 		<s:layout>
 			<s:HorizontalLayout/>
 		</s:layout>

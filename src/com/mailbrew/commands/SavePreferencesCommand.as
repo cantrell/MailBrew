@@ -8,7 +8,6 @@ package com.mailbrew.commands
 	import com.mailbrew.util.StatusBarManager;
 	
 	import flash.desktop.NativeApplication;
-	import flash.events.TimerEvent;
 	
 	public class SavePreferencesCommand
 		implements ICommand

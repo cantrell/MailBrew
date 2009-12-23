@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 width="100%" height="15">
 
 	<fx:Script>
@@ -12,10 +12,10 @@
 
 	<s:Line left="0" right="0" top="0">
 		<s:stroke>
-			<s:SolidColorStroke weight="1" color="0xCCCCCC"/>
+			<s:SolidColorStroke weight="1" color="0x252525"/>
 		</s:stroke>
 	</s:Line>
 
 	<s:Label id="statusMessage" text="{ModelLocator.getInstance().statusMessage}" left="2" bottom="2"/>
-	<mx:ProgressBar id="progress" indeterminate="true" visible="{ModelLocator.getInstance().showStatusProgressBar}" right="5" width="100" bottom="0" label="" labelPlacement="right"/>
+	<mx:ProgressBar id="progress" indeterminate="true" visible="{ModelLocator.getInstance().showStatusProgressBar}" right="7" width="100" bottom="4" label="" labelPlacement="center" height="10"/>
 </s:Group>

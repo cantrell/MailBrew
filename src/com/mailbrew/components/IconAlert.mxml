@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Alert xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/halo">
+		  xmlns:mx="library://ns.adobe.com/flex/mx">
 	<fx:Script>
 		<![CDATA[
 			
@@ -10,10 +10,10 @@
 			[Bindable] [Embed(source="assets/alerts/face-smile.png")]    public static var successIconClass:Class;
 			[Bindable] [Embed(source="assets/alerts/face-wink.png")]     public static var informationIconClass:Class;
 			
-			public static const YES:uint    = YES;
-			public static const NO:uint     = NO;
-			public static const OK:uint     = OK;
-			public static const CANCEL:uint = CANCEL;
+			public static const YES:uint    = Alert.YES;
+			public static const NO:uint     = Alert.NO;
+			public static const OK:uint     = Alert.OK;
+			public static const CANCEL:uint = Alert.CANCEL;
 
 			public static function showFailure(title:String, text:String, closeHandler:Function=null):void
 			{

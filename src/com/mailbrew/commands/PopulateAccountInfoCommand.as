@@ -9,8 +9,6 @@ package com.mailbrew.commands
 	import com.mailbrew.events.PopulateAccountInfoEvent;
 	import com.mailbrew.model.ModelLocator;
 	
-	import mx.collections.ArrayCollection;
-	
 	public class PopulateAccountInfoCommand
 		implements ICommand
 	{

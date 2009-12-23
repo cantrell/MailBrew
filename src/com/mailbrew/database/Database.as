@@ -1,14 +1,10 @@
 package com.mailbrew.database
 {
 	
-	import com.mailbrew.email.EmailHeader;
-	
 	import flash.data.*;
-	import flash.errors.SQLError;
 	import flash.events.SQLErrorEvent;
 	import flash.events.SQLEvent;
 	import flash.filesystem.*;
-	import flash.system.System;
 	import flash.utils.ByteArray;
 
 	public class Database

@@ -15,8 +15,6 @@
 			import com.mailbrew.events.SavePreferencesEvent;
 			import com.mailbrew.model.ModelLocator;
 			
-			import mx.events.FlexEvent;
-			
 			private function onCreationComplete():void
 			{
 				var ml:ModelLocator = ModelLocator.getInstance();

@@ -8,7 +8,6 @@
 			import com.adobe.air.notification.AbstractNotification;
 			
 			import mx.collections.ArrayCollection;
-			import mx.events.FlexEvent;
 			
 			private var dp:ArrayCollection;
 			

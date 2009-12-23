@@ -7,8 +7,6 @@
 			import com.mailbrew.data.AccountTypes;
 			import com.mailbrew.model.ModelLocator;
 			
-			import flash.events.MouseEvent;
-			
 			public function determineFontColor(active:Boolean, working:Boolean):uint
 			{
 				if (!active) return 0xcccccc;
@@ -40,20 +38,12 @@
 		<s:State name="selected" />
 	</s:states>
 	
-	<s:Rect left="0" right="0" top="0" bottom="0">
-		<s:fill>
-			<s:SolidColor color="black"
-						  alpha="0"
-						  alpha.hovered="0.4"
-						  alpha.selected="0.4"/>
-		</s:fill>
-	</s:Rect>
 	
 	<s:HGroup verticalAlign="middle" paddingLeft="3">
 		<s:BitmapImage source="{determineServiceIcon(data.accountType)}"/>
 		<s:Label color="{determineFontColor(data.active, data.working)}"
 				 text="{data.label}"
-				 paddingBottom="2" paddingTop="2" paddingLeft="2"
+				 paddingBottom="2" paddingTop="5" paddingLeft="2"
 				 width="100%">
 		</s:Label>
 	</s:HGroup>

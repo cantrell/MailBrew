@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<application xmlns="http://ns.adobe.com/air/application/2.0beta">
+<application xmlns="http://ns.adobe.com/air/application/2.0beta2">
 
 	<id>com.mailbrew.mailbrew</id>
 	<filename>MailBrew</filename>
 	<name>MailBrew</name>
-	<version>1.0</version>
+	<version>.1</version>
 	<description>MailBrew is a notifier for IMAP, Gmail, Google Wave, and Google Voice. Created by Christian Cantrell.</description>
 	<copyright>2009 Cantrell Media Company</copyright>
 

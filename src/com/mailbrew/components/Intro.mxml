@@ -5,7 +5,4 @@
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
-	<s:Label>
-		<s:text>Welcome to MailBrew!</s:text>
-	</s:Label>
 </s:Group>

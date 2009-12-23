@@ -4,7 +4,6 @@ package com.mailbrew.model
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.data.AccountInfo;
-	import com.mailbrew.data.MainAppViews;
 	import com.mailbrew.data.NotificationSounds;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.events.CheckMailEvent;
@@ -47,9 +46,11 @@ package com.mailbrew.model
 		public var waveIconBitmapLarge:Bitmap;		
 		public var voiceIconBitmapLarge:Bitmap;		
 		
-        [Embed(source="assets/logos/dynamic_logo_128x128.png")]
-        public var DynamicIconClass:Class;
+		// App logos
+        [Embed(source="assets/logos/dynamic_logo_128x128.png")] public var Dynamic128IconClass:Class;
 		public var dynamicAppIcon:Bitmap;
+		[Embed(source="assets/logos/dynamic_logo_16x16.png")] public var Dynamic16IconClass:Class;
+		[Bindable] [Embed(source="assets/logos/top_left_24x24.png")] public var TopLeftLogo:Class;
 
 		[Bindable] public var statusMessage:String;
 		[Bindable] public var showStatusProgressBar:Boolean;

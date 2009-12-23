@@ -13,7 +13,6 @@ package com.mailbrew.email.google
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
-	import flash.net.URLStream;
 	import flash.system.System;
 	
 	import mx.utils.Base64Encoder;

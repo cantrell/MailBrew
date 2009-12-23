@@ -2,10 +2,10 @@ package com.mailbrew.commands
 {
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
-	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
 	
 	import flash.desktop.NativeApplication;
+	import flash.desktop.SystemTrayIcon;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.NativeMenu;
@@ -26,12 +26,16 @@ package com.mailbrew.commands
 	{
 		public function execute(e:CairngormEvent):void
 		{
-			if (NativeApplication.supportsSystemTrayIcon) return;
 			var unseenCount:uint = 0;
 			var menu:NativeMenu = ModelLocator.getInstance().purr.getMenu();
 			for each (var nmi:NativeMenuItem in menu.items)
 			{
 				unseenCount += nmi.submenu.numItems;
+			}
+			if (NativeApplication.supportsSystemTrayIcon) // For Windows, just update the system tray icon tooltip
+			{
+				SystemTrayIcon(NativeApplication.nativeApplication.icon).tooltip = unseenCount + " unread messages";
+				return;
 			}
 			var ml:ModelLocator = ModelLocator.getInstance();
 			var unreadCountSprite:Sprite = new Sprite();
@@ -56,14 +60,13 @@ package com.mailbrew.commands
 			unreadCountSprite.filters = [shadow,bevel];
 			var unreadCountData:BitmapData = new BitmapData(128, 128, true, 0x00000000);
 			unreadCountData.draw(unreadCountSprite);
-			var appData:BitmapData = new ml.DynamicIconClass().bitmapData;
+			var appData:BitmapData = new ml.Dynamic128IconClass().bitmapData;
 			appData.copyPixels(unreadCountData,
 				new Rectangle(0, 0, unreadCountData.width, unreadCountData.height),
 				new Point(0, 0),
 				null, null, true);
 			var appIcon:Bitmap = new Bitmap(appData);
 			ml.purr.setIcons([appIcon]);
-			// TBD: Set menu
 		}
 	}
 }
