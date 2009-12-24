@@ -91,16 +91,24 @@
         </selectAll>
         <selectForList>
             SELECT
-                id,
-                name,
-                account_type,
-                working,
-                active
+                accounts.id,
+                accounts.name,
+                accounts.username,
+                accounts.account_type,
+                accounts.active,
+                accounts.working,
+                count(messages.id) AS total
             FROM
-                accounts
+				accounts LEFT OUTER JOIN messages
+			ON
+				messages.account_id = accounts.id
+            AND
+            	accounts.active = true
+            GROUP BY
+            	accounts.id
             ORDER BY
-            	id ASC;
-        </selectForList>   
+            	accounts.id ASC;
+        </selectForList>
         <selectWorkingReason>
             SELECT
                 working_reason

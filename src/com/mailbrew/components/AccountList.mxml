@@ -17,8 +17,10 @@
 			
 			import flash.display.NativeMenu;
 			import flash.display.NativeMenuItem;
+			import flash.display.NativeWindow;
 			import flash.events.Event;
 			import flash.events.MouseEvent;
+			import flash.geom.Point;
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.events.CloseEvent;
@@ -145,11 +147,42 @@
 				responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				db.getErrorMessage(responder, accountId);
 			}
+			
+			private function onToggleSummaryWindow(e:MouseEvent):void
+			{
+				if (this.summaryCheckbox.selected)
+				{
+					if (this.ml.summaryWindow == null)
+					{
+						this.ml.summaryWindow = new Summary();
+						this.ml.summaryWindow.setLocation(this.globalToScreen(e.stageX, e.stageY));
+						this.ml.summaryWindow.open(true);
+					}
+					else
+					{
+						this.ml.summaryWindow.setLocation(this.globalToScreen(e.stageX, e.stageY));
+						this.ml.summaryWindow.visible = true;
+					}
+				}
+				else
+				{
+					if (this.ml.summaryWindow != null)
+					{
+						this.ml.summaryWindow.visible = false;
+					}
+				}
+			}
+			
+			private function globalToScreen(x:uint, y:uint):Point
+			{
+				var win:NativeWindow = NativeApplication.nativeApplication.openedWindows[0];
+				return win.globalToScreen(new Point(x, y));
+			}
 		]]>
 	</fx:Script>
 	
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center"/>
+		<s:VerticalLayout horizontalAlign="left"/>
 	</s:layout>
 	
 	<s:List id="accountList"
@@ -166,5 +199,7 @@
 		<s:Button id="addAccountButton" label="Add New Account" width="130" skinClass="com.mailbrew.components.skins.AddAccountButtonSkin" click="onAddAccount();"/>
 		<s:Button id="removeAccountButton" label="Remove Account" width="130" skinClass="com.mailbrew.components.skins.RemoveAccountButtonSkin" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null || ModelLocator.getInstance().checkEmailLock) ? false : true}"/>
 	</s:Group>	
+	
+	<s:CheckBox id="summaryCheckbox" label="Summary Window" click="onToggleSummaryWindow(event);"/>
 	
 </s:Group>

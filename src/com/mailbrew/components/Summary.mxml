@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/halo"
+		  type="lightweight" systemChrome="none" transparent="true"
+		  showStatusBar="false" backgroundAlpha="0" alwaysInFront="true"
+		  mouseDown="onMouseDown(event);" mouseWheel="onMouseWheel(event);"
+		  creationComplete="onCreationComplete();" width="200" height="200" resizable="false">
+	<fx:Script>
+		<![CDATA[
+			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.util.ServiceToURLMapper;
+			
+			import flash.events.MouseEvent;
+			import flash.geom.Point;
+			import flash.net.URLRequest;
+			import flash.net.navigateToURL;
+			
+			import mx.binding.utils.ChangeWatcher;
+			import mx.events.PropertyChangeEvent;
+			
+			import spark.skins.spark.ListSkin;
+
+			private var ml:ModelLocator;
+			private var globalPoint:Point;
+			
+			private function onCreationComplete():void
+			{
+				this.ml = ModelLocator.getInstance();
+				ChangeWatcher.watch(ml, "accounts", onAccountsChange);
+				ListSkin(this.accountSummaryList.skin).background.alpha = 0;
+				ListSkin(this.accountSummaryList.skin).border.alpha = 0;
+				this.onAccountsChange();
+				if (this.globalPoint != null)
+				{
+					this.nativeWindow.x = globalPoint.x;
+					this.nativeWindow.y = globalPoint.y;
+				}
+			}
+
+			private function onMouseDown(e:MouseEvent):void
+			{
+				this.nativeWindow.startMove();
+			}
+			
+			private function onMouseWheel(e:MouseEvent):void
+			{
+				var delta:int = (e.delta < 0) ? -1 : 1;
+				if (alpha >= .1 || e.delta > 0)
+				{
+					alpha += (delta / 50);
+				}
+			}
+			
+			private function onAccountsChange(e:PropertyChangeEvent = null):void
+			{
+				this.height = (ml.accounts.length * 28) + 4;
+			}
+			
+			public function setLocation(p:Point):void
+			{
+				this.globalPoint = p;
+				if (this.nativeWindow != null)
+				{
+					this.nativeWindow.x = p.x;
+					this.nativeWindow.y = p.y;
+				}
+			}
+
+			private function onAccountSelect():void
+			{
+				if (this.accountSummaryList.selectedItem != null)
+				{
+					var item:Object = this.accountSummaryList.selectedItem;
+					var url:String = ServiceToURLMapper.getServiceURL(item.accountType, item.username);
+					if (url != null)
+					{
+						navigateToURL(new URLRequest(url));
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:DesignLayer>
+		<s:Rect height="100%" width="100%" x="0" y="0" alpha=".75" radiusX="10" id="background">
+			<s:fill>
+				<s:SolidColor color="0x000000"/>
+			</s:fill>
+		</s:Rect>
+	</fx:DesignLayer>
+	<s:HGroup width="100%" height="100%" paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5" verticalAlign="middle">
+		<s:List id="accountSummaryList" rollOverColor="0x000000" selectionColor="0x000000" buttonMode="true" useHandCursor="true"
+				dataProvider="{ModelLocator.getInstance().accounts}"
+				width="100%"
+				itemRenderer="com.mailbrew.components.skins.SummaryListRenderer" click="onAccountSelect();"/>
+	</s:HGroup>
+</s:Window>

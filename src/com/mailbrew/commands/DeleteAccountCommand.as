@@ -2,6 +2,7 @@ package com.mailbrew.commands
 {
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.IconAlert;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
 	import com.mailbrew.events.DeleteAccountEvent;
@@ -18,6 +19,7 @@ package com.mailbrew.commands
 		{
 			if (ModelLocator.getInstance().checkEmailLock)
 			{
+				IconAlert.showInformation("Bad Timing", "You can't delete an account while checking for new messages. Please wait a second, then try again.");
 				return;
 			}
 			var dae:DeleteAccountEvent = DeleteAccountEvent(e);

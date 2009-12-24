@@ -27,11 +27,13 @@ package com.mailbrew.commands
 				{
 					var accountInfo:Object = new Object();
 					accountInfo.label = o.name;
+					accountInfo.username = o.username;
 					accountInfo.accountId = o.id;
 					accountInfo.working = o.working;
 					accountInfo.active = o.active;
 					accountInfo.accountType = o.account_type;
 					accountInfo.selected = (o.id == pale.selectedId) ? true : false;
+					accountInfo.total = o.total;
 					accountData.push(accountInfo);
 				}
 				ml.accounts = new ArrayCollection(accountData);

@@ -33,7 +33,7 @@
 			
 			private function onApplicationComplete():void
 			{
-				this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
+				if (!ModelLocator.TEST_MODE) this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
 				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);
 				this.nativeApplication.addEventListener(Event.ACTIVATE, onApplicationActivate);

@@ -45,11 +45,7 @@ package com.mailbrew.commands
 		{
 			var cme:CheckMailEvent = e as CheckMailEvent;
 			this.ml = ModelLocator.getInstance();
-			if (this.ml.checkEmailLock)
-			{
-				IconAlert.showInformation("Bad Timing", "You can't delete an account while checking for new messages. Please wait a second, then try again.");
-				return;
-			}
+			if (this.ml.checkEmailLock) return;
 			this.ml.checkEmailLock = true;
 			StatusBarManager.showMessage("Checking for new messages", true);
 			var db:Database = this.ml.db;
@@ -204,6 +200,10 @@ package com.mailbrew.commands
 			}
 			else if (this.newUnseenEmails.length == 0)
 			{
+				if (this.topLevelMenu.getItemByName(this.currentAccount.id) != null)
+				{
+					this.topLevelMenu.getItemByName(this.currentAccount.id).enabled = false;
+				}
 				this.deleteOldMessages();
 				return;
 			}

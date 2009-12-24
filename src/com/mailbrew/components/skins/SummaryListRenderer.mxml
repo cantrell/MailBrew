@@ -4,16 +4,15 @@
 				xmlns:mx="library://ns.adobe.com/flex/halo">
 	<fx:Script>
 		<![CDATA[
-			import com.mailbrew.data.AccountTypes;
-			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.ServiceIconFactory;
 			
 			public function determineFontColor(active:Boolean, working:Boolean):uint
 			{
-				if (!active) return 0xcccccc;
+				if (!active) return 0x666666;
 				if (!working) return 0xff0000;
-				return 0x000000;
+				return 0xffffff;
 			}
+
 		]]>
 	</fx:Script>
 		
@@ -23,12 +22,10 @@
 		<s:State name="selected" />
 	</s:states>
 	
-	<s:HGroup verticalAlign="middle" paddingLeft="3">
-		<s:BitmapImage source="{ServiceIconFactory.getServiceIconClass(data.accountType)}"/>
-		<s:Label color="{determineFontColor(data.active, data.working)}"
-				 text="{data.label}" paddingTop="4"
-				 width="100%">
-		</s:Label>
-	</s:HGroup>
+	<s:Group width="100%">
+		<s:BitmapImage source="{ServiceIconFactory.getServiceIconClass(data.accountType)}" left="2"/>
+		<s:Label text="{data.label}" color="{determineFontColor(data.active, data.working)}" left="30" top="7"/>
+		<s:Label text="{data.total}" color="{determineFontColor(data.active, data.working)}" right="4" top="7"/>
+	</s:Group>
 
 </s:ItemRenderer>

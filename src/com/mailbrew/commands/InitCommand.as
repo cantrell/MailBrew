@@ -137,7 +137,7 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer = new Timer(this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
 			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
 			this.ml.checkEmailTimer.start();
-			new CheckMailEvent().dispatch();
+			if (!ModelLocator.TEST_MODE) new CheckMailEvent().dispatch();
 		}
 		
 		private function onExitApplication(e:Event):void

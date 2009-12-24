@@ -3,6 +3,7 @@ package com.mailbrew.model
 	import com.adobe.air.notification.Purr;
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.model.IModelLocator;
+	import com.mailbrew.components.Summary;
 	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.NotificationSounds;
 	import com.mailbrew.database.Database;
@@ -19,6 +20,7 @@ package com.mailbrew.model
 	{
 		protected static var inst:ModelLocator;
 		
+		public static const TEST_MODE:Boolean = true;
 		public static const DEFAULT_FRAME_RATE:uint = 24;
 		
 		// Buttons
@@ -64,6 +66,7 @@ package com.mailbrew.model
 		public var checkEmailTimer:Timer;
 		public var db:Database;
 		public var notificationSounds:NotificationSounds = new NotificationSounds();
+		public var summaryWindow:Summary;
 
 		public function checkEmail(e:TimerEvent):void
 		{
