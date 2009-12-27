@@ -15,7 +15,8 @@
                 working BOOLEAN DEFAULT false NOT NULL,
                 working_reason TEXT,
                 last_checked DATE,
-                active BOOLEAN
+                active BOOLEAN,
+                sort_order INTEGER
             );
         </create>
         <insert>
@@ -81,13 +82,21 @@
             WHERE
                 id = :account_id;
         </updateLastChecked>
+        <updateSortOrder>
+            UPDATE
+                accounts
+            SET
+                sort_order = :sort_order
+            WHERE
+                id = :account_id;
+        </updateSortOrder>
         <selectAll>
             SELECT
             	*
             FROM
                 accounts
             ORDER BY
-            	id ASC;
+            	sort_order ASC;
         </selectAll>
         <selectForList>
             SELECT
@@ -97,6 +106,7 @@
                 accounts.account_type,
                 accounts.active,
                 accounts.working,
+                accounts.sort_order,
                 count(messages.id) AS total
             FROM
 				accounts LEFT OUTER JOIN messages
@@ -107,7 +117,7 @@
             GROUP BY
             	accounts.id
             ORDER BY
-            	accounts.id ASC;
+            	accounts.sort_order ASC;
         </selectForList>
         <selectWorkingReason>
             SELECT

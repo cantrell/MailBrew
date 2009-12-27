@@ -24,17 +24,7 @@ package com.mailbrew.commands
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
-				var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
-				pale.selectedId = e.data;
-				pale.dispatch();
-				if (sae.saveMode == AccountSaveMode.INSERT)
-				{
-					IconAlert.showSuccess("Account Created", "Your new account has been created.");
-				}
-				else
-				{
-					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
-				}
+				insertSortOrder(e.data, e.data, sae.saveMode);
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			if (sae.saveMode == AccountSaveMode.INSERT)
@@ -66,6 +56,30 @@ package com.mailbrew.commands
 								 sae.notificationSound,
 								 sae.active);
 			}
+		}
+		
+		private function insertSortOrder(accountId:Number, sortOrder:Number, saveMode:String):void
+		{
+			var ml:ModelLocator = ModelLocator.getInstance();
+			var db:Database = ml.db;
+			var responder:DatabaseResponder = new DatabaseResponder();
+			var listener:Function = function(e:DatabaseEvent):void
+			{
+				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+				var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
+				pale.selectedId = accountId;
+				pale.dispatch();
+				if (saveMode == AccountSaveMode.INSERT)
+				{
+					IconAlert.showSuccess("Account Created", "Your new account has been created.");
+				}
+				else
+				{
+					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
+				}
+			};
+			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
+			db.updateSortOrder(responder, accountId, sortOrder);
 		}
 	}
 }

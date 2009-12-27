@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark" 
-				xmlns:mx="library://ns.adobe.com/flex/halo">
+				xmlns:mx="library://ns.adobe.com/flex/halo"
+				autoDrawBackground="false">
 	<fx:Script>
 		<![CDATA[
 			import com.mailbrew.util.ServiceIconFactory;
@@ -23,7 +24,7 @@
 	</s:states>
 	
 	<s:Group width="100%">
-		<s:BitmapImage source="{ServiceIconFactory.getServiceIconClass(data.accountType)}" left="2"/>
+		<s:BitmapImage source="{ServiceIconFactory.getSmallServiceIconClass(data.accountType, data.username)}" left="2"/>
 		<s:Label text="{data.label}" color="{determineFontColor(data.active, data.working)}" left="30" top="7"/>
 		<s:Label text="{data.total}" color="{determineFontColor(data.active, data.working)}" right="4" top="7"/>
 	</s:Group>

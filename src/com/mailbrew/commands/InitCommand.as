@@ -62,6 +62,7 @@ package com.mailbrew.commands
 			
 			this.ml.imapIconBitmapLarge = new this.ml.ImapIconClassLarge();
 			this.ml.gmailIconBitmapLarge = new this.ml.GmailIconClassLarge();
+			this.ml.googleAppsIconBitmapLarge = new this.ml.GoogleAppsIconClassLarge();
 			this.ml.waveIconBitmapLarge = new this.ml.WaveIconClassLarge();
 			this.ml.voiceIconBitmapLarge = new this.ml.VoiceIconClassLarge();
 			
@@ -137,7 +138,7 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer = new Timer(this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
 			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
 			this.ml.checkEmailTimer.start();
-			if (!ModelLocator.TEST_MODE) new CheckMailEvent().dispatch();
+			if (!ModelLocator.testMode) new CheckMailEvent().dispatch();
 		}
 		
 		private function onExitApplication(e:Event):void

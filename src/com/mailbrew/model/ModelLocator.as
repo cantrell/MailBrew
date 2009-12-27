@@ -20,8 +20,9 @@ package com.mailbrew.model
 	{
 		protected static var inst:ModelLocator;
 		
-		public static const TEST_MODE:Boolean = true;
 		public static const DEFAULT_FRAME_RATE:uint = 24;
+		public static const MAX_NOTIFICATIONS:uint = 10;
+		public static var testMode:Boolean;
 		
 		// Buttons
 		[Bindable] [Embed(source="assets/buttons/list_add.png")] public var listAddIconClass:Class;
@@ -34,17 +35,20 @@ package com.mailbrew.model
 		// Services (small)
 		[Bindable] [Embed(source="assets/services/imap_24x24.png")] public var ImapIconClassSmall:Class;
 		[Bindable] [Embed(source="assets/services/gmail_24x24.png")] public var GmailIconClassSmall:Class;
+		[Bindable] [Embed(source="assets/services/google_apps_24x24.png")] public var GoogleAppsIconClassSmall:Class;
 		[Bindable] [Embed(source="assets/services/wave_24x24.png")] public var WaveIconClassSmall:Class;
 		[Bindable] [Embed(source="assets/services/voice_24x24.png")] public var VoiceIconClassSmall:Class;
 
 		// Services (large)
 		[Bindable] [Embed(source="assets/services/imap_64x64.png")] public var ImapIconClassLarge:Class;
 		[Bindable] [Embed(source="assets/services/gmail_64x64.png")] public var GmailIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/google_apps_64x64.png")] public var GoogleAppsIconClassLarge:Class;
 		[Bindable] [Embed(source="assets/services/wave_64x64.png")] public var WaveIconClassLarge:Class;
 		[Bindable] [Embed(source="assets/services/voice_64x64.png")] public var VoiceIconClassLarge:Class;
 
 		public var imapIconBitmapLarge:Bitmap;		
 		public var gmailIconBitmapLarge:Bitmap;		
+		public var googleAppsIconBitmapLarge:Bitmap;		
 		public var waveIconBitmapLarge:Bitmap;		
 		public var voiceIconBitmapLarge:Bitmap;		
 		
@@ -60,6 +64,7 @@ package com.mailbrew.model
 		[Bindable] public var accountInfo:AccountInfo;
 		[Bindable] public var mainAppView:String;
 		[Bindable] public var checkEmailLock:Boolean;
+		[Bindable] public var reorderAccountsLock:Boolean;
 		[Bindable] public var frameRate:uint;
 		public var purr:Purr;
 		public var prefs:Preference;

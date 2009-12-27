@@ -13,17 +13,21 @@
 			import com.mailbrew.events.CheckMailEvent;
 			import com.mailbrew.events.DeleteAccountEvent;
 			import com.mailbrew.events.PopulateAccountInfoEvent;
+			import com.mailbrew.events.ReorderAccountsEvent;
 			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.util.WindowManager;
 			
 			import flash.display.NativeMenu;
 			import flash.display.NativeMenuItem;
 			import flash.display.NativeWindow;
+			import flash.display.Screen;
 			import flash.events.Event;
 			import flash.events.MouseEvent;
 			import flash.geom.Point;
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.events.CloseEvent;
+			import mx.events.DragEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
@@ -43,7 +47,6 @@
 				{
 					if (accountInfo.selected)
 					{
-						trace(accountInfo.label);
 						this.accountList.selectedItem = accountInfo;
 						break;
 					}
@@ -140,6 +143,8 @@
 				var listener:Function = function(e:DatabaseEvent):void
 				{
 					responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
+					var win:NativeWindow = WindowManager.getWindowByTitle(WindowManager.ERROR_VIEWER);
+					if (win != null) win.close();
 					var errorViewer:ErrorViewer = new ErrorViewer();
 					errorViewer.errorMessage = e.data;
 					errorViewer.open();
@@ -160,7 +165,13 @@
 					}
 					else
 					{
-						this.ml.summaryWindow.setLocation(this.globalToScreen(e.stageX, e.stageY));
+						var screens:Array = Screen.getScreensForRectangle(this.ml.summaryWindow.nativeWindow.bounds);
+						// Only reposition if the screen configuration changed such that it can't
+						// reappear where it was when it was closed.
+						if (screens == null || screens.length == 0)
+						{
+							this.ml.summaryWindow.setLocation(this.globalToScreen(e.stageX, e.stageY));
+						}
 						this.ml.summaryWindow.visible = true;
 					}
 				}
@@ -178,6 +189,21 @@
 				var win:NativeWindow = NativeApplication.nativeApplication.openedWindows[0];
 				return win.globalToScreen(new Point(x, y));
 			}
+			
+			private function onDragComplete(e:DragEvent):void
+			{
+				var list:List = e.target as List;
+				if (list == null || list.dataProvider == null || list.dataProvider.length == 0) return;
+				var accountData:Array = new Array();
+				for (var i:uint = 0; i < list.dataProvider.length; ++i)
+				{
+					var account:Object = list.dataProvider.getItemAt(i);
+					accountData.push({accountId:account.accountId, sortOrder:i});
+				}
+				var rae:ReorderAccountsEvent = new ReorderAccountsEvent();
+				rae.accountData = accountData;
+				rae.dispatch();
+			}
 		]]>
 	</fx:Script>
 	
@@ -187,6 +213,7 @@
 	
 	<s:List id="accountList"
 			width="100%" height="100%"
+			dragEnabled="true" dropEnabled="true" dragMoveEnabled="true" dragComplete="onDragComplete(event);"
 			dataProvider="{ModelLocator.getInstance().accounts}"
 			change="onAccountListChange(event);" rightClick="onRightClick(event);"
 			itemRenderer="com.mailbrew.components.skins.AccountListRenderer"

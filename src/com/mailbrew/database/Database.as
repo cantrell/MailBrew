@@ -184,6 +184,27 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		public function updateSortOrder(responder:DatabaseResponder,
+									  	accountId:Number,
+									    sortOrder:Number):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+            stmt.text = this.sql.accounts.updateSortOrder;
+            stmt.parameters[":account_id"] = accountId;
+            stmt.parameters[":sort_order"] = sortOrder;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = accountId;
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
 		public function deleteAccountById(responder:DatabaseResponder,
 									      accountId:uint):void
 		{

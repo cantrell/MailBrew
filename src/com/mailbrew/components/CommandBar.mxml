@@ -6,6 +6,9 @@
 		<![CDATA[
 			import com.mailbrew.events.CheckMailEvent;
 			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.util.WindowManager;
+			
+			import flash.display.NativeWindow;
 			
 			private function onCheckNow():void
 			{
@@ -14,8 +17,16 @@
 
 			private function onOpenSettings():void
 			{
-				var prefsWin:PreferencesWindow = new PreferencesWindow();
-				prefsWin.open();
+				var win:NativeWindow = WindowManager.getWindowByTitle(WindowManager.PREFERENCES);
+				if (win != null)
+				{
+					win.activate();
+				}
+				else
+				{
+					var prefsWin:PreferencesWindow = new PreferencesWindow();
+					prefsWin.open(true);
+				}
 			}
 			
 			private function onOpenAbout():void

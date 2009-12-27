@@ -12,9 +12,11 @@
 			import com.mailbrew.events.SaveAccountEvent;
 			import com.mailbrew.events.VerifyAccountEvent;
 			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.util.ServiceIconFactory;
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
+			import mx.events.IndexChangedEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
@@ -25,8 +27,11 @@
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
-				this.changeState(AccountTypes.IMAP);
-				this.onFormChange();
+				if (ModelLocator.getInstance().accountInfo == null)
+				{
+					this.changeState(AccountTypes.IMAP);
+					this.onFormChange();
+				}
 			}
 			
 			private function onAccountInfoChange(e:PropertyChangeEvent):void
@@ -39,21 +44,24 @@
 					this.changeState(AccountTypes.IMAP);
 					return;
 				}
-				this.changeState(ml.accountInfo.accountType);
+				this.changeState(ml.accountInfo.accountType, ml.accountInfo.username);
 				this.accountType.enabled = false;
 				this.setData(ml.accountInfo);
 			}
 			
 			private function onAccountTypeChange(e:IndexChangeEvent):void
 			{
+				// Don't execute if this is called as a result of programmatically setting the account type
+				if (!accountType.enabled) return;
 				this.changeState(this.accountType.selectedItem);
 				this.onFormChange();
 			}
 			
-			private function changeState(newState:String):void
+			private function changeState(newState:String, username:String = null):void
 			{
 				if (newState == null) newState = AccountTypes.IMAP;
 				this.accountType.selectedItem = newState;
+				this.serviceIcon.source = ServiceIconFactory.getSmallServiceIconClass(newState, username);
 				if (newState == AccountTypes.IMAP)
 				{
 					this.currentState = "imap";
@@ -97,7 +105,6 @@
 			public function setData(accountInfo:AccountInfo):void
 			{
 				this.accountId = accountInfo.accountId;
-				this.accountType.selectedItem = accountInfo.accountType;
 				this.accountNameInput.text = accountInfo.accountName;
 				this.usernameInput.text = accountInfo.username;
 				this.passwordInput.text = accountInfo.password;
@@ -199,7 +206,10 @@
 	
 	<mx:Form id="accountForm">
 		<mx:FormItem label="Account Type" includeIn="imap, gmail, wave, voice">
-			<s:DropDownList id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);"/>
+			<s:HGroup verticalAlign="middle">
+				<s:DropDownList id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" width="115"/>
+				<s:BitmapImage id="serviceIcon"/>
+			</s:HGroup>
 		</mx:FormItem>
 		<mx:FormItem label="Account Name" required="true" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>

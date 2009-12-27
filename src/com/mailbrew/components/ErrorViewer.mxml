@@ -4,11 +4,18 @@
 		   xmlns:s="library://ns.adobe.com/flex/spark" 
 		   xmlns:mx="library://ns.adobe.com/flex/mx"
 		   layout="absolute" width="200"
-		   height="125"
-		   type="utility">
+		   height="125" type="utility"
+		   creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.util.WindowManager;
 			[Bindable] public var errorMessage:String;
+			
+			private function onCreationComplete():void
+			{
+				this.title = WindowManager.ERROR_VIEWER;
+			}
+			
 		]]>
 	</fx:Script>
 	<mx:TextArea text="{this.errorMessage}" editable="false" top="0" right="0" bottom="0" left="0"/>

@@ -17,6 +17,7 @@
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.StatusBarManager;
+			import com.mailbrew.util.WindowManager;
 			
 			import flash.events.ErrorEvent;
 			import flash.events.Event;
@@ -33,7 +34,9 @@
 			
 			private function onApplicationComplete():void
 			{
-				if (!ModelLocator.TEST_MODE) this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
+				// If we're running from ADL, put the app in test mode
+				ModelLocator.testMode = (File.applicationDirectory.nativePath.search(/bin-debug$/) == -1) ? false : true;
+				if (!ModelLocator.testMode) this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
 				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);
 				this.nativeApplication.addEventListener(Event.ACTIVATE, onApplicationActivate);
@@ -56,10 +59,8 @@
 				ml.mainAppView = MainAppViews.INTRO;
 
 				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
-				
-				var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (this.width/2)), (Screen.mainScreen.bounds.height / 2 - (this.height/2)), this.width, this.height);
-				this.nativeWindow.bounds = initialBounds;
-				this.visible = true;
+
+				WindowManager.centerWindowOnMainScreen(this.nativeWindow);
 				
 				new InitEvent().dispatch();
 				

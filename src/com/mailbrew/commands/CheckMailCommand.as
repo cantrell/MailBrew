@@ -17,6 +17,7 @@ package com.mailbrew.commands
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.util.EmailServiceFactory;
+	import com.mailbrew.util.ServiceIconFactory;
 	import com.mailbrew.util.StatusBarManager;
 	
 	import flash.desktop.DockIcon;
@@ -271,7 +272,10 @@ package com.mailbrew.commands
 					this.bounceDockIcon();
 					dockIconBounced = true;
 				}
-				this.addNotification(emailHeader);
+				if (i < ModelLocator.MAX_NOTIFICATIONS)
+				{
+					this.addNotification(emailHeader);
+				}
 			}
 			this.deleteOldMessages();
 		}
@@ -283,7 +287,7 @@ package com.mailbrew.commands
                                                              summary,
 															 this.currentAccount.notification_location,
 															 this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
-															 this.getServiceIcon(this.currentAccount.account_type));
+															 ServiceIconFactory.getLargeServiceIconBitmap(this.currentAccount.account_type, this.currentAccount.username));
 			notification.addEventListener(Event.CLOSE, onNotificationClosed);
 			notification.width = 250;
 			if (this.ml.frameRate == 1) this.ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
@@ -302,22 +306,6 @@ package com.mailbrew.commands
 					this.ml.frameRate = 1;
 				}
 			}
-		}
-		
-		private function getServiceIcon(accountType:String):Bitmap
-		{
-			switch (accountType)
-			{
-				case(AccountTypes.IMAP):
-					return this.ml.imapIconBitmapLarge;
-				case(AccountTypes.GMAIL):
-					return this.ml.gmailIconBitmapLarge;
-				case(AccountTypes.GOOGLE_WAVE):
-					return this.ml.waveIconBitmapLarge;
-				case(AccountTypes.GOOGLE_VOICE):
-					return this.ml.voiceIconBitmapLarge;
-			}
-			return null;
 		}
 		
 		private function playNotificationSound():void
