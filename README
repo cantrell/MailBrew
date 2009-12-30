@@ -1,8 +1,13 @@
-A generic email notifier that supports Gmail and IMAP.
+A generic email notifier that supports:
+
+- IMAP
+- Gmail
+- Google Wave
+- Google Voice
 
 Dependencies include:
 
+http://code.google.com/p/as3corelib/
 http://code.google.com/p/as3preferenceslib/
-http://code.google.com/p/as3notificationlib/
 
 Written by Christian Cantrell.
