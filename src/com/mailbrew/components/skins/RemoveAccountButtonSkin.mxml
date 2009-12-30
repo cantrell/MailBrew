@@ -207,7 +207,7 @@
         </s:stroke>
     </s:Rect>
     
-	<s:BitmapImage source="{ModelLocator.getInstance().listRemoveIconClass}" top="3" left="3"/>
+	<s:BitmapImage source="{ModelLocator.getInstance().ListRemoveIconClass}" top="3" left="3"/>
 
     <!-- layer 8: text -->
     <!--- @copy spark.components.supportClasses.ButtonBase#labelDisplay -->

@@ -49,8 +49,8 @@
 		<s:layout>
 			<s:HorizontalLayout/>
 		</s:layout>
-		<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().checkNowIconClass}" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
-		<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().configureIconClass}" click="onOpenSettings();"/>
-		<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().aboutIconClass}" click="onOpenAbout();"/>
+		<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().CheckNowIconClass}" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
+		<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().ConfigureIconClass}" click="onOpenSettings();"/>
+		<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().AboutIconClass}" click="onOpenAbout();"/>
 	</s:Group>
 </s:Group>

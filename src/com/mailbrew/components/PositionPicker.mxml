@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="onCreationComplete();">
+	<fx:Script>
+		<![CDATA[
+			import com.mailbrew.data.PreferenceKeys;
+			import com.mailbrew.model.ModelLocator;
+			import com.mailbrew.notify.Notification;
+			import com.mailbrew.util.ServiceIconFactory;
+			
+			import mx.collections.ArrayCollection;
+			
+			private var dp:ArrayCollection;
+			public var accountType:String;
+			
+			private function onCreationComplete():void
+			{
+				this.dp = new ArrayCollection();
+				this.dp.addItem({label:"Top Left", data:Notification.TOP_LEFT});
+				this.dp.addItem({label:"Top Right", data:Notification.TOP_RIGHT});
+				this.dp.addItem({label:"Bottom Left", data:Notification.BOTTOM_LEFT});
+				this.dp.addItem({label:"Bottom Right", data:Notification.BOTTOM_RIGHT});
+				this.positionList.dataProvider = dp;
+				this.positionList.selectedIndex = 0;
+			}
+			
+			public function setSelectionByData(data:String):void
+			{
+				for each (var o:Object in this.dp)
+				{
+					if (o.data == data)
+					{
+						this.positionList.selectedItem = o;
+						break;
+					}
+				}
+			}
+			
+			public function get selectedItem():Object
+			{
+				return this.positionList.selectedItem;
+			}
+			
+			public function clearSelection():void
+			{
+				this.positionList.selectedIndex = 0;
+			}
+			
+			private function onDemoNotification():void
+			{
+				var ml:ModelLocator = ModelLocator.getInstance();
+				var iconClass:Class = ServiceIconFactory.getLargeServiceIconClass(this.accountType);
+				var notification:Notification = new Notification("Test Notification",
+																 "This is a test notification to demonstrate how MailBrew will notify you of new messages. Clicking on the notification dismisses the current notification, and clicking on the \"x\" dismisses all pending notifications.",
+																 this.positionList.selectedItem.data,
+																 ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
+																 iconClass);
+				ml.notificationManager.addNotification(notification);
+			}
+		]]>
+	</fx:Script>
+	<s:DropDownList id="positionList" x="0" y="0"/>
+	<s:Button label="Demo" skinClass="com.mailbrew.components.skins.DemoNotificationButtonSkin" x="120" y="0" click="onDemoNotification();"/>
+</s:Group>

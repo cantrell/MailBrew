@@ -2,7 +2,6 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
-		 xmlns:c="com.mailbrew.components.*"
 		 creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
@@ -57,5 +56,5 @@
 		]]>
 	</fx:Script>
 	<s:DropDownList id="soundList" x="0" y="0"/>
-	<mx:Button label="Play" icon="{ModelLocator.getInstance().audioIconClass}" x="120" y="0" click="onPlay();" enabled="{(this.soundList.selectedItem.soundClass == null) ? false : true}"/>
+	<s:Button label="Play" skinClass="com.mailbrew.components.skins.DemoSoundButtonSkin" x="120" y="0" click="onPlay();" enabled="{(this.soundList.selectedItem.soundClass == null) ? false : true}"/>
 </s:Group>

@@ -310,8 +310,7 @@ package com.mailbrew.commands
                                                              summary,
 															 this.currentAccount.notification_location,
 															 this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
-															 ServiceIconFactory.getLargeServiceIconClass(this.currentAccount.account_type, this.currentAccount.username),
-															 250, 100);
+															 ServiceIconFactory.getLargeServiceIconClass(this.currentAccount.account_type, this.currentAccount.username));
 			notification.addEventListener(Event.CLOSE, onNotificationClosed);
 			if (this.ml.frameRate == 1) this.ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 			this.ml.notificationManager.addNotification(notification);

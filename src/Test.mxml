@@ -45,12 +45,14 @@
 			
 			private function addNotification():void
 			{
-				var notification:Notification = new Notification("This is the subject",
-                                                                 "This is a very long message that wraps and wraps and wraps. It just keeps on going and going and going. In fact, it's so long that we may just never see the end of it. It might just be the longest thing ever written. We will never really know because it should get cut off, and nobody will ever see how it ends. It's a cliffhanger. I hate cliffhangers.",
+				var subject:String = "This is the subject";
+				//var message:String = "This is a very long message that wraps and wraps and wraps. It just keeps on going and going and going. In fact, it's so long that we may just never see the end of it. It might just be the longest thing ever written. We will never really know because it should get cut off, and nobody will ever see how it ends. It's a cliffhanger. I hate cliffhangers. I need to make this a little longer because it has to be over ten lines. Is it over ten lines yet? I think so!";
+				var message:String = "Hi, there. You really rock. I want to pay you $1 million.";
+				var notification:Notification = new Notification(subject,
+                                                                 message,
 																 Notification.TOP_LEFT,
 																 7,
-																 new NotificationIconClass(),
-																 250, 100);
+																 NotificationIconClass);
 				this.notificationManager.addNotification(notification);
 			}
 			

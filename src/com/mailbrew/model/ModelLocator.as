@@ -25,12 +25,13 @@ package com.mailbrew.model
 		public static var testMode:Boolean;
 		
 		// Buttons
-		[Bindable] [Embed(source="assets/buttons/list_add.png")] public var listAddIconClass:Class;
-		[Bindable] [Embed(source="assets/buttons/list_remove.png")] public var listRemoveIconClass:Class;
-		[Bindable] [Embed(source="assets/buttons/configure.png")] public var configureIconClass:Class;
-		[Bindable] [Embed(source="assets/buttons/about.png")] public var aboutIconClass:Class;
-		[Bindable] [Embed(source="assets/buttons/refresh.png")] public var checkNowIconClass:Class;
-		[Bindable] [Embed(source="assets/buttons/play.png")] public var audioIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/list_add.png")] public var ListAddIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/list_remove.png")] public var ListRemoveIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/configure.png")] public var ConfigureIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/about.png")] public var AboutIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/refresh.png")] public var CheckNowIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/play.png")] public var AudioIconClass:Class;
+		[Bindable] [Embed(source="assets/buttons/demo.png")] public var NotificationIconClass:Class;
 		
 		// Services (small)
 		[Bindable] [Embed(source="assets/services/imap_24x24.png")] public var ImapIconClassSmall:Class;

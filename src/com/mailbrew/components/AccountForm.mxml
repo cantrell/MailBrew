@@ -230,7 +230,7 @@
 			<mx:CheckBox id="secureCheckBox"/>
 		</mx:FormItem>
 		<mx:FormItem label="Notification Position" includeIn="imap, gmail, wave, voice">
-			<c:PositionComboBox id="notificationPositionInput"/>
+			<c:PositionPicker id="notificationPositionInput" accountType="{accountType.selectedItem}"/>
 		</mx:FormItem>
 		<mx:FormItem label="Notification Sound" includeIn="imap, gmail, wave, voice">
 			<c:SoundPicker id="notificationSound"/>

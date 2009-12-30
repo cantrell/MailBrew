@@ -31,7 +31,7 @@
 			
 			private var controller:Controller;
 			private var ml:ModelLocator;
-			
+
 			private function onApplicationComplete():void
 			{
 				// If we're running from ADL, put the app in test mode

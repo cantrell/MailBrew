@@ -44,10 +44,10 @@ package com.mailbrew.notify
 		private var manager:NotificationManager;
 		
 		private var LEADING:Number = 1.25;
-		private var MAX_TEXT_LINES:uint = 5;
+		private var MAX_TEXT_LINES:uint = 10;
 		private static var filters:Array;
 		
-		public function Notification(subject:String, message:String, position:String, duration:uint, iconClass:Class, width:uint, height:uint)
+		public function Notification(subject:String, message:String, position:String, duration:uint, iconClass:Class)
 		{
 			var winOptions: NativeWindowInitOptions = new NativeWindowInitOptions();
 			winOptions.maximizable = false;
@@ -72,13 +72,11 @@ package com.mailbrew.notify
 			
 			if (filters == null)
 			{
-				filters = [new DropShadowFilter(4, 45, 0x000000, .9)];
+				filters = [new DropShadowFilter(3, 45, 0x000000, .5)];
 			}
 			
-			this.width = width;
-			this.height = height;
+			this.width = 350;
 			
-			this.drawBackGround();
 			this.draw();
 		}
 		
@@ -111,7 +109,7 @@ package com.mailbrew.notify
 			closeButton.addEventListener(MouseEvent.CLICK, this.onCloseButtonClick);
 			this.getSprite().addChild(closeButton);
 			
-			var leftPos: int = (this.icon != null) ? 62 : 4;
+			var leftPos:int = 62;
 			
 			// subject
 			var subjectFontDesc:FontDescription = new FontDescription("Verdana", "bold");
@@ -120,8 +118,7 @@ package com.mailbrew.notify
 			var subjectTextBlock:TextBlock = new TextBlock(subjectTextElement);
 			var subjectTextLine:TextLine = subjectTextBlock.createTextLine();
 			subjectTextLine.x = leftPos;
-			subjectTextLine.y = 14;
-			subjectTextLine.filters = filters;
+			subjectTextLine.y = 15;
 			this.getSprite().addChild(subjectTextLine);
 			
 			// message
@@ -129,22 +126,48 @@ package com.mailbrew.notify
 			var messageElementFormat:ElementFormat = new ElementFormat(messageFontDesc, 12, 0xffffff);
 			var messageTextElement:TextElement = new TextElement(this.message, messageElementFormat);
 			var messageTextBlock:TextBlock = new TextBlock(messageTextElement);
-			var yPos:Number = 30;
+			var yPos:Number = 32;
 			var textLine:TextLine;
 			var linesAdded:uint = 0;
-			while (textLine = messageTextBlock.createTextLine(textLine, width - 60, 0, true))
+			var messageTextHeight:uint = 0;
+			while (textLine = messageTextBlock.createTextLine(textLine, width - 70, 0, true))
 			{
 				textLine.x = leftPos;
 				textLine.y = yPos;
 				yPos += LEADING * textLine.height;
 				this.getSprite().addChild(textLine);
+				messageTextHeight += (textLine.textHeight * LEADING);
 				if (++linesAdded == MAX_TEXT_LINES) break;
 			}
 			
+			var workingHeight:uint = (messageTextHeight + subjectTextLine.textHeight) + 24;
+			if (workingHeight < 80)
+			{
+				this.height = 80;
+			}
+			else
+			{
+				this.height = workingHeight;
+			}
+
+			this.drawBackGround();
+
 			// icon
 			this.icon.x = 6;
 			this.icon.y = (this.height / 2) - 25;
 			this.getSprite().addChild(this.icon);
+		}
+		
+		internal function set index(index:uint):void
+		{
+			var indexFontDesc:FontDescription = new FontDescription("Verdana", "normal");
+			var indexElementFormat:ElementFormat = new ElementFormat(indexFontDesc, 10, 0xffffff);
+			var indexTextElement:TextElement = new TextElement("#" + (index + 1), indexElementFormat);
+			var indexTextBlock:TextBlock = new TextBlock(indexTextElement);
+			var indexTextLine:TextLine = indexTextBlock.createTextLine();
+			indexTextLine.x = (this.icon.x + 25) - (indexTextLine.textWidth / 2);
+			indexTextLine.y = (this.icon.y + 50) + 4;
+			this.getSprite().addChild(indexTextLine);
 		}
 		
 		private function onCloseButtonClick(event:MouseEvent):void
@@ -187,12 +210,12 @@ package com.mailbrew.notify
 			this.timer.start();
 		}
 		
-		public function closeNow():void
+		internal function closeNow():void
 		{
 			this.superClose();
 		}
 		
-		public function destroy():void
+		internal function destroy():void
 		{
 			this.cleanUpTimer();
 			this.pos = null;
@@ -252,12 +275,12 @@ package com.mailbrew.notify
 			this.close();
 		}
 		
-		public function get position():String
+		internal function get position():String
 		{
 			return this.pos;
 		}
 
-		public function set notificationManager(manager:NotificationManager):void
+		internal function set notificationManager(manager:NotificationManager):void
 		{
 			this.manager = manager;
 		}
