@@ -1,6 +1,6 @@
 package com.mailbrew.commands
 {
-	import com.adobe.air.notification.Notification;
+	import com.mailbrew.notify.Notification;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	import com.mailbrew.components.IconAlert;
@@ -41,6 +41,7 @@ package com.mailbrew.commands
 		private var ml:ModelLocator;
 		private var topLevelMenu:NativeMenu;
 		private var serviceMenu:NativeMenu;
+		private var emailService:IEmailService;
 		
 		public function execute(e:CairngormEvent):void
 		{
@@ -55,11 +56,11 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				accountData = e.data;
-				topLevelMenu = ml.purr.getMenu();
+				topLevelMenu = ml.notificationManager.getMenu();
 				if (topLevelMenu == null)
 				{
 					topLevelMenu = new NativeMenu();
-					ml.purr.setMenu(topLevelMenu);
+					ml.notificationManager.setMenu(topLevelMenu);
 				}
 				checkEmailLoop();
 			};
@@ -92,13 +93,21 @@ package com.mailbrew.commands
 			// Update the app icon
 			new UpdateAppIconEvent().dispatch();
 			
-			// Refresh the account list to show or clear errors
-			new PopulateAccountListEvent().dispatch();
+			// Refresh the account list to show or clear errors.
+			// Make sure the correct account is selected after 
+			// the refresh.
+			var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
+			if (this.ml.accountInfo != null)
+			{
+				pale.selectedId = this.ml.accountInfo.accountId;
+			}
+			pale.dispatch();
 			
 			// Update the status message
 			StatusBarManager.showMessage("Done", false);
 			
 			// Do some memory management
+			this.disposeEmailService();
 			this.accountData = null;
 			this.currentAccount = null;
 			this.newUnseenEmails = null;
@@ -139,24 +148,38 @@ package com.mailbrew.commands
 			menuItem.name = this.currentAccount.id;
 			menuItem.submenu = this.serviceMenu;
 			this.topLevelMenu.addItemAt(menuItem, 0);
-			var emailService:IEmailService = EmailServiceFactory.getEmailService(this.currentAccount.account_type,
-																				 this.currentAccount.username,
-																				 this.currentAccount.password,
-																				 this.currentAccount.imap_server,
-																				 Number(this.currentAccount.port_number),
-																				 Boolean(this.currentAccount.secure));
-			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
-			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
-			emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
-			emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+			this.disposeEmailService();
+			this.emailService = EmailServiceFactory.getEmailService(this.currentAccount.account_type,
+																	this.currentAccount.username,
+																	this.currentAccount.password,
+																	this.currentAccount.imap_server,
+																	Number(this.currentAccount.port_number),
+																	Boolean(this.currentAccount.secure));
+			this.emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+			this.emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+			this.emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+			this.emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			StatusBarManager.showMessage("Checking " + this.currentAccount.name, true);
-			emailService.getUnseenEmailHeaders();
+			this.emailService.getUnseenEmailHeaders();
+		}
+		
+		private function disposeEmailService():void
+		{
+			if (this.emailService != null)
+			{
+				this.emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+				this.emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+				this.emailService.removeEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+				this.emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+				this.emailService.dispose();
+				this.emailService = null;
+			}
 		}
 		
 		private function onProtocolError(e:EmailEvent):void
 		{
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			var reason:String = "Protocol error.";
 			if (e.data != null)
 			{
@@ -167,8 +190,8 @@ package com.mailbrew.commands
 		
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			var reason:String = "Authentication failed. Your credentials were not accepted. Please update your username and password.";
 			if (e.data != null)
 			{
@@ -179,8 +202,8 @@ package com.mailbrew.commands
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			var reason:String = "Unable to connect to email service.";
 			if (e.data != null)
 			{
@@ -191,8 +214,8 @@ package com.mailbrew.commands
 		
 		private function onUnseenEmails(e:EmailEvent):void
 		{
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			this.newUnseenEmails = e.data;
 			if (this.newUnseenEmails == null)
 			{
@@ -287,18 +310,18 @@ package com.mailbrew.commands
                                                              summary,
 															 this.currentAccount.notification_location,
 															 this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
-															 ServiceIconFactory.getLargeServiceIconBitmap(this.currentAccount.account_type, this.currentAccount.username));
+															 ServiceIconFactory.getLargeServiceIconClass(this.currentAccount.account_type, this.currentAccount.username),
+															 250, 100);
 			notification.addEventListener(Event.CLOSE, onNotificationClosed);
-			notification.width = 250;
 			if (this.ml.frameRate == 1) this.ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
-			this.ml.purr.addNotification(notification);
+			this.ml.notificationManager.addNotification(notification);
 		}
 		
 		private function onNotificationClosed(e:Event):void
 		{
 			var notification:Notification = e.target as Notification;
 			notification.removeEventListener(Event.CLOSE, onNotificationClosed);
-			if (this.ml.purr.length == 0)
+			if (this.ml.notificationManager.length == 0)
 			{
 				// All done showing notifications
 				if (NativeApplication.nativeApplication.activeWindow == null) // App isn't open or active

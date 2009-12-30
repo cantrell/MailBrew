@@ -4,6 +4,7 @@
 		  xmlns:mx="library://ns.adobe.com/flex/mx">
 	<fx:Script>
 		<![CDATA[
+			import flash.display.Sprite;
 			
 			[Bindable] [Embed(source="assets/alerts/face-crying.png")]   public static var failureIconClass:Class;
 			[Bindable] [Embed(source="assets/alerts/face-surprise.png")] public static var questionIconClass:Class;
@@ -15,24 +16,24 @@
 			public static const OK:uint     = Alert.OK;
 			public static const CANCEL:uint = Alert.CANCEL;
 
-			public static function showFailure(title:String, text:String, closeHandler:Function=null):void
+			public static function showFailure(title:String, text:String, closeHandler:Function=null, parent:Sprite=null):void
 			{
-				show(text, title, Alert.OK, null, closeHandler, failureIconClass, Alert.OK);
+				show(text, title, Alert.OK, parent, closeHandler, failureIconClass, Alert.OK);
 			}
 			
-			public static function showQuestion(title:String, text:String, closeHandler:Function=null, defaultButtonFlag:uint=Alert.NO):void
+			public static function showQuestion(title:String, text:String, closeHandler:Function=null, defaultButtonFlag:uint=Alert.NO, parent:Sprite=null):void
 			{
-				show(text, title, Alert.YES|Alert.NO, null, closeHandler, questionIconClass, defaultButtonFlag);
+				show(text, title, Alert.YES|Alert.NO, parent, closeHandler, questionIconClass, defaultButtonFlag);
 			}
 			
-			public static function showSuccess(title:String, text:String, closeHandler:Function=null):void
+			public static function showSuccess(title:String, text:String, closeHandler:Function=null, parent:Sprite=null):void
 			{
-				show(text, title, Alert.OK, null, closeHandler, successIconClass, Alert.OK);
+				show(text, title, Alert.OK, parent, closeHandler, successIconClass, Alert.OK);
 			}
 			
-			public static function showInformation(title:String, text:String, closeHandler:Function=null):void
+			public static function showInformation(title:String, text:String, closeHandler:Function=null, parent:Sprite=null):void
 			{
-				show(text, title, Alert.OK, null, closeHandler, informationIconClass, Alert.OK);
+				show(text, title, Alert.OK, parent, closeHandler, informationIconClass, Alert.OK);
 			}
 			
 		]]>

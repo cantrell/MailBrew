@@ -33,6 +33,7 @@ package com.mailbrew.email.google
 		private var password:String;
 		private var mode:String;
 		private var status:Number;
+		private var urlLoader:URLLoader;
 		
 		public function Gmail(username:String, password:String)
 		{
@@ -49,10 +50,10 @@ package com.mailbrew.email.google
 		private function start():void
 		{
 			this.status = NaN;
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-			urlLoader.addEventListener(Event.COMPLETE, onComplete);
-			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+			this.urlLoader = new URLLoader();
+			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
+			this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
 			var req:URLRequest;
 			// Decide if this is a straight-up Gmail account, or a Google Apps for My Domain account.
 			if (this.username.search(/@gmail\.com$/) != -1)
@@ -70,7 +71,18 @@ package com.mailbrew.email.google
 			b64.encode(authString, 0, authString.length);
 			var authHeader:URLRequestHeader = new URLRequestHeader("Authorization", ("Basic " + b64.toString()));
 			req.requestHeaders = new Array(authHeader);
-			urlLoader.load(req);
+			this.urlLoader.load(req);
+		}
+		
+		public function dispose():void
+		{
+			if (this.urlLoader != null)
+			{
+				this.urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				this.urlLoader.removeEventListener(Event.COMPLETE, onComplete);
+				this.urlLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+				this.urlLoader = null;
+			}
 		}
 		
 		private function onResponseStatus(e:HTTPStatusEvent):void
@@ -97,8 +109,8 @@ package com.mailbrew.email.google
 			if (this.mode == EmailModes.AUTHENTICATION_TEST_MODE) return;
 			try
 			{
-				var urlLoader:URLLoader = e.target as URLLoader;
-				var response:XML = new XML(urlLoader.data);
+				var ul:URLLoader = e.target as URLLoader;
+				var response:XML = new XML(ul.data);
 				if (this.mode == EmailModes.UNSEEN_COUNT_MODE)
 				{
 					var unseenCount:Number = Number(response.PURL::fullcount);

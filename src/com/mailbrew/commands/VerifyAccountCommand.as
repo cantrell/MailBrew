@@ -12,11 +12,15 @@ package com.mailbrew.commands
 	public class VerifyAccountCommand
 		implements ICommand
 	{
+		// Only want one of these to exist
+		private static var emailService:IEmailService;
+		
 		public function execute(e:CairngormEvent):void
 		{
 			var vae:VerifyAccountEvent = e as VerifyAccountEvent;
 			StatusBarManager.showMessage("Verifying acount " + vae.accountName, true);
-			var emailService:IEmailService = EmailServiceFactory.getEmailService(vae.accountType, vae.username, vae.password, vae.server, vae.portNumber, vae.secure);
+			this.disposeEmailService();
+			emailService = EmailServiceFactory.getEmailService(vae.accountType, vae.username, vae.password, vae.server, vae.portNumber, vae.secure);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
 			emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
@@ -24,36 +28,53 @@ package com.mailbrew.commands
 			emailService.testAccount();
 		}
 		
+		private function disposeEmailService():void
+		{
+			if (emailService != null)
+			{
+				emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+				emailService.removeEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
+				emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+				emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+				emailService.dispose();
+				emailService = null;
+			}
+		}
+
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
 			StatusBarManager.clearMessage();
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			IconAlert.showFailure("Login Failed", "Unable to log in. Please check your username and password, then try again.");
+			this.disposeEmailService();
 		}
 
 		private function onAuthenticationSucceeded(e:EmailEvent):void
 		{
 			StatusBarManager.clearMessage();
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
 			IconAlert.showInformation("Login Successful", "Everything appears to be in order!");
+			this.disposeEmailService();
 		}
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
 			StatusBarManager.clearMessage();
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			IconAlert.showFailure("Connection Failure", "Unable to connect. Please check your network settings and try again.");
+			this.disposeEmailService();
 		}
 		
 		private function onProtocolError(e:EmailEvent):void
 		{
 			StatusBarManager.clearMessage();
-			var emailService:IEmailService = e.target as IEmailService;
-			emailService.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
+			var es:IEmailService = e.target as IEmailService;
+			es.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			IconAlert.showFailure("Protocol Error", "You might have found a bug. Could you email this error to christian.cantrell@gmail.com? [" + e.data + "]");
+			this.disposeEmailService();
 		}
 	}
 }

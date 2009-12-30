@@ -53,28 +53,5 @@ package com.mailbrew.util
 			}
 			return null;
 		}
-
-		public static function getLargeServiceIconBitmap(accountType:String, username:String = null):Bitmap
-		{
-			switch (accountType)
-			{
-				case(AccountTypes.IMAP):
-					return ModelLocator.getInstance().imapIconBitmapLarge;
-				case(AccountTypes.GMAIL):
-					if (username == null || username.search(GMAIL_RE) != -1)
-					{
-						return ModelLocator.getInstance().gmailIconBitmapLarge;
-					}
-					else
-					{
-						return ModelLocator.getInstance().googleAppsIconBitmapLarge;
-					}
-				case(AccountTypes.GOOGLE_WAVE):
-					return ModelLocator.getInstance().waveIconBitmapLarge;
-				case(AccountTypes.GOOGLE_VOICE):
-					return ModelLocator.getInstance().voiceIconBitmapLarge;
-			}
-			return null;
-		}
 	}
 }

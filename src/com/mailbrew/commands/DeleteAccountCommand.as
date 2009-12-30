@@ -54,7 +54,7 @@ package com.mailbrew.commands
 		
 		private function removeIconMenu(accountId:Number):void
 		{
-			var menu:NativeMenu = ModelLocator.getInstance().purr.getMenu();
+			var menu:NativeMenu = ModelLocator.getInstance().notificationManager.getMenu();
 			if (menu.getItemByName(String(accountId)) != null)
 			{
 				menu.removeItem(menu.getItemByName(String(accountId)));

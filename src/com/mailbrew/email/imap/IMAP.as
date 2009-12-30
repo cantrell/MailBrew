@@ -10,9 +10,12 @@ package com.mailbrew.email.imap
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.events.TimerEvent;
 	import flash.net.SecureSocket;
 	import flash.net.Socket;
 	import flash.utils.ByteArray;
+	import flash.utils.Timer;
 
 	[Event(name="connectionFailed",        type="com.mailbrew.email.EmailEvent")]
 	[Event(name="connectionSucceeded",     type="com.mailbrew.email.EmailEvent")]
@@ -39,6 +42,7 @@ package com.mailbrew.email.imap
 		private var socket:Socket;
 		private var buffer:ByteArray;
 		private var unseenMessageIds:Array;
+		private var connectDataTimer:Timer;
 
 		public function IMAP(username:String, password:String, imapServer:String, portNumber:Number, secure:Boolean)
 		{
@@ -75,11 +79,28 @@ package com.mailbrew.email.imap
 			this.doneRegExp = new RegExp("\\" + this.tag + ".+\\r\\n");
 			this.stop();
 			this.socket = (this.secure) ? new SecureSocket() : new Socket();
+			this.socket.timeout = 20000; // 20 seconds
 			this.socket.addEventListener(Event.CONNECT, onConnect);
 			this.socket.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			this.socket.addEventListener(Event.CLOSE, onClose);
 			this.socket.addEventListener(ProgressEvent.SOCKET_DATA, onSocketData);
-			this.socket.connect(this.imapServer, this.portNumber);
+			this.socket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError);
+			try
+			{
+				this.socket.connect(this.imapServer, this.portNumber);
+			}
+			catch (e:Error)
+			{
+				var emailEvent:EmailEvent = new EmailEvent(EmailEvent.CONNECTION_FAILED);
+				emailEvent.data = e.message;
+				this.dispatchEvent(emailEvent);
+			}
+		}
+		
+		public function dispose():void
+		{
+			this.stop();
+			this.stopConnectDataTimer();
 		}
 		
 		public function stop():void
@@ -87,13 +108,31 @@ package com.mailbrew.email.imap
 			if (this.socket != null && this.socket.connected)
 			{
 				this.socket.close();
-				this.socket = null;
 			}
+			if (this.socket != null)
+			{
+				this.socket.removeEventListener(Event.CONNECT, onConnect);
+				this.socket.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				this.socket.removeEventListener(Event.CLOSE, onClose);
+				this.socket.removeEventListener(ProgressEvent.SOCKET_DATA, onSocketData);
+				this.socket.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError);
+			}
+			this.socket = null;
 		}
 		
 		private function onConnect(e:Event):void
 		{
+			this.connectDataTimer = new Timer(this.socket.timeout);
+			this.connectDataTimer.addEventListener(TimerEvent.TIMER, onNoDataReceived);
+			this.connectDataTimer.start();
 			this.dispatchEvent(new EmailEvent(EmailEvent.CONNECTION_SUCCEEDED));
+		}
+		
+		private function onSecurityError(e:SecurityErrorEvent):void
+		{
+			var emailEvent:EmailEvent = new EmailEvent(EmailEvent.CONNECTION_FAILED);
+			emailEvent.data = e.text;
+			this.dispatchEvent(emailEvent);
 		}
 		
 		private function onIOError(e:IOErrorEvent):void
@@ -107,15 +146,36 @@ package com.mailbrew.email.imap
 		{
 			this.socket = null;
 		}
-				
+		
+		private function onNoDataReceived(e:TimerEvent):void
+		{
+			this.socket.close();
+			this.socket = null;
+			this.stopConnectDataTimer();
+			var emailEvent:EmailEvent = new EmailEvent(EmailEvent.CONNECTION_FAILED);
+			emailEvent.data = "Connection established, but no data was returned from the server. Please check your server configuration.";
+			this.dispatchEvent(emailEvent);
+		}
+
 		private function onSocketData(e:ProgressEvent):void
 		{
+			if (this.connectDataTimer != null) this.stopConnectDataTimer();
 			var s:Socket = e.target as Socket;
 			s.readBytes(this.buffer, this.buffer.length, s.bytesAvailable);
 			var bufferString:String = buffer.toString();
 			if (bufferString.search(this.doneRegExp) != -1)
 			{
 				this.onResponse();
+			}
+		}
+
+		private function stopConnectDataTimer():void
+		{
+			if (this.connectDataTimer != null)
+			{
+				this.connectDataTimer.stop();
+				this.connectDataTimer.removeEventListener(TimerEvent.TIMER, onNoDataReceived);
+				this.connectDataTimer = null;
 			}
 		}
 		

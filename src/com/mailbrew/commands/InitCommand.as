@@ -1,7 +1,6 @@
 package com.mailbrew.commands
 {
 	import com.adobe.air.crypto.EncryptionKeyGenerator;
-	import com.adobe.air.notification.Purr;
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
@@ -12,6 +11,7 @@ package com.mailbrew.commands
 	import com.mailbrew.events.CheckMailEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.notify.NotificationManager;
 	
 	import flash.desktop.NativeApplication;
 	import flash.display.NativeMenu;
@@ -40,44 +40,44 @@ package com.mailbrew.commands
 			var defaultsSet:Boolean = false;
 			if (this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) == null)
 			{
-				this.ml.prefs.setValue(PreferenceKeys.UPDATE_INTERVAL, 5, false);
+				this.ml.prefs.setValue(PreferenceKeys.UPDATE_INTERVAL, PreferenceKeys.UPDATE_INTERVAL_DEFAULT, false);
 				defaultsSet = true;
 			}
 
 			if (this.ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL) == null)
 			{
-				this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, 7, false);
+				this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL_DEFAULT, false);
 				defaultsSet = true;
 			}
 
 			if (this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD) == null)
 			{
-				this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, 10, false);
+				this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, PreferenceKeys.IDLE_THRESHOLD_DEFAULT, false);
+				defaultsSet = true;
+			}
+			
+			if (this.ml.prefs.getValue(PreferenceKeys.BOUNCE_DOCK_ICON) == null)
+			{
+				this.ml.prefs.setValue(PreferenceKeys.BOUNCE_DOCK_ICON, PreferenceKeys.BOUNCE_DOCK_ICON_DEFAULT, false);
 				defaultsSet = true;
 			}
 			
 			if (defaultsSet) this.ml.prefs.save();
 			
-			this.ml.purr = new Purr(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
-			
-			this.ml.imapIconBitmapLarge = new this.ml.ImapIconClassLarge();
-			this.ml.gmailIconBitmapLarge = new this.ml.GmailIconClassLarge();
-			this.ml.googleAppsIconBitmapLarge = new this.ml.GoogleAppsIconClassLarge();
-			this.ml.waveIconBitmapLarge = new this.ml.WaveIconClassLarge();
-			this.ml.voiceIconBitmapLarge = new this.ml.VoiceIconClassLarge();
-			
+			this.ml.notificationManager = new NotificationManager(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
+						
 			// Dock and system tray icons
 			var appIcons:Array = new Array();
 			appIcons.push(new this.ml.Dynamic128IconClass());
 			appIcons.push(new this.ml.Dynamic16IconClass());
-			this.ml.purr.setIcons(appIcons);
+			this.ml.notificationManager.setIcons(appIcons);
 			
 			// Exit option on Windows
-			var topLevelMenu:NativeMenu = ml.purr.getMenu();
+			var topLevelMenu:NativeMenu = this.ml.notificationManager.getMenu();
 			if (topLevelMenu == null)
 			{
 				topLevelMenu = new NativeMenu();
-				this.ml.purr.setMenu(topLevelMenu);
+				this.ml.notificationManager.setMenu(topLevelMenu);
 			}
 			if (NativeApplication.supportsSystemTrayIcon)
 			{

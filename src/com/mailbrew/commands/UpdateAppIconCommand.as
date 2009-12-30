@@ -27,7 +27,7 @@ package com.mailbrew.commands
 		public function execute(e:CairngormEvent):void
 		{
 			var unseenCount:uint = 0;
-			var menu:NativeMenu = ModelLocator.getInstance().purr.getMenu();
+			var menu:NativeMenu = ModelLocator.getInstance().notificationManager.getMenu();
 			for each (var nmi:NativeMenuItem in menu.items)
 			{
 				if (nmi.isSeparator || nmi.submenu == null) continue; // The "Exit" menu on Windows
@@ -67,7 +67,7 @@ package com.mailbrew.commands
 				new Point(0, 0),
 				null, null, true);
 			var appIcon:Bitmap = new Bitmap(appData);
-			ml.purr.setIcons([appIcon]);
+			ml.notificationManager.setIcons([appIcon]);
 		}
 	}
 }

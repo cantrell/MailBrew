@@ -1,6 +1,5 @@
 package com.mailbrew.model
 {
-	import com.adobe.air.notification.Purr;
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.components.Summary;
@@ -8,6 +7,7 @@ package com.mailbrew.model
 	import com.mailbrew.data.NotificationSounds;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.events.CheckMailEvent;
+	import com.mailbrew.notify.NotificationManager;
 	
 	import flash.display.Bitmap;
 	import flash.events.TimerEvent;
@@ -40,18 +40,12 @@ package com.mailbrew.model
 		[Bindable] [Embed(source="assets/services/voice_24x24.png")] public var VoiceIconClassSmall:Class;
 
 		// Services (large)
-		[Bindable] [Embed(source="assets/services/imap_64x64.png")] public var ImapIconClassLarge:Class;
-		[Bindable] [Embed(source="assets/services/gmail_64x64.png")] public var GmailIconClassLarge:Class;
-		[Bindable] [Embed(source="assets/services/google_apps_64x64.png")] public var GoogleAppsIconClassLarge:Class;
-		[Bindable] [Embed(source="assets/services/wave_64x64.png")] public var WaveIconClassLarge:Class;
-		[Bindable] [Embed(source="assets/services/voice_64x64.png")] public var VoiceIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/imap_50x50.png")] public var ImapIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/gmail_50x50.png")] public var GmailIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/google_apps_50x50.png")] public var GoogleAppsIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/wave_50x50.png")] public var WaveIconClassLarge:Class;
+		[Bindable] [Embed(source="assets/services/voice_50x50.png")] public var VoiceIconClassLarge:Class;
 
-		public var imapIconBitmapLarge:Bitmap;		
-		public var gmailIconBitmapLarge:Bitmap;		
-		public var googleAppsIconBitmapLarge:Bitmap;		
-		public var waveIconBitmapLarge:Bitmap;		
-		public var voiceIconBitmapLarge:Bitmap;		
-		
 		// App logos
         [Embed(source="assets/logos/dynamic_logo_128x128.png")] public var Dynamic128IconClass:Class;
 		public var dynamicAppIcon:Bitmap;
@@ -66,7 +60,7 @@ package com.mailbrew.model
 		[Bindable] public var checkEmailLock:Boolean;
 		[Bindable] public var reorderAccountsLock:Boolean;
 		[Bindable] public var frameRate:uint;
-		public var purr:Purr;
+		public var notificationManager:NotificationManager;
 		public var prefs:Preference;
 		public var checkEmailTimer:Timer;
 		public var db:Database;

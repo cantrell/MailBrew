@@ -1,9 +1,9 @@
 package com.mailbrew.commands
 {
-	import com.adobe.air.notification.AbstractNotification;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.notify.Notification;
 	
 	import flash.desktop.NativeApplication;
 	import flash.display.NativeWindow;
@@ -22,15 +22,15 @@ package com.mailbrew.commands
 				ml.checkEmailTimer.removeEventListener(TimerEvent.TIMER, ml.checkEmail);
 			}
 			
-			ml.purr.clear(AbstractNotification.TOP_RIGHT);
-			ml.purr.clear(AbstractNotification.TOP_LEFT);
-			ml.purr.clear(AbstractNotification.BOTTOM_RIGHT);
-			ml.purr.clear(AbstractNotification.BOTTOM_LEFT);
+			ml.notificationManager.clear(Notification.TOP_RIGHT);
+			ml.notificationManager.clear(Notification.TOP_LEFT);
+			ml.notificationManager.clear(Notification.BOTTOM_RIGHT);
+			ml.notificationManager.clear(Notification.BOTTOM_LEFT);
 			for (var i:int = NativeApplication.nativeApplication.openedWindows.length - 1; i >= 0; --i)
 			{
 				NativeWindow(NativeApplication.nativeApplication.openedWindows[i]).close();
 			}
-			NativeApplication.nativeApplication.exit(1);
+			NativeApplication.nativeApplication.exit(0);
 		}
 	}
 }

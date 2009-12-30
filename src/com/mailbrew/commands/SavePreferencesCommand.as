@@ -33,7 +33,7 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer.stop();
 			this.ml.checkEmailTimer.delay = (this.ml.prefs.getValue(PreferenceKeys.UPDATE_INTERVAL) * 60 * 1000);
 			this.ml.checkEmailTimer.start();
-			this.ml.purr.setIdleThreshold(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
+			this.ml.notificationManager.setIdleThreshold(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
 			StatusBarManager.showMessage("Preferences saved", false);
 		}
 	}

@@ -27,6 +27,7 @@ package com.mailbrew.controller
 			this.addCommand(SavePreferencesEvent.SAVE_PREFERENCES_EVENT, SavePreferencesCommand);
 			this.addCommand(VerifyAccountEvent.VERIFY_ACCOUNT_EVENT, VerifyAccountCommand);
 			this.addCommand(ReorderAccountsEvent.REORDER_ACCOUNTS_EVENT, ReorderAccountsCommand);
+			this.addCommand(ResetEvent.RESET_EVENT, ResetCommand);
 		}
 	}
 }

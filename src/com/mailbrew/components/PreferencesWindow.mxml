@@ -3,17 +3,22 @@
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/halo"
-		  width="335" height="305" resizable="false"
-		  minWidth="335" minHeight="305"
+		  width="345" height="305" resizable="false"
+		  minWidth="345" minHeight="305"
 		  type="utility" showStatusBar="false"
 		  creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
 			import com.adobe.air.preferences.Preference;
 			import com.mailbrew.data.PreferenceKeys;
+			import com.mailbrew.events.ResetEvent;
 			import com.mailbrew.events.SavePreferencesEvent;
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.WindowManager;
+			
+			import flash.events.NativeWindowBoundsEvent;
+			
+			import mx.events.CloseEvent;
 			
 			private function onCreationComplete():void
 			{
@@ -43,7 +48,13 @@
 			
 			private function onReset():void
 			{
-				
+				IconAlert.showQuestion("Are You Sure?", "Are you sure you want to reset MailBrew?\nResetting will:\n\n 1. Remove all your accounts.\n 2. Reset all your preferences.\n 3. Exit the application.\n\n", onResetConfirm, IconAlert.NO, this);
+			}
+			
+			private function onResetConfirm(e:CloseEvent):void
+			{
+				if (e.detail != IconAlert.YES) return;
+				new ResetEvent().dispatch();
 			}
 			
 			private function onSave():void
@@ -52,7 +63,7 @@
 				spe.updateInterval = this.updateIntervalStepper.value;
 				spe.idleThreshold = this.idlePeriodStepper.value;
 				spe.notificationDisplayInterval = this.notificationDisplayLengthStepper.value;
-				spe.bounceDockIcon = this.bounceDockIconCheckbox.selected;
+				if (this.bounceDockIconCheckbox) spe.bounceDockIcon = this.bounceDockIconCheckbox.selected;
 				spe.startAtLogin = this.startAtLoginCheckbox.selected;
 				spe.dispatch();
 				this.onCancel();

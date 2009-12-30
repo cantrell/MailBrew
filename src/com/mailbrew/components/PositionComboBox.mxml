@@ -5,7 +5,7 @@
 				creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
-			import com.adobe.air.notification.AbstractNotification;
+			import com.mailbrew.notify.Notification;
 			
 			import mx.collections.ArrayCollection;
 			
@@ -14,10 +14,10 @@
 			private function onCreationComplete():void
 			{
 				this.dp = new ArrayCollection();
-				this.dp.addItem({label:"Top Left", data:AbstractNotification.TOP_LEFT});
-				this.dp.addItem({label:"Top Right", data:AbstractNotification.TOP_RIGHT});
-				this.dp.addItem({label:"Bottom Left", data:AbstractNotification.BOTTOM_LEFT});
-				this.dp.addItem({label:"Bottom Right", data:AbstractNotification.BOTTOM_RIGHT});
+				this.dp.addItem({label:"Top Left", data:Notification.TOP_LEFT});
+				this.dp.addItem({label:"Top Right", data:Notification.TOP_RIGHT});
+				this.dp.addItem({label:"Bottom Left", data:Notification.BOTTOM_LEFT});
+				this.dp.addItem({label:"Bottom Right", data:Notification.BOTTOM_RIGHT});
 				this.dataProvider = dp;
 				this.selectedIndex = 0;
 			}

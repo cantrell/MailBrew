@@ -10,6 +10,7 @@
 		<![CDATA[
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.ServiceToURLMapper;
+			import com.mailbrew.util.WindowManager;
 			
 			import flash.events.MouseEvent;
 			import flash.geom.Point;

@@ -35,6 +35,7 @@ package com.mailbrew.email.google
 		private var internalMode:String;
 		private var status:Number;
 		private var authToken:String;
+		private var urlLoader:URLLoader;
 		
 		public function UnsupportedService(username:String, password:String, serviceName:String, inboxUrl:String, logoutUrl:String)
 		{
@@ -49,10 +50,10 @@ package com.mailbrew.email.google
 		{
 			this.status = NaN;
 			this.internalMode = InternalModes.LOGIN;
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-			urlLoader.addEventListener(Event.COMPLETE, onComplete);
-			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+			this.urlLoader = new URLLoader();
+			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
+			this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
 			var req:URLRequest = new URLRequest(LOGIN_URL);
 			req.method = URLRequestMethod.POST;
 			req.contentType = "application/x-www-form-urlencoded";
@@ -63,40 +64,51 @@ package com.mailbrew.email.google
 			urlVars.Email = this.username;
 			urlVars.Passwd = this.password;
 			req.data = urlVars;
-			urlLoader.load(req);
+			this.urlLoader.load(req);
 		}
 		
 		private function getInbox():void
 		{
 			this.status = NaN;
 			this.internalMode = InternalModes.INBOX;
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-			urlLoader.addEventListener(Event.COMPLETE, onComplete);
-			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+			this.urlLoader = new URLLoader();
+			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
+			this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
 			var req:URLRequest = new URLRequest(this.inboxUrl);
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.nouacheck = "";
 			urlVars.auth = this.authToken;
 			req.data = urlVars;
-			urlLoader.load(req);
+			this.urlLoader.load(req);
 		}
 		
 		private function logout():void
 		{
 			this.status = NaN;
 			this.internalMode = InternalModes.LOGOUT;
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-			urlLoader.addEventListener(Event.COMPLETE, onComplete);
-			urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+			this.urlLoader = new URLLoader();
+			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
+			this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
 			var req:URLRequest = new URLRequest(this.logoutUrl);
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
 			urlVars.auth = this.authToken;
 			req.data = urlVars;
-			urlLoader.load(req);
+			this.urlLoader.load(req);
+		}
+
+		public function dispose():void
+		{
+			if (this.urlLoader != null)
+			{
+				this.urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				this.urlLoader.removeEventListener(Event.COMPLETE, onComplete);
+				this.urlLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
+				this.urlLoader = null;
+			}
 		}
 		
 		private function onResponseStatus(e:HTTPStatusEvent):void
@@ -125,8 +137,8 @@ package com.mailbrew.email.google
 				return;
 			}
 			this.dispatchEvent(new EmailEvent(EmailEvent.CONNECTION_SUCCEEDED));
-			var urlLoader:URLLoader = e.target as URLLoader;
-			var response:String = urlLoader.data as String;
+			var ul:URLLoader = e.target as URLLoader;
+			var response:String = ul.data as String;
 			if (this.internalMode == InternalModes.LOGIN)
 			{
 				var responseStrings:Array = response.split("\n");

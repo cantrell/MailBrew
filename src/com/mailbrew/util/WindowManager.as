@@ -11,7 +11,6 @@ package com.mailbrew.util
 		
 		public static const PREFERENCES:String  = "MailBrew Preferences";
 		public static const ERROR_VIEWER:String = "Error Message";
-		public static const SUMMARY_WINDOW:String = "Account Summary";
 		
 		public static function isWindowOpen(title:String):Boolean
 		{

@@ -227,6 +227,6 @@
 		<s:Button id="removeAccountButton" label="Remove Account" width="130" skinClass="com.mailbrew.components.skins.RemoveAccountButtonSkin" click="onRemoveAccount(event)" enabled="{(this.accountList.selectedItem == null || ModelLocator.getInstance().checkEmailLock) ? false : true}"/>
 	</s:Group>	
 	
-	<s:CheckBox id="summaryCheckbox" label="Summary Window" click="onToggleSummaryWindow(event);"/>
+	<s:CheckBox id="summaryCheckbox" label="Summary Window" click="onToggleSummaryWindow(event);" enabled="{(this.accountList.dataProvider.length &gt; 0) ? true : false}"/>
 	
 </s:Group>

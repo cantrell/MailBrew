@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="onApplicationComplete();">
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" applicationComplete="onApplicationComplete();" xmlns:s="library://ns.adobe.com/flex/spark">
 	<mx:Script>
 		<![CDATA[
 			import com.mailbrew.email.EmailCounts;
@@ -7,26 +7,51 @@
 			import com.mailbrew.email.EmailHeader;
 			import com.mailbrew.email.IEmailService;
 			import com.mailbrew.email.google.Gmail;
-			import com.mailbrew.email.imap.IMAP;
-			import com.mailbrew.email.google.Wave;
 			import com.mailbrew.email.google.Voice;
+			import com.mailbrew.email.google.Wave;
+			import com.mailbrew.email.imap.IMAP;
+			import com.mailbrew.notify.Notification;
+			import com.mailbrew.notify.NotificationManager;
+			
+			//[Embed(source="assets/services/imap_64x64.png")] public var NotificationIconClass:Class;
+			[Embed(source="assets/services/gmail_50x50.png")] public var NotificationIconClass:Class;
+			
+			private var notificationManager:NotificationManager;
+			
 			private function onApplicationComplete():void
 			{
+				// Email service tests
+				
 				//var emailService:IEmailService = new IMAP("fake", "fake", "imap.gmail.com", 993, true);
 				//var emailService:IEmailService = new Gmail("fake", "fake");
 				//var emailService:IEmailService = new Wave("fake", "fake");
-				var emailService:IEmailService = new Voice("fake", "fake");
+				//var emailService:IEmailService = new Voice("fake", "fake");
 				
-				emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
-				emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
-				emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
-				emailService.addEventListener(EmailEvent.CONNECTION_SUCCEEDED, onConnectionSucceeded);
-				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
-				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
+				//emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+				//emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
+				//emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+				//emailService.addEventListener(EmailEvent.CONNECTION_SUCCEEDED, onConnectionSucceeded);
+				//emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+				//emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
 			
 				//emailService.testAccount();
 				//emailService.getUnseenEmailCount();
-				emailService.getUnseenEmailHeaders();
+				//emailService.getUnseenEmailHeaders();
+				
+				
+				// Notification tests
+				this.notificationManager = new NotificationManager();
+			}
+			
+			private function addNotification():void
+			{
+				var notification:Notification = new Notification("This is the subject",
+                                                                 "This is a very long message that wraps and wraps and wraps. It just keeps on going and going and going. In fact, it's so long that we may just never see the end of it. It might just be the longest thing ever written. We will never really know because it should get cut off, and nobody will ever see how it ends. It's a cliffhanger. I hate cliffhangers.",
+																 Notification.TOP_LEFT,
+																 7,
+																 new NotificationIconClass(),
+																 250, 100);
+				this.notificationManager.addNotification(notification);
 			}
 			
 			private function onAuthenticationFailed(e:EmailEvent):void
@@ -74,4 +99,5 @@
 			
 		]]>
 	</mx:Script>
+	<s:Button label="Add Notification" click="addNotification();"/>
 </mx:WindowedApplication>

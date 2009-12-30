@@ -19,6 +19,9 @@
                 sort_order INTEGER
             );
         </create>
+        <drop>
+        	DROP TABLE IF EXISTS accounts;
+        </drop>
         <insert>
             INSERT INTO
                 accounts (
@@ -151,6 +154,9 @@
                 unique_id TEXT NOT NULL
             );
         </create>
+        <drop>
+        	DROP TABLE IF EXISTS messages;
+        </drop>
         <insert>
             INSERT INTO
                 messages (

@@ -53,7 +53,7 @@ package com.mailbrew.database
 			}
 			if (this.aConn.connected)
 			{
-				// Let the runtime close the connection
+				// Best to let the runtime close the connection.
 				//this.aConn.close();
 			}
 		}
@@ -66,6 +66,23 @@ package com.mailbrew.database
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
             stmt.text = this.sql.accounts.create;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			
+            stmt.addEventListener(SQLEvent.RESULT, listener);
+            stmt.execute();
+		}
+
+		public function dropAccountsTable(responder:DatabaseResponder):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+            stmt.text = this.sql.accounts.drop;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
@@ -326,6 +343,22 @@ package com.mailbrew.database
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
 			stmt.text = this.sql.messages.create;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				responder.dispatchEvent(dbe);
+			};
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
+		public function dropMessagesTable(responder:DatabaseResponder):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.messages.drop;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);
