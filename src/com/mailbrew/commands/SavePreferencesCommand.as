@@ -20,7 +20,7 @@ package com.mailbrew.commands
 			this.ml.prefs.setValue(PreferenceKeys.UPDATE_INTERVAL, spe.updateInterval);
 			this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, spe.notificationDisplayInterval);
 			this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, spe.idleThreshold);
-			this.ml.prefs.setValue(PreferenceKeys.BOUNCE_DOCK_ICON, spe.bounceDockIcon);
+			this.ml.prefs.setValue(PreferenceKeys.APPLICATION_ALERT, spe.applicationAlert);
 			this.ml.prefs.save();
 			try
 			{

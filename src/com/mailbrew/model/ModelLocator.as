@@ -1,5 +1,7 @@
 package com.mailbrew.model
 {
+	import air.update.ApplicationUpdaterUI;
+	
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.model.IModelLocator;
 	import com.mailbrew.components.Summary;
@@ -22,7 +24,7 @@ package com.mailbrew.model
 		
 		public static const DEFAULT_FRAME_RATE:uint = 24;
 		public static const MAX_NOTIFICATIONS:uint = 10;
-		public static var testMode:Boolean;
+		[Bindable] public static var testMode:Boolean;
 		
 		// Buttons
 		[Bindable] [Embed(source="assets/buttons/list_add.png")] public var ListAddIconClass:Class;
@@ -67,6 +69,7 @@ package com.mailbrew.model
 		public var db:Database;
 		public var notificationSounds:NotificationSounds = new NotificationSounds();
 		public var summaryWindow:Summary;
+		public var appUpdater:ApplicationUpdaterUI;
 
 		public function checkEmail(e:TimerEvent):void
 		{

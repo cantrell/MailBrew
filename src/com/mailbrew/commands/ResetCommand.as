@@ -23,7 +23,7 @@ package com.mailbrew.commands
 			spe.updateInterval = PreferenceKeys.UPDATE_INTERVAL_DEFAULT;
 			spe.notificationDisplayInterval = PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL_DEFAULT;
 			spe.idleThreshold = PreferenceKeys.IDLE_THRESHOLD_DEFAULT;
-			spe.bounceDockIcon = PreferenceKeys.BOUNCE_DOCK_ICON_DEFAULT;
+			spe.applicationAlert = PreferenceKeys.APPLICATION_ALERT_DEFAULT;
 			spe.startAtLogin = PreferenceKeys.START_AT_LOGIN_DEFAULT;
 			spe.dispatch();
 			this.dropMessagesTable();

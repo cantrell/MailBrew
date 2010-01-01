@@ -1,5 +1,7 @@
 package com.mailbrew.commands
 {
+	import air.update.ApplicationUpdaterUI;
+	
 	import com.adobe.air.crypto.EncryptionKeyGenerator;
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.commands.ICommand;
@@ -56,9 +58,9 @@ package com.mailbrew.commands
 				defaultsSet = true;
 			}
 			
-			if (this.ml.prefs.getValue(PreferenceKeys.BOUNCE_DOCK_ICON) == null)
+			if (this.ml.prefs.getValue(PreferenceKeys.APPLICATION_ALERT) == null)
 			{
-				this.ml.prefs.setValue(PreferenceKeys.BOUNCE_DOCK_ICON, PreferenceKeys.BOUNCE_DOCK_ICON_DEFAULT, false);
+				this.ml.prefs.setValue(PreferenceKeys.APPLICATION_ALERT, PreferenceKeys.APPLICATION_ALERT_DEFAULT, false);
 				defaultsSet = true;
 			}
 			
@@ -88,11 +90,11 @@ package com.mailbrew.commands
 				topLevelMenu.addItemAt(seperator, 0);
 			}
 			
-			var databasePassword:String = this.ml.prefs.getValue("databasePassword");
+			var databasePassword:String = this.ml.prefs.getValue(PreferenceKeys.DATABASE_PASSWORD);
 			if (databasePassword == null)
 			{
 				databasePassword = this.generateStrongPassword();
-				this.ml.prefs.setValue("databasePassword", databasePassword, true);
+				this.ml.prefs.setValue(PreferenceKeys.DATABASE_PASSWORD, databasePassword, true);
 				this.ml.prefs.save();
 			}
 			var sqlFile:File = File.applicationDirectory.resolvePath("sql.xml");
@@ -118,7 +120,7 @@ package com.mailbrew.commands
 		{
 			var responder:DatabaseResponder = new DatabaseResponder();
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, createMessagesTable);
-			ModelLocator.getInstance().db.createAccountsTable(responder);			
+			this.ml.db.createAccountsTable(responder);			
 		}
 		
 		private function createMessagesTable(e:Event):void
@@ -127,7 +129,7 @@ package com.mailbrew.commands
 			oldResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, createMessagesTable);
 			var responder:DatabaseResponder = new DatabaseResponder();
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, start);
-			ModelLocator.getInstance().db.createMessagesTable(responder);			
+			this.ml.db.createMessagesTable(responder);			
 		}
 		
 		private function start(e:Event):void
@@ -139,6 +141,14 @@ package com.mailbrew.commands
 			this.ml.checkEmailTimer.addEventListener(TimerEvent.TIMER, ml.checkEmail);
 			this.ml.checkEmailTimer.start();
 			if (!ModelLocator.testMode) new CheckMailEvent().dispatch();
+			
+			// Set up the application updater
+			/*
+			ml.appUpdater = new ApplicationUpdaterUI();
+			ml.appUpdater.configurationFile = File.applicationDirectory.resolvePath("updaterSettings.xml");			
+			ml.appUpdater.delay = 0; // No timer. Just check on startup
+			ml.appUpdater.initialize();
+			*/
 		}
 		
 		private function onExitApplication(e:Event):void

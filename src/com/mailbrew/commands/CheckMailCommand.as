@@ -1,10 +1,7 @@
 package com.mailbrew.commands
 {
-	import com.mailbrew.notify.Notification;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
-	import com.mailbrew.components.IconAlert;
-	import com.mailbrew.data.AccountTypes;
 	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
@@ -16,6 +13,7 @@ package com.mailbrew.commands
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.UpdateAppIconEvent;
 	import com.mailbrew.model.ModelLocator;
+	import com.mailbrew.notify.Notification;
 	import com.mailbrew.util.EmailServiceFactory;
 	import com.mailbrew.util.ServiceIconFactory;
 	import com.mailbrew.util.StatusBarManager;
@@ -23,7 +21,6 @@ package com.mailbrew.commands
 	import flash.desktop.DockIcon;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.NotificationType;
-	import flash.display.Bitmap;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
 	import flash.events.Event;
@@ -112,10 +109,13 @@ package com.mailbrew.commands
 			this.currentAccount = null;
 			this.newUnseenEmails = null;
 			this.oldUnseenEmails = null;
+			this.ml = null;
+			this.topLevelMenu = null;
+			this.serviceMenu = null;
 			System.gc();
 			
 			// Remove the lock
-			this.ml.checkEmailLock = false;
+			ModelLocator.getInstance().checkEmailLock = false;
 		}
 		
 		private function checkEmailLoop():void
@@ -316,16 +316,16 @@ package com.mailbrew.commands
 			this.ml.notificationManager.addNotification(notification);
 		}
 		
-		private function onNotificationClosed(e:Event):void
+		private static function onNotificationClosed(e:Event):void
 		{
 			var notification:Notification = e.target as Notification;
 			notification.removeEventListener(Event.CLOSE, onNotificationClosed);
-			if (this.ml.notificationManager.length == 0)
+			if (ModelLocator.getInstance().notificationManager.length == 0)
 			{
 				// All done showing notifications
 				if (NativeApplication.nativeApplication.activeWindow == null) // App isn't open or active
 				{
-					this.ml.frameRate = 1;
+					ModelLocator.getInstance().frameRate = 1;
 				}
 			}
 		}
@@ -341,11 +341,8 @@ package com.mailbrew.commands
 		
 		private function bounceDockIcon():void
 		{
-			if (!this.ml.prefs.getValue(PreferenceKeys.BOUNCE_DOCK_ICON, false)) return;
-			if (NativeApplication.supportsDockIcon)
-			{
-				DockIcon(NativeApplication.nativeApplication.icon).bounce(NotificationType.INFORMATIONAL);
-			}
+			if (!this.ml.prefs.getValue(PreferenceKeys.APPLICATION_ALERT, false)) return;
+			ModelLocator.getInstance().notificationManager.alert(NotificationType.INFORMATIONAL, NativeApplication.nativeApplication.openedWindows[0]);
 		}
 		
 		private function deleteOldMessages():void
@@ -382,7 +379,7 @@ package com.mailbrew.commands
 			db.insertUnseenMessage(responder, this.currentAccount.id, unseenEmail.id);
 		}
 		
-		private function onMenuItemSelected(e:Event):void
+		private static function onMenuItemSelected(e:Event):void
 		{
 			var menuItem:NativeMenuItem = e.target as NativeMenuItem;
 			if (menuItem.data != null)

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
          xmlns:s="library://ns.adobe.com/flex/spark"
-		 xmlns:mx="library://ns.adobe.com/flex/mx">
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
 			import com.mailbrew.events.CheckMailEvent;
@@ -9,6 +10,23 @@
 			import com.mailbrew.util.WindowManager;
 			
 			import flash.display.NativeWindow;
+			
+			private function onCreationComplete():void
+			{
+				if (NativeApplication.supportsSystemTrayIcon) // Windows
+				{
+					this.logoBitmap.visible = false;
+					this.logoLabel.right = 3;
+					this.buttonGroup.left = 5;
+				}
+				else
+				{
+					this.logoBitmap.visible = true;
+					this.logoBitmap.left = 4;
+					this.logoLabel.left = 30;
+					this.buttonGroup.right = 5;
+				}
+			}
 			
 			private function onCheckNow():void
 			{
@@ -43,14 +61,12 @@
 			</s:fill>
 		</s:Rect>
 	</fx:DesignLayer>
-	<s:BitmapImage source="{ModelLocator.getInstance().TopLeftLogo}" left="4" top="3"/>
-	<mx:Label text="MailBrew" left="30" top="6" fontSize="20" fontWeight="bold" color="0xf2f2f2"/>
-	<s:Group right="5" top="5">
-		<s:layout>
-			<s:HorizontalLayout/>
-		</s:layout>
+	
+	<s:BitmapImage id="logoBitmap" source="{ModelLocator.getInstance().TopLeftLogo}" top="3"/>
+	<mx:Label id="logoLabel" text="MailBrew" top="6" fontSize="20" fontWeight="bold" color="0xf2f2f2"/>
+	<s:HGroup id="buttonGroup" top="5">
 		<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().CheckNowIconClass}" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
 		<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().ConfigureIconClass}" click="onOpenSettings();"/>
 		<mx:Button id="aboutButton" label="About" icon="{ModelLocator.getInstance().AboutIconClass}" click="onOpenAbout();"/>
-	</s:Group>
+	</s:HGroup>
 </s:Group>

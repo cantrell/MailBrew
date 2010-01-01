@@ -24,6 +24,7 @@
 			import flash.events.InvokeEvent;
 			import flash.events.ScreenMouseEvent;
 			import flash.geom.Rectangle;
+			import flash.system.Capabilities;
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
@@ -35,7 +36,7 @@
 			private function onApplicationComplete():void
 			{
 				// If we're running from ADL, put the app in test mode
-				ModelLocator.testMode = (File.applicationDirectory.nativePath.search(/bin-debug$/) == -1) ? false : true;
+				ModelLocator.testMode = Capabilities.isDebugger;
 				if (!ModelLocator.testMode) this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 				this.nativeApplication.addEventListener(Event.EXITING, onApplicationExiting);
 				this.nativeWindow.addEventListener(Event.CLOSING, onWindowClosing);

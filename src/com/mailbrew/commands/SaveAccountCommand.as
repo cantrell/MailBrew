@@ -24,7 +24,14 @@ package com.mailbrew.commands
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
-				insertSortOrder(e.data, e.data, sae.saveMode);
+				if (sae.saveMode == AccountSaveMode.INSERT)
+				{
+					insertSortOrder(e.data, e.data);
+				}
+				else
+				{
+					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
+				}
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			if (sae.saveMode == AccountSaveMode.INSERT)
@@ -58,7 +65,7 @@ package com.mailbrew.commands
 			}
 		}
 		
-		private function insertSortOrder(accountId:Number, sortOrder:Number, saveMode:String):void
+		private function insertSortOrder(accountId:Number, sortOrder:Number):void
 		{
 			var ml:ModelLocator = ModelLocator.getInstance();
 			var db:Database = ml.db;
@@ -69,14 +76,7 @@ package com.mailbrew.commands
 				var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
 				pale.selectedId = accountId;
 				pale.dispatch();
-				if (saveMode == AccountSaveMode.INSERT)
-				{
-					IconAlert.showSuccess("Account Created", "Your new account has been created.");
-				}
-				else
-				{
-					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
-				}
+				IconAlert.showSuccess("Account Created", "Your new account has been created.");
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			db.updateSortOrder(responder, accountId, sortOrder);

@@ -3,8 +3,8 @@
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/halo"
-		  width="345" height="305" resizable="false"
-		  minWidth="345" minHeight="305"
+		  width="345" height="405" resizable="false" maximizable="false"
+		  minWidth="345" minHeight="405"
 		  type="utility" showStatusBar="false"
 		  creationComplete="onCreationComplete();">
 	<fx:Script>
@@ -39,16 +39,25 @@
 
 				if (NativeApplication.supportsDockIcon)
 				{
-					this.currentState = "hasDock";
-					this.height = 355;
-					this.minHeight = 355;
-					this.bounceDockIconCheckbox.selected = prefs.getValue(PreferenceKeys.BOUNCE_DOCK_ICON, false);
+					this.currentState = "supportsDockIcon";
+					this.bounceDockIconCheckbox.selected = prefs.getValue(PreferenceKeys.APPLICATION_ALERT, false);
+				}
+				else
+				{
+					this.currentState = "supportsSystemTray";
+					this.flashTaskBarCheckbox.selected = prefs.getValue(PreferenceKeys.APPLICATION_ALERT, false);
 				}
 			}
 			
 			private function onReset():void
 			{
 				IconAlert.showQuestion("Are You Sure?", "Are you sure you want to reset MailBrew?\nResetting will:\n\n 1. Remove all your accounts.\n 2. Reset all your preferences.\n 3. Exit the application.\n\n", onResetConfirm, IconAlert.NO, this);
+			}
+			
+			private function onCheckForUpdate():void
+			{
+				if (ModelLocator.testMode) return;
+				ModelLocator.getInstance().appUpdater.checkNow();
 			}
 			
 			private function onResetConfirm(e:CloseEvent):void
@@ -63,7 +72,14 @@
 				spe.updateInterval = this.updateIntervalStepper.value;
 				spe.idleThreshold = this.idlePeriodStepper.value;
 				spe.notificationDisplayInterval = this.notificationDisplayLengthStepper.value;
-				if (this.bounceDockIconCheckbox) spe.bounceDockIcon = this.bounceDockIconCheckbox.selected;
+				if (this.currentState == "supportsDockIcon")
+				{
+					spe.applicationAlert = this.bounceDockIconCheckbox.selected;
+				}
+				else
+				{
+					spe.applicationAlert = this.flashTaskBarCheckbox.selected;
+				}
 				spe.startAtLogin = this.startAtLoginCheckbox.selected;
 				spe.dispatch();
 				this.onCancel();
@@ -77,8 +93,8 @@
 	</fx:Script>
 
 	<s:states>
-		<s:State name="default"/>
-		<s:State name="hasDock"/>
+		<s:State name="supportsDockIcon"/>
+		<s:State name="supportsSystemTray"/>
 	</s:states>
 	
 	<s:VGroup width="100%" height="100%">
@@ -101,16 +117,28 @@
 			<s:NumericStepper id="idlePeriodStepper" minimum="5" maximum="60" y="5" right="20"/>
 		</s:Group>		
 		
-		<s:Group width="100%" includeIn="hasDock">
+		<s:Group width="100%" includeIn="supportsDockIcon">
 			<s:Label text="Bounce Dock Icon" fontWeight="bold" y="5" left="5"/>
 			<s:Label y="20" width="210" left="5">Do you want the Dock icon to bounce when you get new messages?</s:Label>
 			<s:CheckBox id="bounceDockIconCheckbox" y="5" right="20"/>
+		</s:Group>
+
+		<s:Group width="100%" includeIn="supportsSystemTray">
+			<s:Label text="Flash Task Bar Icon" fontWeight="bold" y="5" left="5"/>
+			<s:Label y="20" width="210" left="5">Do you want the task bar icon to flash when you get new messages?</s:Label>
+			<s:CheckBox id="flashTaskBarCheckbox" y="5" right="20"/>
 		</s:Group>
 
 		<s:Group width="100%">
 			<s:Label text="Start at Login" fontWeight="bold" y="5" left="5"/>
 			<s:Label y="20" width="210" left="5">Should MailBrew start automatically when you log in?</s:Label>
 			<s:CheckBox id="startAtLoginCheckbox" y="5" right="20"/>
+		</s:Group>
+
+		<s:Group width="100%">
+			<s:Label text="Check For Update" fontWeight="bold" y="5" left="5"/>
+			<s:Label y="20" width="210" left="5">Check to see if a newer version of MailBrew is available.</s:Label>
+			<s:Button label="Update" id="updateButton" click="onCheckForUpdate();" right="20" enabled="{!ModelLocator.testMode}"/>
 		</s:Group>
 
 		<s:Group width="100%">
