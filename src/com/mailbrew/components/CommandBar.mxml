@@ -23,7 +23,7 @@
 				{
 					this.logoBitmap.visible = true;
 					this.logoBitmap.left = 4;
-					this.logoLabel.left = 30;
+					this.logoLabel.left = 31;
 					this.buttonGroup.right = 5;
 				}
 			}
@@ -63,7 +63,7 @@
 	</fx:DesignLayer>
 	
 	<s:BitmapImage id="logoBitmap" source="{ModelLocator.getInstance().TopLeftLogo}" top="3"/>
-	<mx:Label id="logoLabel" text="MailBrew" top="6" fontSize="20" fontWeight="bold" color="0xf2f2f2"/>
+	<s:Label id="logoLabel" text="MailBrew" top="11" fontSize="20" color="0xf2f2f2" fontFamily="_sans"/>
 	<s:HGroup id="buttonGroup" top="5">
 		<mx:Button id="checkNowButton" label="Check Now" icon="{ModelLocator.getInstance().CheckNowIconClass}" click="onCheckNow();" enabled="{(ModelLocator.getInstance().accounts.length == 0) ? false : true}"/>
 		<mx:Button id="settingsButton" label="Settings" icon="{ModelLocator.getInstance().ConfigureIconClass}" click="onOpenSettings();"/>

@@ -10,21 +10,21 @@ package com.mailbrew.util
 			{
 				if (username == null || username.search(/@gmail\.com$/) != -1)
 				{
-					return "https://mail.google.com";
+					return "http://mail.google.com/mail/?shva=1#inbox";
 				}
 				else
 				{
 					var domain:String = username.substring(username.indexOf("@") + 1, username.length);
-					return "http://mail.google.com/a/" + domain + "/";
+					return "http://mail.google.com/a/" + domain + "/#inbox";
 				}
 			}
 			else if (serviceName == AccountTypes.GOOGLE_VOICE)
 			{
-				return "https://www.google.com/voice";
+				return "https://www.google.com/voice/#inbox";
 			}
 			else if (serviceName == AccountTypes.GOOGLE_WAVE)
 			{
-				return "http://wave.google.com";
+				return "http://wave.google.com/wave/";
 			}
 			return null;
 		}

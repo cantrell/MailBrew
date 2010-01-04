@@ -30,6 +30,7 @@ package com.mailbrew.commands
 				}
 				else
 				{
+					populateAccountList(e.data);
 					IconAlert.showSuccess("Account Updated", "Your account information has been updated.");
 				}
 			};
@@ -73,13 +74,18 @@ package com.mailbrew.commands
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
-				var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
-				pale.selectedId = accountId;
-				pale.dispatch();
+				populateAccountList(accountId);
 				IconAlert.showSuccess("Account Created", "Your new account has been created.");
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
 			db.updateSortOrder(responder, accountId, sortOrder);
+		}
+		
+		private function populateAccountList(accountId:Number):void
+		{
+			var pale:PopulateAccountListEvent = new PopulateAccountListEvent();
+			pale.selectedId = accountId;
+			pale.dispatch();
 		}
 	}
 }

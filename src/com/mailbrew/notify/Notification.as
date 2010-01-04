@@ -38,6 +38,7 @@ package com.mailbrew.notify
 		private var message:String;        
 		private var subject:String;
 		private var icon:Bitmap;
+		private var frameRate:uint;
 		private var timer:Timer;
 		private var timerListener:Function;
 		private var sprite:Sprite;
@@ -47,7 +48,7 @@ package com.mailbrew.notify
 		private var MAX_TEXT_LINES:uint = 10;
 		private static var filters:Array;
 		
-		public function Notification(subject:String, message:String, position:String, duration:uint, iconClass:Class)
+		public function Notification(subject:String, message:String, position:String, duration:uint, iconClass:Class, frameRate:uint = 24)
 		{
 			var winOptions: NativeWindowInitOptions = new NativeWindowInitOptions();
 			winOptions.maximizable = false;
@@ -69,6 +70,7 @@ package com.mailbrew.notify
 			this.subject = subject;
 			this.message = message;
 			this.icon = new iconClass();
+			this.frameRate = frameRate;
 			
 			if (filters == null)
 			{
@@ -188,6 +190,7 @@ package com.mailbrew.notify
 		
 		override public function close(): void
 		{
+			this.frameRateCheck();
 			this.cleanUpTimer();
 			this.timer = new Timer(25);
 			this.timerListener = function (e:TimerEvent):void
@@ -225,12 +228,13 @@ package com.mailbrew.notify
 			this.sprite = null;
 			this.manager = null;
 		}
-		
+
 		override public function set visible(value:Boolean):void
 		{
 			super.visible = value;
-			if (value == true)
+			if (value)
 			{
+				this.frameRateCheck();
 				this.cleanUpTimer();
 				this.timer = new Timer(10);
 				this.timerListener = function (e:TimerEvent):void
@@ -293,6 +297,15 @@ package com.mailbrew.notify
 				this.timer.removeEventListener(TimerEvent.TIMER, this.timerListener);
 				this.timer = null;
 			}
+		}
+		
+		private function frameRateCheck():void
+		{
+			if (this.stage.frameRate != this.frameRate)
+			{
+				this.stage.frameRate = frameRate;
+			}
+			
 		}
 	}
 }
