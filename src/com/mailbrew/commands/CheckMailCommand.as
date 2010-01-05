@@ -140,7 +140,9 @@ package com.mailbrew.commands
 			// Manage the Dock or System Tray menu
 			if (this.topLevelMenu.getItemByName(this.currentAccount.id) != null)
 			{
-				this.topLevelMenu.removeItem(this.topLevelMenu.getItemByName(this.currentAccount.id));
+				var oldItem:NativeMenuItem = this.topLevelMenu.removeItem(this.topLevelMenu.getItemByName(this.currentAccount.id));
+				oldItem.removeEventListener(Event.SELECT, onMenuItemSelected);
+				oldItem = null;
 			}
 			this.serviceMenu = new NativeMenu();
 			this.serviceMenu.addEventListener(Event.SELECT, onMenuItemSelected);
@@ -246,7 +248,7 @@ package com.mailbrew.commands
 				compareOldAndNew();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
-			db.getMessagesByAccountId(responder, this.currentAccount.id);
+			db.getMessageUniqueIdsByAccountId(responder, this.currentAccount.id);
 		}
 		
 		private function compareOldAndNew():void
@@ -376,7 +378,8 @@ package com.mailbrew.commands
 				insertNewMessageLoop();
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
-			db.insertUnseenMessage(responder, this.currentAccount.id, unseenEmail.id);
+			var summary:String = (unseenEmail.summary != null) ? unseenEmail.summary : unseenEmail.subject;
+			db.insertUnseenMessage(responder, this.currentAccount.id, unseenEmail.id, unseenEmail.from, summary, unseenEmail.url);
 		}
 		
 		private static function onMenuItemSelected(e:Event):void

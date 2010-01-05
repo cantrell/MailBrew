@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <application xmlns="http://ns.adobe.com/air/application/2.0beta2">
 
-	<id>com.mailbrew.mailbrew</id>
+	<id>com.christiancantrell.mailbrew</id>
 	<filename>MailBrew</filename>
 	<name>MailBrew</name>
 	<version>.1</version>

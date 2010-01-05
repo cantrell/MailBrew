@@ -369,13 +369,32 @@ package com.mailbrew.database
 			stmt.execute();
 		}
 
+		public function getMessageUniqueIdsByAccountId(responder:DatabaseResponder,
+											   		   accountId:Number):void
+		{
+			if (!this.aConn.connected) return;
+			var stmt:SQLStatement = this.getStatement();
+			stmt.sqlConnection = this.aConn;
+			stmt.text = this.sql.messages.selectUniqueIdsByAccountId;
+			stmt.parameters[":account_id"] = accountId;
+			var listener:Function = function(e:SQLEvent):void
+			{
+				stmt.removeEventListener(SQLEvent.RESULT, listener);
+				var dbe:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				dbe.data = stmt.getResult().data;
+				responder.dispatchEvent(dbe);
+			}
+			stmt.addEventListener(SQLEvent.RESULT, listener);
+			stmt.execute();
+		}
+
 		public function getMessagesByAccountId(responder:DatabaseResponder,
 											   accountId:Number):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
 			stmt.sqlConnection = this.aConn;
-			stmt.text = this.sql.messages.selectByAccountId;
+			stmt.text = this.sql.messages.selectMessagesByAccountId;
 			stmt.parameters[":account_id"] = accountId;
 			var listener:Function = function(e:SQLEvent):void
 			{
@@ -408,7 +427,10 @@ package com.mailbrew.database
 
 		public function insertUnseenMessage(responder:DatabaseResponder,
 										    accountId:Number,
-											uniqueId:String):void
+											uniqueId:String,
+											sender:String,
+											summary:String = null,
+											url:String = null):void
 		{
 			if (!this.aConn.connected) return;
 			var stmt:SQLStatement = this.getStatement();
@@ -416,17 +438,9 @@ package com.mailbrew.database
 			stmt.text = this.sql.messages.insert;
 			stmt.parameters[":account_id"] = accountId;
 			stmt.parameters[":unique_id"] = uniqueId;
-			
-			/*
-			var sql:String = "INSERT INTO messages (account_id, unique_id) VALUES ";
-			for each (var emailHeader:EmailHeader in unseenMessages)
-			{
-				sql += "("+accountId+", '"+emailHeader.id+"'),";
-			}
-			sql = sql.slice(0, sql.length - 1);
-			stmt.text = sql;
-			*/
-
+			stmt.parameters[":sender"] = sender;
+			stmt.parameters[":summary"] = summary;
+			stmt.parameters[":url"] = url;
 			var listener:Function = function(e:SQLEvent):void
 			{
 				stmt.removeEventListener(SQLEvent.RESULT, listener);

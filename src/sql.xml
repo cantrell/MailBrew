@@ -151,7 +151,10 @@
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 account_id INT NOT NULL,
-                unique_id TEXT NOT NULL
+                unique_id TEXT NOT NULL,
+                sender TEXT NOT NULL,
+                summary TEXT,
+                url TEXT
             );
         </create>
         <drop>
@@ -161,21 +164,35 @@
             INSERT INTO
                 messages (
                     account_id,
-                    unique_id 
+                    unique_id,
+                    sender,
+                    summary,
+                    url
                 )
             VALUES (
                     :account_id,
-                    :unique_id
+                    :unique_id,
+                    :sender,
+                   	:summary,
+                   	:url
                 );
         </insert>
-        <selectByAccountId>
+        <selectUniqueIdsByAccountId>
         	SELECT
         		unique_id
         	FROM 
         		messages
         	WHERE
         		account_id = :account_id;
-        </selectByAccountId>
+        </selectUniqueIdsByAccountId>
+        <selectMessagesByAccountId>
+        	SELECT
+        		*
+        	FROM 
+        		messages
+        	WHERE
+        		account_id = :account_id;
+        </selectMessagesByAccountId>
         <deleteByAccountId>
             DELETE FROM
                 messages
