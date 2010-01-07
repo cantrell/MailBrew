@@ -15,7 +15,7 @@ package com.mailbrew.util
 				case(AccountTypes.IMAP):
 					return ModelLocator.getInstance().ImapIconClassSmall;
 				case(AccountTypes.GMAIL):
-					if (username == null || username.search(GMAIL_RE) != -1)
+					if (username == null || username.indexOf("@") == -1 || username.search(GMAIL_RE) != -1)
 					{
 						return ModelLocator.getInstance().GmailIconClassSmall;
 					}
@@ -38,7 +38,7 @@ package com.mailbrew.util
 				case(AccountTypes.IMAP):
 					return ModelLocator.getInstance().ImapIconClassLarge;
 				case(AccountTypes.GMAIL):
-					if (username == null || username.search(GMAIL_RE) != -1)
+					if (username == null || username.indexOf("@") == -1 || username.search(GMAIL_RE) != -1)
 					{
 						return ModelLocator.getInstance().GmailIconClassLarge;
 					}

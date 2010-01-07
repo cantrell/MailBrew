@@ -56,7 +56,7 @@ package com.mailbrew.email.google
 			this.urlLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
 			var req:URLRequest;
 			// Decide if this is a straight-up Gmail account, or a Google Apps for My Domain account.
-			if (this.username.search(/@gmail\.com$/) != -1)
+			if (this.username.indexOf("@") == -1 || this.username.search(/@gmail\.com$/) != -1)
 			{
 				req = new URLRequest("https://mail.google.com/mail/feed/atom");
 			}
