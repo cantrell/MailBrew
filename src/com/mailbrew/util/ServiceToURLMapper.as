@@ -8,7 +8,7 @@ package com.mailbrew.util
 		{
 			if (serviceName == AccountTypes.GMAIL)
 			{
-				if (username == null || username.search(/@gmail\.com$/) != -1)
+				if (username == null || username.indexOf("@") == -1 || username.search(/@gmail\.com$/) != -1)
 				{
 					return "http://mail.google.com/mail/?shva=1#inbox";
 				}
