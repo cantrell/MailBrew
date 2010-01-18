@@ -7,6 +7,7 @@ package com.mailbrew.commands
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
+	import com.mailbrew.events.CheckMailEvent;
 	import com.mailbrew.events.PopulateAccountInfoEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.events.SaveAccountEvent;
@@ -75,6 +76,9 @@ package com.mailbrew.commands
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				populateAccountList(accountId);
+				var cme:CheckMailEvent = new CheckMailEvent();
+				cme.accountIds = [accountId];
+				cme.dispatch();
 				IconAlert.showSuccess("Account Created", "Your new account has been created.");
 			};
 			responder.addEventListener(DatabaseEvent.RESULT_EVENT, listener);
