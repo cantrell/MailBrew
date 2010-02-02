@@ -297,16 +297,14 @@ package com.mailbrew.commands
 					this.bounceDockIcon();
 					dockIconBounced = true;
 				}
-				if (i < ModelLocator.MAX_NOTIFICATIONS)
-				{
-					this.addNotification(emailHeader);
-				}
+				this.addNotification(emailHeader);
 			}
 			this.deleteOldMessages();
 		}
 		
 		private function addNotification(emailHeader:EmailHeader):void
 		{
+			if (this.ml.notificationManager.length >= ModelLocator.MAX_NOTIFICATIONS) return;
 			var summary:String = (emailHeader.summary != null) ? emailHeader.summary : emailHeader.subject;
 			var notification:Notification = new Notification(emailHeader.from,
                                                              summary,
