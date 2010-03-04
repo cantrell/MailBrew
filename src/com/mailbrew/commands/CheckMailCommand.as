@@ -24,10 +24,12 @@ package com.mailbrew.commands
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
 	import flash.media.Sound;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	import flash.system.System;
+	import flash.utils.Timer;
 	
 	public class CheckMailCommand implements ICommand
 	{
@@ -39,6 +41,7 @@ package com.mailbrew.commands
 		private var topLevelMenu:NativeMenu;
 		private var serviceMenu:NativeMenu;
 		private var emailService:IEmailService;
+		private var requestTimer:Timer;
 		
 		public function execute(e:CairngormEvent):void
 		{
@@ -162,7 +165,29 @@ package com.mailbrew.commands
 			this.emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			this.emailService.addEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			StatusBarManager.showMessage("Checking " + this.currentAccount.name, true);
+			this.requestTimer = new Timer(ModelLocator.REQUEST_TIMEOUT * 1000);
+			this.requestTimer.addEventListener(TimerEvent.TIMER, onRequestTimeout);
+			this.requestTimer.start();
 			this.emailService.getUnseenEmailHeaders();
+		}
+		
+		private function onRequestTimeout(e:TimerEvent):void
+		{
+			this.cleanupRequestTimer();
+			this.disposeEmailService();
+			var emailEvent:EmailEvent = new EmailEvent(EmailEvent.CONNECTION_FAILED);
+			emailEvent.data = "Request timed out.";
+			this.onConnectionFailed(emailEvent);
+		}
+		
+		private function cleanupRequestTimer():void
+		{
+			if (this.requestTimer != null)
+			{
+				this.requestTimer.stop();
+				this.requestTimer.removeEventListener(TimerEvent.TIMER, onRequestTimeout);
+				this.requestTimer = null;
+			}
 		}
 		
 		private function disposeEmailService():void
@@ -180,6 +205,7 @@ package com.mailbrew.commands
 		
 		private function onProtocolError(e:EmailEvent):void
 		{
+			this.cleanupRequestTimer();
 			var es:IEmailService = e.target as IEmailService;
 			es.removeEventListener(EmailEvent.PROTOCOL_ERROR, onProtocolError);
 			var reason:String = "Protocol error.";
@@ -192,6 +218,7 @@ package com.mailbrew.commands
 		
 		private function onAuthenticationFailed(e:EmailEvent):void
 		{
+			this.cleanupRequestTimer();
 			var es:IEmailService = e.target as IEmailService;
 			es.removeEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
 			var reason:String = "Authentication failed. Your credentials were not accepted. Please update your username and password.";
@@ -204,8 +231,9 @@ package com.mailbrew.commands
 		
 		private function onConnectionFailed(e:EmailEvent):void
 		{
+			this.cleanupRequestTimer();
 			var es:IEmailService = e.target as IEmailService;
-			es.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+			if (es != null) es.removeEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
 			var reason:String = "Unable to connect to email service.";
 			if (e.data != null)
 			{
@@ -216,6 +244,7 @@ package com.mailbrew.commands
 		
 		private function onUnseenEmails(e:EmailEvent):void
 		{
+			this.cleanupRequestTimer();
 			var es:IEmailService = e.target as IEmailService;
 			es.removeEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
 			this.newUnseenEmails = e.data;

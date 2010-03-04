@@ -104,6 +104,14 @@ package com.mailbrew.email.google
 		{
 			if (this.urlLoader != null)
 			{
+				try
+				{
+					this.urlLoader.close();
+				}
+				catch (e:Error)
+				{
+					// no problem
+				}
 				this.urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
 				this.urlLoader.removeEventListener(Event.COMPLETE, onComplete);
 				this.urlLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);

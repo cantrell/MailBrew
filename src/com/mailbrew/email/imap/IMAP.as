@@ -79,7 +79,7 @@ package com.mailbrew.email.imap
 			this.doneRegExp = new RegExp("\\" + this.tag + ".+\\r\\n");
 			this.stop();
 			this.socket = (this.secure) ? new SecureSocket() : new Socket();
-			this.socket.timeout = 20000; // 20 seconds
+			this.socket.timeout = 30000; // 30 seconds
 			this.socket.addEventListener(Event.CONNECT, onConnect);
 			this.socket.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			this.socket.addEventListener(Event.CLOSE, onClose);

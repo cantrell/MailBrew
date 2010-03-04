@@ -43,6 +43,7 @@ package com.mailbrew.notify
 		private var timerListener:Function;
 		private var sprite:Sprite;
 		private var manager:NotificationManager;
+		private var closeTime:uint = 25;
 		
 		private var LEADING:Number = 1.25;
 		private var MAX_TEXT_LINES:uint = 10;
@@ -192,7 +193,7 @@ package com.mailbrew.notify
 		{
 			this.frameRateCheck();
 			this.cleanUpTimer();
-			this.timer = new Timer(25);
+			this.timer = new Timer(this.closeTime);
 			this.timerListener = function (e:TimerEvent):void
 			{
 				timer.stop();
@@ -276,6 +277,7 @@ package com.mailbrew.notify
 			var sprite:Sprite = event.currentTarget as Sprite;
 			sprite.removeEventListener(MouseEvent.CLICK, this.notificationClick);
 			this.dispatchEvent(new NotificationClickedEvent());
+			this.closeTime = 5;
 			this.close();
 		}
 		

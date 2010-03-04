@@ -24,19 +24,19 @@
 				
 				//var emailService:IEmailService = new IMAP("fake", "fake", "imap.gmail.com", 993, true);
 				//var emailService:IEmailService = new Gmail("fake", "fake");
-				//var emailService:IEmailService = new Wave("fake", "fake");
+				var emailService:IEmailService = new Wave("fake", "fake");
 				//var emailService:IEmailService = new Voice("fake", "fake");
 				
-				//emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
-				//emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
-				//emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
-				//emailService.addEventListener(EmailEvent.CONNECTION_SUCCEEDED, onConnectionSucceeded);
-				//emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
-				//emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
+				emailService.addEventListener(EmailEvent.AUTHENTICATION_FAILED, onAuthenticationFailed);
+				emailService.addEventListener(EmailEvent.AUTHENTICATION_SUCCEEDED, onAuthenticationSucceeded);
+				emailService.addEventListener(EmailEvent.CONNECTION_FAILED, onConnectionFailed);
+				emailService.addEventListener(EmailEvent.CONNECTION_SUCCEEDED, onConnectionSucceeded);
+				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS, onUnseenEmails);
+				emailService.addEventListener(EmailEvent.UNSEEN_EMAILS_COUNT, onUnseenEmailsCount);
 			
 				//emailService.testAccount();
 				//emailService.getUnseenEmailCount();
-				//emailService.getUnseenEmailHeaders();
+				emailService.getUnseenEmailHeaders();
 				
 				
 				// Notification tests

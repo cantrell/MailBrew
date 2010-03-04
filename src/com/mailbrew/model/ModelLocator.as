@@ -24,6 +24,7 @@ package com.mailbrew.model
 		
 		public static const DEFAULT_FRAME_RATE:uint = 24;
 		public static const MAX_NOTIFICATIONS:uint = 10;
+		public static const REQUEST_TIMEOUT:uint = 10;  // in seconds
 		[Bindable] public static var testMode:Boolean;
 		
 		// Buttons
