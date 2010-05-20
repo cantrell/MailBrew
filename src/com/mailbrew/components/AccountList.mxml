@@ -28,6 +28,7 @@
 			import mx.binding.utils.ChangeWatcher;
 			import mx.events.CloseEvent;
 			import mx.events.DragEvent;
+			import mx.events.FlexEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
@@ -80,7 +81,7 @@
 				cme.dispatch();
 			}
 			
-			private function onAccountListChange(e:IndexChangeEvent):void
+			private function onAccountListChange(e:FlexEvent):void
 			{
 				var list:List = e.target as List;
 				if (list.selectedItem == null) return;
@@ -215,7 +216,7 @@
 			width="100%" height="100%"
 			dragEnabled="true" dropEnabled="true" dragMoveEnabled="true" dragComplete="onDragComplete(event);"
 			dataProvider="{ModelLocator.getInstance().accounts}"
-			change="onAccountListChange(event);" rightClick="onRightClick(event);"
+			valueCommit="onAccountListChange(event);" rightClick="onRightClick(event);"
 			itemRenderer="com.mailbrew.components.skins.AccountListRenderer"
 			contentBackgroundColor="0xf2f2f2"/>
 
