@@ -12,7 +12,7 @@ package com.mailbrew.email.google
 	public class Voice extends UnsupportedService
 	{
 		private const SERVICE:String = "grandcentral";
-		private const INBOX_URL:String = "https://www.google.com/voice/inbox/recent/inbox/";
+		private const INBOX_URL:String = "https://www.google.com/voice/inbox/recent/";
 		private const LOGOUT_URL:String = "https://www.google.com/voice/account/signout";
 		
 		public function Voice(username:String, password:String)

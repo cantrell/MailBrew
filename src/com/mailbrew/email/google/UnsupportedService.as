@@ -10,6 +10,7 @@ package com.mailbrew.email.google
 	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestHeader;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	
@@ -78,9 +79,10 @@ package com.mailbrew.email.google
 			var req:URLRequest = new URLRequest(this.inboxUrl);
 			req.method = URLRequestMethod.GET;
 			var urlVars:URLVariables = new URLVariables();
-			urlVars.nouacheck = "";
+			urlVars.nouacheck = "true";
 			urlVars.auth = this.authToken;
 			req.data = urlVars;
+			req.requestHeaders = [new URLRequestHeader("Authorization", "GoogleLogin auth=" + this.authToken)];
 			this.urlLoader.load(req);
 		}
 		
