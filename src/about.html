@@ -10,9 +10,11 @@
           }
       </style>
       <script type="text/javascript">
-          function setVersion(v) {
+          function setInfo(version, copyright) {
               var verElem = document.getElementById("version");
-              verElem.innerHTML = ("Version " + v);
+              verElem.innerHTML = ("Version " + version);
+              var copyrightElem = document.getElementById("copyright");
+              copyrightElem.innerHTML = ("Copyright &copy; " + copyright + "<br/>All rights reserved"); 
           }
       </script>
 	</head>
@@ -25,20 +27,20 @@
 
 <p id="version" style="text-align:center"></p>
 
-<p style="text-align:center">Copyright &copy; 2010 Cantrell Media Company<br/>All rights reserved.</p>
+<p id="copyright" style="text-align:center"></p>
 
 <hr/>
 
-<p>MailBrew is a cross-platform,  multi-protocol message notifier. It currently supports:</p>
+<p>MailBrew is a cross-platform, multi-protocol message notifier. It currently supports:</p>
 
 <ul>
     <li>IMAP (encrypted and non-encrypted)</li>
     <li>Gmail (including Google Apps email accounts)</li>
-    <li>Google Wave</li>
-    <li>Google Voice (both SMS and voicemail)</li>
+    <!--<li>Google Wave</li>-->
+    <!--<li>Google Voice (both SMS and voicemail)</li>-->
 </ul>
 
-<p>(Note that Google Wave and Google Voice support are experimental; there is no official API for either of these services yet.)</p>
+<!--<p>(Note that Google Wave and Google Voice support are experimental; there is no official API for either of these services yet.)</p>-->
 
 <p>Credits:</p>
 
