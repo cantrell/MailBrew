@@ -8,7 +8,7 @@
 	<fx:Script>
 		<![CDATA[
 			
-			private static const APP_NS:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0beta2");
+			private static const APP_NS:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
 			
 			private function onCreationComplete():void
 			{
@@ -18,8 +18,9 @@
 			private function onLoadComplete():void
 			{
 				if (html.location != "app:/about.html") return;
-				var version:String = NativeApplication.nativeApplication.applicationDescriptor.APP_NS::version;
-				html.htmlLoader.window.setVersion(version);
+				var version:String   = NativeApplication.nativeApplication.applicationDescriptor.APP_NS::version;
+				var copyright:String = NativeApplication.nativeApplication.applicationDescriptor.APP_NS::copyright;
+				html.htmlLoader.window.setInfo(version, copyright);
 			}
 			
 		]]>
