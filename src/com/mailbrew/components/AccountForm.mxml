@@ -16,22 +16,26 @@
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
-			import mx.events.IndexChangedEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			import spark.events.IndexChangeEvent;
 			
 			private var accountId:Number;
-			[Bindable] private var accountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE, AccountTypes.GOOGLE_VOICE]);
+			
+			[Bindable] private var accountTypes:ArrayCollection         = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL]);
+			[Bindable] private var extendedAccountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE, AccountTypes.GOOGLE_VOICE]);
 			
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
+
 				if (ModelLocator.getInstance().accountInfo == null)
 				{
 					this.changeState(AccountTypes.IMAP);
 					this.onFormChange();
 				}
+				
+				this.pickAccountListData();
 			}
 			
 			private function onAccountInfoChange(e:PropertyChangeEvent):void
@@ -55,6 +59,19 @@
 				if (!accountType.enabled) return;
 				this.changeState(this.accountType.selectedItem);
 				this.onFormChange();
+			}
+			
+			private function pickAccountListData():void
+			{
+				for each (var accountInfo:Object in ModelLocator.getInstance().accounts)
+				{
+					if (accountInfo.accountType == AccountTypes.GOOGLE_VOICE || accountInfo.accountType == AccountTypes.GOOGLE_WAVE)
+					{
+						this.accountType.dataProvider = this.extendedAccountTypes;
+						return;
+					}
+				}
+				this.accountType.dataProvider = this.accountTypes;
 			}
 			
 			private function changeState(newState:String, username:String = null):void
@@ -181,6 +198,13 @@
 				this.portNumberValidator.enabled = enabled;
 			}
 			
+			private function extendAccountTypes(e:MouseEvent):void
+			{
+				this.accountType.dataProvider = extendedAccountTypes;
+				this.accountType.selectedItem = null;
+				this.changeState(AccountTypes.IMAP);
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -205,11 +229,13 @@
 	</fx:Declarations>
 	
 	<mx:Form id="accountForm">
-		<mx:FormItem label="Account Type" includeIn="imap, gmail, wave, voice">
-			<s:HGroup verticalAlign="middle">
+		<mx:FormItem label="Account Type" includeIn="imap, gmail, wave, voice" doubleClickEnabled="true" doubleClick="extendAccountTypes(event);">
+			<mx:HBox verticalAlign="middle"> <!-- Work-around Flex rendering bug related to DropDownLists in Groups in Forms -->
 				<s:DropDownList id="accountType" dataProvider="{accountTypes}" change="onAccountTypeChange(event);" width="115"/>
-				<s:BitmapImage id="serviceIcon"/>
-			</s:HGroup>
+				<s:Group>
+					<s:BitmapImage id="serviceIcon"/>
+				</s:Group>
+			</mx:HBox>
 		</mx:FormItem>
 		<mx:FormItem label="Account Name" required="true" includeIn="imap, gmail, wave, voice">
 			<mx:TextInput id="accountNameInput" width="200" change="onFormChange();"/>
