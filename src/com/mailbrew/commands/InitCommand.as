@@ -143,12 +143,10 @@ package com.mailbrew.commands
 			if (!ModelLocator.testMode) new CheckMailEvent().dispatch();
 			
 			// Set up the application updater
-			/*
 			ml.appUpdater = new ApplicationUpdaterUI();
 			ml.appUpdater.configurationFile = File.applicationDirectory.resolvePath("updaterSettings.xml");			
 			ml.appUpdater.delay = 0; // No timer. Just check on startup
 			ml.appUpdater.initialize();
-			*/
 		}
 		
 		private function onExitApplication(e:Event):void
