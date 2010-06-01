@@ -4,18 +4,18 @@
 	<id>com.christiancantrell.mailbrew</id>
 	<filename>MailBrew</filename>
 	<name>MailBrew</name>
-	<version>.1</version>
-	<description>MailBrew is a notifier for IMAP, Gmail, Google Wave, and Google Voice. Created by Christian Cantrell.</description>
-	<copyright>2009 Cantrell Media Company</copyright>
+	<version>0.9</version>
+	<description>MailBrew is an email notifier which supports Gmail and IMAP. Created by Christian Cantrell.</description>
+	<copyright>2010 Cantrell Media Company</copyright>
 
 	<initialWindow>
 		<content>[This value will be overwritten by Flash Builder in the output app.xml]</content>
-		<!-- <title></title> -->
-		<!-- <systemChrome></systemChrome> -->
+		<title>MailBrew</title>
+		<systemChrome>standard</systemChrome>
 		<transparent>false</transparent>
 		<visible>false</visible>
-		<!-- <minimizable></minimizable> -->
-		<!-- <maximizable></maximizable> -->
+		<minimizable>true</minimizable>
+		<maximizable>false</maximizable>
 		<resizable>false</resizable>
 		<width>500</width>
 		<height>400</height>
@@ -24,9 +24,6 @@
 		<minSize>500 400</minSize>
 		<!-- <maxSize></maxSize> -->
 	</initialWindow>
-
-	<!-- <installFolder></installFolder> -->
-	<!-- <programMenuFolder></programMenuFolder> -->
 
 	<icon>
 		<image16x16>assets/logos/logo_16x16.png</image16x16>
