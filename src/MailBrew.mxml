@@ -152,8 +152,6 @@
 
 		]]>
 	</fx:Script>
-	
-	
 
 	<s:states>
 		<s:State name="intro"/>
