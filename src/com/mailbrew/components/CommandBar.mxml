@@ -49,8 +49,16 @@
 			
 			private function onOpenAbout():void
 			{
-				var about:About = new About();
-				about.open(true);
+				var win:NativeWindow = WindowManager.getWindowByTitle(WindowManager.ABOUT);
+				if (win != null)
+				{
+					win.activate();
+				}
+				else
+				{
+					var about:About = new About();
+					about.open(true);
+				}
 			}
 		]]>
 	</fx:Script>
