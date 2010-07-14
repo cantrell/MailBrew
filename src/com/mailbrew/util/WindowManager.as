@@ -10,6 +10,7 @@ package com.mailbrew.util
 	{
 		
 		public static const PREFERENCES:String  = "MailBrew Preferences";
+		public static const ABOUT:String        = "About MailBrew";
 		public static const ERROR_VIEWER:String = "Error Message";
 		
 		public static function isWindowOpen(title:String):Boolean
