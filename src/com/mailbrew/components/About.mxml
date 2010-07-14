@@ -7,11 +7,13 @@
 		  creationComplete="onCreationComplete();">
 	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.util.WindowManager;
 			
 			private static const APP_NS:Namespace = new Namespace("http://ns.adobe.com/air/application/2.0");
 			
 			private function onCreationComplete():void
 			{
+				this.title = WindowManager.ABOUT;
 				html.htmlLoader.navigateInSystemBrowser = true;
 			}
 			
