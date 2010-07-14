@@ -6,6 +6,7 @@ package com.mailbrew.email.imap
 	import com.mailbrew.email.EmailModes;
 	import com.mailbrew.email.IEmailService;
 	
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -107,7 +108,16 @@ package com.mailbrew.email.imap
 		{
 			if (this.socket != null && this.socket.connected)
 			{
-				this.socket.close();
+				// This shouldn't fail, but just in case, swallow the exception.
+				// It doesn't need to be handled.
+				try
+				{
+					this.socket.close();
+				}
+				catch (ie:IOError)
+				{
+					// Swallow
+				}
 			}
 			if (this.socket != null)
 			{
@@ -149,7 +159,19 @@ package com.mailbrew.email.imap
 		
 		private function onNoDataReceived(e:TimerEvent):void
 		{
-			this.socket.close();
+			if (this.socket != null && this.socket.connected)
+			{
+				// This shouldn't fail, but just in case, swallow the exception.
+				// It doesn't need to be handled.
+				try
+				{
+					this.socket.close();
+				}
+				catch (ie:IOError)
+				{
+					// Swallow
+				}
+			}
 			this.socket = null;
 			this.stopConnectDataTimer();
 			var emailEvent:EmailEvent = new EmailEvent(EmailEvent.CONNECTION_FAILED);
