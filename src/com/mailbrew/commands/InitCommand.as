@@ -159,7 +159,7 @@ package com.mailbrew.commands
 		private function generateStrongPassword(length:uint = 32):String
 		{
 			if (length < 8) length = 8;
-			var pw:String = new String;
+			var pw:String = new String();
 			var charPos:uint = 0;
 			while (pw.length < length)
 			{
