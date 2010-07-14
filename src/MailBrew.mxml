@@ -145,6 +145,13 @@
 					name = errorEvent.type;
 					message = errorEvent.text;
 				}
+
+				var errorWin:NativeWindow = WindowManager.getWindowByTitle(WindowManager.ERROR_VIEWER);
+				if (errorWin != null)
+				{
+					errorWin.close();
+				}
+
 				var exceptionWindow:UncaughtExceptionWindow = new UncaughtExceptionWindow();
 				exceptionWindow.setData(id, name, message);
 				exceptionWindow.open(true);
