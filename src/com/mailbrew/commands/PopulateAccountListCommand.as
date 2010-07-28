@@ -71,11 +71,6 @@ package com.mailbrew.commands
 				// Handle monthly usage reports
 				var oldTimestamp:Number = ml.prefs.getValue(PreferenceKeys.MONTHLY_REPORT_TIMESTAMP, 0);
 				var newTimestamp:Number = new Date().time;
-				if (oldTimestamp == 0)
-				{
-					ml.prefs.setValue(PreferenceKeys.MONTHLY_REPORT_TIMESTAMP, newTimestamp, false);
-					return;
-				}
 				if ((newTimestamp - oldTimestamp) >= (30 * 24 * 60 * 60 * 1000)) // about one month
 				{
 					var gmail:uint = 0, imap:uint = 0, googleWave:uint = 0, googleVoice:uint = 0;
