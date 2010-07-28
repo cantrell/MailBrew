@@ -57,15 +57,18 @@
 				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "frameRate", onFrameRateChange);
-				ml.mainAppView = MainAppViews.INTRO;
 
 				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 
 				WindowManager.centerWindowOnMainScreen(this.nativeWindow);
 				
 				new InitEvent().dispatch();
-				
+
+				ml.mainAppView = MainAppViews.INTRO;
+
 				StatusBarManager.showMessage("Welcome to MailBrew");
+				
+				ml.tracker.eventLaunch();
 			}
 						
 			private function onWindowClosing(e:Event):void
@@ -93,6 +96,7 @@
 			{
 				if (ModelLocator.getInstance().mainAppView == MainAppViews.INTRO)
 				{
+					this.ml.tracker.pageViewIndex();
 					this.currentState = "intro";
 				}
 				else
