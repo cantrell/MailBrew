@@ -1,6 +1,8 @@
 package com.mailbrew.events
 {
 	import com.adobe.cairngorm.control.CairngormEvent;
+	
+	import flash.display.DisplayObject;
 
 	public class InitEvent extends CairngormEvent
 	{
