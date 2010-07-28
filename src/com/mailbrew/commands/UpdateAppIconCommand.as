@@ -30,7 +30,7 @@ package com.mailbrew.commands
 			var menu:NativeMenu = ModelLocator.getInstance().notificationManager.getMenu();
 			for each (var nmi:NativeMenuItem in menu.items)
 			{
-				if (nmi.isSeparator || nmi.submenu == null) continue; // The "Exit" menu on Windows
+				if (nmi.isSeparator || nmi.submenu == null) continue; // The "Check Now" or "Exit" menu on Windows
 				unseenCount += nmi.submenu.numItems;
 			}
 			if (NativeApplication.supportsSystemTrayIcon) // For Windows, just update the system tray icon tooltip
