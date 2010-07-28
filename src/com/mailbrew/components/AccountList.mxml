@@ -68,6 +68,7 @@
 					var dae:DeleteAccountEvent = new DeleteAccountEvent();
 					dae.accountId = this.accountList.selectedItem.accountId;
 					dae.dispatch();
+					this.ml.tracker.eventDeleteAccount(this.accountList.selectedItem.accountType);
 					this.accountList.selectedItem = null;
 				}
 			}
@@ -79,6 +80,7 @@
 				var cme:CheckMailEvent = new CheckMailEvent();
 				cme.accountIds = [accountId];
 				cme.dispatch();
+				this.ml.tracker.eventCheckNow();
 			}
 			
 			private function onAccountListChange(e:IndexChangeEvent = null):void
@@ -103,6 +105,7 @@
 					this.ml.mainAppView = MainAppViews.STARTED;
 				}
 				this.ml.accountInfo = null;
+				this.ml.tracker.pageViewNewAccount();
 			}
 			
 			public function onRightClick(e:MouseEvent):void
@@ -164,6 +167,7 @@
 						this.ml.summaryWindow = new Summary();
 						this.ml.summaryWindow.setLocation(this.globalToScreen(e.stageX, e.stageY));
 						this.ml.summaryWindow.open(true);
+						this.ml.tracker.eventShowSummary();
 					}
 					else
 					{
