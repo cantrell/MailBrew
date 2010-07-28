@@ -3,6 +3,7 @@ package com.mailbrew.commands
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	import com.mailbrew.components.IconAlert;
+	import com.mailbrew.data.AccountInfo;
 	import com.mailbrew.data.AccountSaveMode;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
@@ -27,6 +28,19 @@ package com.mailbrew.commands
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
 				if (sae.saveMode == AccountSaveMode.INSERT)
 				{
+					var accountInfo:AccountInfo = new AccountInfo();
+					accountInfo.accountId = e.data;
+					accountInfo.accountType = sae.accountType;
+					accountInfo.accountName = sae.accountName;
+					accountInfo.username = sae.username;
+					accountInfo.password = sae.password;
+					accountInfo.imapServer = sae.imapServer;
+					accountInfo.portNumber = sae.portNumber;
+					accountInfo.secure = sae.secure;
+					accountInfo.notificationPosition = sae.notificationPosition;
+					accountInfo.notificationSound = sae.notificationSound;
+					accountInfo.active = true;
+					ml.accountInfo = accountInfo;
 					insertSortOrder(e.data, e.data);
 				}
 				else
@@ -75,7 +89,6 @@ package com.mailbrew.commands
 			var listener:Function = function(e:DatabaseEvent):void
 			{
 				responder.removeEventListener(DatabaseEvent.RESULT_EVENT, listener);
-				populateAccountList(accountId);
 				var cme:CheckMailEvent = new CheckMailEvent();
 				cme.accountIds = [accountId];
 				cme.dispatch();
