@@ -10,6 +10,7 @@ package com.mailbrew.model
 	import com.mailbrew.database.Database;
 	import com.mailbrew.events.CheckMailEvent;
 	import com.mailbrew.notify.NotificationManager;
+	import com.mailbrew.util.Tracker;
 	
 	import flash.display.Bitmap;
 	import flash.events.TimerEvent;
@@ -25,6 +26,7 @@ package com.mailbrew.model
 		public static const DEFAULT_FRAME_RATE:uint = 24;
 		public static const MAX_NOTIFICATIONS:uint = 10;
 		public static const REQUEST_TIMEOUT:uint = 10;  // in seconds
+		public static const GA_ACCOUNT:String = "UA-1561219-9";
 		[Bindable] public static var testMode:Boolean;
 		
 		// Buttons
@@ -71,6 +73,7 @@ package com.mailbrew.model
 		public var notificationSounds:NotificationSounds = new NotificationSounds();
 		public var summaryWindow:Summary;
 		public var appUpdater:ApplicationUpdaterUI;
+		public var tracker:Tracker;
 
 		public function checkEmail(e:TimerEvent):void
 		{
