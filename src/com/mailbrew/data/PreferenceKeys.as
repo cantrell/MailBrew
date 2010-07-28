@@ -11,11 +11,14 @@ package com.mailbrew.data
 		public static const IDLE_THRESHOLD:String                      = "idleThreshold";
 		public static const IDLE_THRESHOLD_DEFAULT:uint                = 10;
 		
-		public static const APPLICATION_ALERT:String                    = "applicationAlert";
-		public static const APPLICATION_ALERT_DEFAULT:Boolean           = false;
+		public static const APPLICATION_ALERT:String                   = "applicationAlert";
+		public static const APPLICATION_ALERT_DEFAULT:Boolean          = false;
 		
 		public static const START_AT_LOGIN_DEFAULT:Boolean             = false;
 		
 		public static const DATABASE_PASSWORD:String                   = "databasePassword";
+		
+		public static const MAILBREW_INSTALLATION_FLAG:String          = "mailbrewInstallationFlag";
+		public static const MONTHLY_REPORT_TIMESTAMP:String            = "monthlyReportTimestamp";
 	}
 }
