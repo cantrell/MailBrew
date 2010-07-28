@@ -31,6 +31,7 @@
 			private function onCheckNow():void
 			{
 				new CheckMailEvent().dispatch();
+				ModelLocator.getInstance().tracker.eventCheckAllNow();
 			}
 
 			private function onOpenSettings():void
