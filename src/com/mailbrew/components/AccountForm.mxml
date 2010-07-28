@@ -21,15 +21,17 @@
 			import spark.events.IndexChangeEvent;
 			
 			private var accountId:Number;
+			private var ml:ModelLocator;
 			
 			[Bindable] private var accountTypes:ArrayCollection         = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL]);
 			[Bindable] private var extendedAccountTypes:ArrayCollection = new ArrayCollection([AccountTypes.IMAP, AccountTypes.GMAIL, AccountTypes.GOOGLE_WAVE, AccountTypes.GOOGLE_VOICE]);
 			
 			private function onCreationComplete():void
 			{
-				ChangeWatcher.watch(ModelLocator.getInstance(), "accountInfo", onAccountInfoChange);
+				this.ml = ModelLocator.getInstance();
+				ChangeWatcher.watch(this.ml, "accountInfo", onAccountInfoChange);
 
-				if (ModelLocator.getInstance().accountInfo == null)
+				if (ml.accountInfo == null)
 				{
 					this.changeState(AccountTypes.IMAP);
 					this.onFormChange();
@@ -40,17 +42,17 @@
 			
 			private function onAccountInfoChange(e:PropertyChangeEvent):void
 			{
-				var ml:ModelLocator = ModelLocator.getInstance();
-				if (ml.accountInfo == null)
+				if (this.ml.accountInfo == null)
 				{
 					this.clearData();
 					this.accountType.enabled = true;
 					this.changeState(AccountTypes.IMAP);
 					return;
 				}
-				this.changeState(ml.accountInfo.accountType, ml.accountInfo.username);
+				this.changeState(this.ml.accountInfo.accountType, this.ml.accountInfo.username);
 				this.accountType.enabled = false;
-				this.setData(ml.accountInfo);
+				this.setData(this.ml.accountInfo);
+				this.ml.tracker.pageViewDetails();
 			}
 			
 			private function onAccountTypeChange(e:IndexChangeEvent):void
@@ -63,7 +65,7 @@
 			
 			private function pickAccountListData():void
 			{
-				for each (var accountInfo:Object in ModelLocator.getInstance().accounts)
+				for each (var accountInfo:Object in this.ml.accounts)
 				{
 					if (accountInfo.accountType == AccountTypes.GOOGLE_VOICE || accountInfo.accountType == AccountTypes.GOOGLE_WAVE)
 					{
@@ -117,6 +119,14 @@
 				sae.active = this.activeCheckbox.selected;
 				sae.dispatch();
 				this.accountType.enabled = false;
+				if (sae.saveMode == AccountSaveMode.INSERT)
+				{
+					this.ml.tracker.eventAddAccount(this.accountType.selectedItem);
+				}
+				else if (sae.saveMode == AccountSaveMode.UPDATE)
+				{
+					this.ml.tracker.eventEditAccount(this.accountType.selectedItem);
+				}
 			}
 			
 			public function setData(accountInfo:AccountInfo):void
@@ -187,6 +197,7 @@
 				vae.portNumber = Number(this.portNumberInput.text);
 				vae.secure = this.secureCheckBox.selected;
 				vae.dispatch();
+				this.ml.tracker.eventVerifyAccount();
 			}
 			
 			private function enableValidators(enabled:Boolean):void
@@ -203,6 +214,7 @@
 				this.accountType.dataProvider = extendedAccountTypes;
 				this.accountType.selectedItem = null;
 				this.changeState(AccountTypes.IMAP);
+				this.ml.tracker.eventEasterEgg();
 			}
 			
 		]]>
