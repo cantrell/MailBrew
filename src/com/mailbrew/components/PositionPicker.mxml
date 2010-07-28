@@ -58,6 +58,7 @@
 																 ml.prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL),
 																 iconClass);
 				ml.notificationManager.addNotification(notification);
+				ml.tracker.eventDemoNotification();
 			}
 		]]>
 	</fx:Script>
