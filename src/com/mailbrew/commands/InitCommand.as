@@ -11,9 +11,11 @@ package com.mailbrew.commands
 	import com.mailbrew.database.DatabaseEvent;
 	import com.mailbrew.database.DatabaseResponder;
 	import com.mailbrew.events.CheckMailEvent;
+	import com.mailbrew.events.InitEvent;
 	import com.mailbrew.events.PopulateAccountListEvent;
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.notify.NotificationManager;
+	import com.mailbrew.util.Tracker;
 	
 	import flash.desktop.NativeApplication;
 	import flash.display.NativeMenu;
@@ -33,6 +35,7 @@ package com.mailbrew.commands
 		
 		public function execute(e:CairngormEvent):void
 		{
+			var initEvent:InitEvent = e as InitEvent;
 			this.ml = ModelLocator.getInstance();
 			
 			this.ml.prefs = new Preference();
@@ -65,9 +68,21 @@ package com.mailbrew.commands
 			}
 			
 			if (defaultsSet) this.ml.prefs.save();
+
+			// Set up analytics
+			ml.tracker = new Tracker();
+
+			// Installation event
+			if (!this.ml.prefs.getValue(PreferenceKeys.MAILBREW_INSTALLATION_FLAG))
+			{
+				this.ml.prefs.setValue(PreferenceKeys.MAILBREW_INSTALLATION_FLAG, true, false);
+				this.ml.prefs.save();
+				this.ml.tracker.eventInstall();
+			}
 			
+			// Set up the notification manager
 			this.ml.notificationManager = new NotificationManager(this.ml.prefs.getValue(PreferenceKeys.IDLE_THRESHOLD));
-						
+
 			// Dock and system tray icons
 			var appIcons:Array = new Array();
 			appIcons.push(new this.ml.Dynamic128IconClass());
@@ -81,13 +96,19 @@ package com.mailbrew.commands
 				topLevelMenu = new NativeMenu();
 				this.ml.notificationManager.setMenu(topLevelMenu);
 			}
+
+			var checkNowMenuItem:NativeMenuItem = new NativeMenuItem("Check Now");
+			checkNowMenuItem.name = "checkNow";
+			checkNowMenuItem.addEventListener(Event.SELECT, onCheckNow);
+			topLevelMenu.addItemAt(checkNowMenuItem, 0);
+			var seperator:NativeMenuItem = new NativeMenuItem(null, true);
+			topLevelMenu.addItemAt(seperator, 0);
+
 			if (NativeApplication.supportsSystemTrayIcon)
 			{
 				var exitMenuItem:NativeMenuItem = new NativeMenuItem("Exit");
 				exitMenuItem.addEventListener(Event.SELECT, onExitApplication);
-				topLevelMenu.addItemAt(exitMenuItem, 0);
-				var seperator:NativeMenuItem = new NativeMenuItem(null, true);
-				topLevelMenu.addItemAt(seperator, 0);
+				topLevelMenu.addItemAt(exitMenuItem, 2);
 			}
 			
 			var databasePassword:String = this.ml.prefs.getValue(PreferenceKeys.DATABASE_PASSWORD);
@@ -147,6 +168,12 @@ package com.mailbrew.commands
 			ml.appUpdater.configurationFile = File.applicationDirectory.resolvePath("updaterSettings.xml");			
 			ml.appUpdater.delay = 0; // No timer. Just check on startup
 			ml.appUpdater.initialize();
+		}
+		
+		private function onCheckNow(e:Event):void
+		{
+			new CheckMailEvent().dispatch();
+			ModelLocator.getInstance().tracker.eventCheckAllNow();
 		}
 		
 		private function onExitApplication(e:Event):void
