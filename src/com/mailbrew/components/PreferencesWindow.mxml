@@ -18,9 +18,6 @@
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.WindowManager;
 			
-			import flash.events.NativeWindowBoundsEvent;
-			
-			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			
 			private function onCreationComplete():void
@@ -50,6 +47,7 @@
 					this.currentState = "supportsSystemTray";
 					this.flashTaskBarCheckbox.selected = prefs.getValue(PreferenceKeys.APPLICATION_ALERT, false);
 				}
+				ml.tracker.pageViewSettings();
 			}
 			
 			private function onReset():void
@@ -157,7 +155,7 @@
 		<s:Group width="100%">
 			<s:Label text="Check For Update" fontWeight="bold" y="5" left="5"/>
 			<s:Label y="20" width="210" left="5">Check to see if a newer version of MailBrew is available.</s:Label>
-			<s:Button label="Update" id="updateButton" click="onCheckForUpdate();" right="20"/>
+			<s:Button label="Check Now" id="updateButton" click="onCheckForUpdate();" right="20"/>
 		</s:Group>
 
 		<s:Group width="100%">
@@ -174,5 +172,5 @@
 		</s:Group>
 		
 	</s:VGroup>
-
+	
 </s:Window>
