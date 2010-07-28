@@ -4,7 +4,7 @@
 	<id>com.christiancantrell.mailbrew</id>
 	<filename>MailBrew</filename>
 	<name>MailBrew</name>
-	<version>0.9</version>
+	<version>0.91</version>
 	<description>MailBrew is an email notifier which supports Gmail and IMAP. Created by Christian Cantrell.</description>
 	<copyright>2010 Cantrell Media Company</copyright>
 
