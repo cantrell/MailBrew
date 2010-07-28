@@ -52,6 +52,7 @@
 				var SoundClass:Class = soundList.selectedItem.soundClass as Class;
 				var sound:Sound = new SoundClass();
 				sound.play();
+				ModelLocator.getInstance().tracker.eventTestSound();
 			}
 		]]>
 	</fx:Script>
