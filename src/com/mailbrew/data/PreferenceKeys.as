@@ -15,6 +15,8 @@ package com.mailbrew.data
 		public static const APPLICATION_ALERT_DEFAULT:Boolean          = false;
 		
 		public static const START_AT_LOGIN_DEFAULT:Boolean             = false;
+
+		public static const SUMMARY_WINDOW_POINT:String                = "summaryWindowPoint";
 		
 		public static const DATABASE_PASSWORD:String                   = "databasePassword";
 		
