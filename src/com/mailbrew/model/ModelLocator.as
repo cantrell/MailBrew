@@ -66,8 +66,8 @@ package com.mailbrew.model
 		[Bindable] public var checkEmailLock:Boolean;
 		[Bindable] public var reorderAccountsLock:Boolean;
 		[Bindable] public var frameRate:uint;
+		[Bindable] public var prefs:Preference;
 		public var notificationManager:NotificationManager;
-		public var prefs:Preference;
 		public var checkEmailTimer:Timer;
 		public var db:Database;
 		public var notificationSounds:NotificationSounds = new NotificationSounds();
