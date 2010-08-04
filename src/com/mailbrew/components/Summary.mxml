@@ -4,10 +4,11 @@
 		  xmlns:mx="library://ns.adobe.com/flex/halo"
 		  type="lightweight" systemChrome="none" transparent="true"
 		  showStatusBar="false" backgroundAlpha="0" alwaysInFront="true"
-		  mouseDown="onMouseDown(event);" mouseWheel="onMouseWheel(event);"
+		  mouseDown="onMouseDown(event);" mouseUp="onMouseUp(event);" mouseWheel="onMouseWheel(event);"
 		  creationComplete="onCreationComplete();" width="200" height="200" resizable="false">
 	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.data.PreferenceKeys;
 			import com.mailbrew.model.ModelLocator;
 			import com.mailbrew.util.ServiceToURLMapper;
 			import com.mailbrew.util.WindowManager;
@@ -36,12 +37,20 @@
 				{
 					this.nativeWindow.x = globalPoint.x;
 					this.nativeWindow.y = globalPoint.y;
+					this.verifyPosition();
 				}
 			}
 			
 			private function onMouseDown(e:MouseEvent):void
 			{
 				this.nativeWindow.startMove();
+			}
+			
+			private function onMouseUp(e:MouseEvent):void
+			{
+				var newLocation:Point = new Point(this.nativeWindow.bounds.x, this.nativeWindow.bounds.y);
+				this.ml.prefs.setValue(PreferenceKeys.SUMMARY_WINDOW_POINT, newLocation);
+				this.ml.prefs.save();
 			}
 			
 			private function onMouseWheel(e:MouseEvent):void
@@ -55,7 +64,7 @@
 			
 			private function onAccountsChange(e:PropertyChangeEvent = null):void
 			{
-				this.height = (ml.accounts.length * 25) + 14;
+				if (this.ml.accounts) this.height = (ml.accounts.length * 25) + 14;
 			}
 			
 			public function setLocation(p:Point):void
@@ -65,6 +74,7 @@
 				{
 					this.nativeWindow.x = p.x;
 					this.nativeWindow.y = p.y;
+					this.verifyPosition();
 				}
 			}
 
@@ -78,6 +88,17 @@
 					{
 						navigateToURL(new URLRequest(url));
 					}
+				}
+			}
+			
+			private function verifyPosition():void
+			{
+				var screens:Array = Screen.getScreensForRectangle(this.nativeWindow.bounds);
+				if (screens.length == 0)
+				{
+					var mainScreen:Screen = Screen.mainScreen;
+					var newPoint:Point = new Point(mainScreen.visibleBounds.x + 2, mainScreen.visibleBounds.y + 2);
+					this.setLocation(newPoint);
 				}
 			}
 			
