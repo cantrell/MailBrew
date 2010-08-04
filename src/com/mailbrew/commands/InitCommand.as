@@ -6,6 +6,7 @@ package com.mailbrew.commands
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.Summary;
 	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
 	import com.mailbrew.database.DatabaseEvent;
@@ -25,6 +26,7 @@ package com.mailbrew.commands
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+	import flash.geom.Point;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
 	
@@ -38,8 +40,9 @@ package com.mailbrew.commands
 			var initEvent:InitEvent = e as InitEvent;
 			this.ml = ModelLocator.getInstance();
 			
-			this.ml.prefs = new Preference();
-			this.ml.prefs.load();
+			var prefs:Preference = new Preference();
+			prefs.load();
+			this.ml.prefs = prefs;
 			
 			// Set up preferences...
 			var defaultsSet:Boolean = false;
@@ -66,12 +69,21 @@ package com.mailbrew.commands
 				this.ml.prefs.setValue(PreferenceKeys.APPLICATION_ALERT, PreferenceKeys.APPLICATION_ALERT_DEFAULT, false);
 				defaultsSet = true;
 			}
-			
+
+			// Summary window
+			if (this.ml.prefs.getValue(PreferenceKeys.SUMMARY_WINDOW_POINT) != null)
+			{
+				var summaryWindowLocation:Object = this.ml.prefs.getValue(PreferenceKeys.SUMMARY_WINDOW_POINT);
+				this.ml.summaryWindow = new Summary();
+				this.ml.summaryWindow.setLocation(new Point(summaryWindowLocation.x, summaryWindowLocation.y));
+				this.ml.summaryWindow.open(false);
+			}
+
 			if (defaultsSet) this.ml.prefs.save();
 
 			// Set up analytics
-			ml.tracker = new Tracker();
-
+			this.ml.tracker = new Tracker();
+			
 			// Installation event
 			if (!this.ml.prefs.getValue(PreferenceKeys.MAILBREW_INSTALLATION_FLAG))
 			{
