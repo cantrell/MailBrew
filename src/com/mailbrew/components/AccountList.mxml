@@ -7,6 +7,7 @@
 		<![CDATA[
 			import com.mailbrew.components.skins.AccountListRenderer;
 			import com.mailbrew.data.MainAppViews;
+			import com.mailbrew.data.PreferenceKeys;
 			import com.mailbrew.database.Database;
 			import com.mailbrew.database.DatabaseEvent;
 			import com.mailbrew.database.DatabaseResponder;
@@ -38,7 +39,13 @@
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "prefs",    onPreferencesChange);
 				this.ml = ModelLocator.getInstance();
+			}
+			
+			private function onPreferencesChange(e:PropertyChangeEvent):void
+			{
+				this.summaryCheckbox.selected = (this.ml.prefs.getValue(PreferenceKeys.SUMMARY_WINDOW_POINT) != null);
 			}
 			
 			private function onAccountsChange(e:PropertyChangeEvent):void
@@ -187,6 +194,8 @@
 					{
 						this.ml.summaryWindow.visible = false;
 					}
+					this.ml.prefs.deleteValue(PreferenceKeys.SUMMARY_WINDOW_POINT);
+					this.ml.prefs.save();
 				}
 			}
 			
