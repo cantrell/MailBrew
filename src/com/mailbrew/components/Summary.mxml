@@ -64,7 +64,11 @@
 			
 			private function onAccountsChange(e:PropertyChangeEvent = null):void
 			{
-				if (this.ml.accounts) this.height = (ml.accounts.length * 25) + 14;
+				if (this.ml.accounts)
+				{
+					this.height = (ml.accounts.length * 25) + 14;
+					this.verifyPosition();
+				}
 			}
 			
 			public function setLocation(p:Point):void
