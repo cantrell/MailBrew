@@ -13,6 +13,10 @@ package com.mailbrew.data
 		
 		public static const APPLICATION_ALERT:String                   = "applicationAlert";
 		public static const APPLICATION_ALERT_DEFAULT:Boolean          = false;
+
+		public static const COLLECT_USAGE_DATA:String                  = "collectUsageData";
+		public static const COLLECT_USAGE_DATA_DEFAULT:Boolean         = false;
+		public static const COLLECT_USAGE_DATA_PROMPT:String           = "collectUsageDataPrompt";
 		
 		public static const START_AT_LOGIN_DEFAULT:Boolean             = false;
 

@@ -25,6 +25,7 @@ package com.mailbrew.commands
 			spe.idleThreshold = PreferenceKeys.IDLE_THRESHOLD_DEFAULT;
 			spe.applicationAlert = PreferenceKeys.APPLICATION_ALERT_DEFAULT;
 			spe.startAtLogin = PreferenceKeys.START_AT_LOGIN_DEFAULT;
+			spe.collectUsageData = PreferenceKeys.COLLECT_USAGE_DATA_DEFAULT;
 			spe.dispatch();
 			this.dropMessagesTable();
 		}

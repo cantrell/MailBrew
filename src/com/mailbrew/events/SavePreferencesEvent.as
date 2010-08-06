@@ -11,6 +11,7 @@ package com.mailbrew.events
 		public var idleThreshold:uint;
 		public var applicationAlert:Boolean;
 		public var startAtLogin:Boolean;
+		public var collectUsageData:Boolean;
 		
 		public function SavePreferencesEvent()
 		{

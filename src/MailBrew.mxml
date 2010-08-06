@@ -10,9 +10,11 @@
 
 	<fx:Script>
 		<![CDATA[
+			import com.mailbrew.components.IconAlert;
 			import com.mailbrew.components.UncaughtExceptionWindow;
 			import com.mailbrew.controller.Controller;
 			import com.mailbrew.data.MainAppViews;
+			import com.mailbrew.data.PreferenceKeys;
 			import com.mailbrew.events.AppExitEvent;
 			import com.mailbrew.events.InitEvent;
 			import com.mailbrew.model.ModelLocator;
@@ -28,6 +30,7 @@
 			
 			import mx.binding.utils.ChangeWatcher;
 			import mx.collections.ArrayCollection;
+			import mx.events.CloseEvent;
 			import mx.events.PropertyChangeEvent;
 			
 			private var controller:Controller;
@@ -57,6 +60,7 @@
 				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
 				ChangeWatcher.watch(ModelLocator.getInstance(), "frameRate", onFrameRateChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "prefs",    onPreferencesInitialized);
 
 				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 
@@ -159,6 +163,21 @@
 				var exceptionWindow:UncaughtExceptionWindow = new UncaughtExceptionWindow();
 				exceptionWindow.setData(id, name, message);
 				exceptionWindow.open(true);
+			}
+
+			private function onPreferencesInitialized(e:PropertyChangeEvent):void
+			{
+				if (!this.ml.prefs.getValue(PreferenceKeys.COLLECT_USAGE_DATA_PROMPT))
+				{
+					IconAlert.showQuestion("Welcome to MailBrew!", "Can MailBrew use Google Analytics to\ncollect anonymous usage statistic?\n\nThis data is 100% anonymous, and is only\nused in aggregate to help us understand\nhow the application is being used.\n\nPretty please?", onUsageStatsConfirm, IconAlert.YES);
+				}
+			}
+			
+			private function onUsageStatsConfirm(e:CloseEvent):void
+			{
+				this.ml.prefs.setValue(PreferenceKeys.COLLECT_USAGE_DATA, (e.detail == IconAlert.YES));
+				this.ml.prefs.setValue(PreferenceKeys.COLLECT_USAGE_DATA_PROMPT, true);
+				this.ml.prefs.save();
 			}
 
 		]]>

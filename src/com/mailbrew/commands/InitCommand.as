@@ -64,6 +64,12 @@ package com.mailbrew.commands
 				defaultsSet = true;
 			}
 			
+			if (this.ml.prefs.getValue(PreferenceKeys.COLLECT_USAGE_DATA) == null)
+			{
+				this.ml.prefs.setValue(PreferenceKeys.COLLECT_USAGE_DATA, PreferenceKeys.COLLECT_USAGE_DATA_DEFAULT, false);
+				defaultsSet = true;
+			}
+			
 			if (this.ml.prefs.getValue(PreferenceKeys.APPLICATION_ALERT) == null)
 			{
 				this.ml.prefs.setValue(PreferenceKeys.APPLICATION_ALERT, PreferenceKeys.APPLICATION_ALERT_DEFAULT, false);

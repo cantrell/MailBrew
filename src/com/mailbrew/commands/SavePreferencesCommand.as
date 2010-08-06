@@ -21,6 +21,7 @@ package com.mailbrew.commands
 			this.ml.prefs.setValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL, spe.notificationDisplayInterval);
 			this.ml.prefs.setValue(PreferenceKeys.IDLE_THRESHOLD, spe.idleThreshold);
 			this.ml.prefs.setValue(PreferenceKeys.APPLICATION_ALERT, spe.applicationAlert);
+			this.ml.prefs.setValue(PreferenceKeys.COLLECT_USAGE_DATA, spe.collectUsageData);
 			this.ml.prefs.save();
 			try
 			{

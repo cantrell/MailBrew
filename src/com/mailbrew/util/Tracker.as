@@ -1,6 +1,7 @@
 package com.mailbrew.util
 {
 	import com.google.analytics.GATracker;
+	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.model.ModelLocator;
 	
 	import flash.desktop.NativeApplication;
@@ -10,10 +11,12 @@ package com.mailbrew.util
 	public class Tracker
 	{
 		private var gaTracker:GATracker;
+		private var ml:ModelLocator;
 		
 		public function Tracker()
 		{
 			var displayObject:DisplayObject = NativeWindow(NativeApplication.nativeApplication.openedWindows[0]).stage;
+			this.ml = ModelLocator.getInstance();
 			this.gaTracker = new GATracker(displayObject, ModelLocator.GA_ACCOUNT, "AS3", ModelLocator.testMode, null, null);
 		}
 		
@@ -66,7 +69,7 @@ package com.mailbrew.util
 		
 		public function eventInstall():void
 		{
-			this.trackEvent(CATEGORY_APPLICATION, EVENT_INSTALL);
+			this.trackEvent(CATEGORY_APPLICATION, EVENT_INSTALL, null, NaN, true);
 		}
 		
 		public function eventLaunch():void
@@ -144,14 +147,20 @@ package com.mailbrew.util
 		
 		// Private functions
 		
-		private function trackPageview(pageURL:String):void
+		private function trackPageview(pageURL:String, overridePreference:Boolean = false):void
 		{
-			this.gaTracker.trackPageview(pageURL);
+			if (this.ml.prefs.getValue(PreferenceKeys.COLLECT_USAGE_DATA) || overridePreference)
+			{
+				this.gaTracker.trackPageview(pageURL);
+			}
 		}
 		
-		private function trackEvent(category:String, action:String, label:String = null, value:Number = NaN):void
+		private function trackEvent(category:String, action:String, label:String = null, value:Number = NaN, overridePreference:Boolean = false):void
 		{
-			this.gaTracker.trackEvent(category, action, label, value);
+			if (this.ml.prefs.getValue(PreferenceKeys.COLLECT_USAGE_DATA) || overridePreference)
+			{
+				this.gaTracker.trackEvent(category, action, label, value);
+			}
 		}
 	}
 }

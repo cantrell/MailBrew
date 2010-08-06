@@ -3,7 +3,7 @@
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/halo"
-		  width="345" height="405" resizable="false" maximizable="false"
+		  width="345" height="460" resizable="false" maximizable="false"
 		  minWidth="345" minHeight="405"
 		  type="utility" showStatusBar="false"
 		  creationComplete="onCreationComplete();">
@@ -28,6 +28,7 @@
 				this.updateIntervalStepper.value = prefs.getValue(PreferenceKeys.UPDATE_INTERVAL);
 				this.notificationDisplayLengthStepper.value = prefs.getValue(PreferenceKeys.NOTIFICATION_DISPLAY_INTERVAL);
 				this.idlePeriodStepper.value = prefs.getValue(PreferenceKeys.IDLE_THRESHOLD);
+				this.enableUsageStats.selected = prefs.getValue(PreferenceKeys.COLLECT_USAGE_DATA);
 				try
 				{
 					this.startAtLoginCheckbox.selected = NativeApplication.nativeApplication.startAtLogin;
@@ -89,6 +90,7 @@
 				spe.updateInterval = this.updateIntervalStepper.value;
 				spe.idleThreshold = this.idlePeriodStepper.value;
 				spe.notificationDisplayInterval = this.notificationDisplayLengthStepper.value;
+				spe.collectUsageData = this.enableUsageStats.selected;
 				if (this.currentState == "supportsDockIcon")
 				{
 					spe.applicationAlert = this.bounceDockIconCheckbox.selected;
@@ -150,6 +152,12 @@
 			<s:Label text="Start at Login" fontWeight="bold" y="5" left="5"/>
 			<s:Label y="20" width="210" left="5">Should MailBrew start automatically when you log in?</s:Label>
 			<s:CheckBox id="startAtLoginCheckbox" y="5" right="20"/>
+		</s:Group>
+
+		<s:Group width="100%">
+			<s:Label text="Enable Usage Stats" fontWeight="bold" y="5" left="5"/>
+			<s:Label y="20" width="210" left="5">Do you want to enable the anonymous collection of usage statistics?</s:Label>
+			<s:CheckBox id="enableUsageStats" y="5" right="20"/>
 		</s:Group>
 
 		<s:Group width="100%">
