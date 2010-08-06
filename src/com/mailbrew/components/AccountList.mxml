@@ -39,11 +39,11 @@
 			private function onCreationComplete():void
 			{
 				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
-				ChangeWatcher.watch(ModelLocator.getInstance(), "prefs",    onPreferencesChange);
+				ChangeWatcher.watch(ModelLocator.getInstance(), "prefs",    onPreferencesInitialized);
 				this.ml = ModelLocator.getInstance();
 			}
 			
-			private function onPreferencesChange(e:PropertyChangeEvent):void
+			private function onPreferencesInitialized(e:PropertyChangeEvent):void
 			{
 				this.summaryCheckbox.selected = (this.ml.prefs.getValue(PreferenceKeys.SUMMARY_WINDOW_POINT) != null);
 			}
