@@ -119,6 +119,10 @@ package com.mailbrew.commands
 			checkNowMenuItem.name = "checkNow";
 			checkNowMenuItem.addEventListener(Event.SELECT, onCheckNow);
 			topLevelMenu.addItemAt(checkNowMenuItem, 0);
+			var openMenuItem:NativeMenuItem = new NativeMenuItem("Open");
+			openMenuItem.name = "open";
+			openMenuItem.addEventListener(Event.SELECT, onOpen);
+			topLevelMenu.addItemAt(openMenuItem, 1);
 			var seperator:NativeMenuItem = new NativeMenuItem(null, true);
 			topLevelMenu.addItemAt(seperator, 0);
 
@@ -192,6 +196,11 @@ package com.mailbrew.commands
 		{
 			new CheckMailEvent().dispatch();
 			ModelLocator.getInstance().tracker.eventCheckAllNow();
+		}
+		
+		private function onOpen(e:Event):void
+		{
+			this.ml.mainAppWindowVisible = true;
 		}
 		
 		private function onExitApplication(e:Event):void
