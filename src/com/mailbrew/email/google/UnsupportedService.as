@@ -72,6 +72,7 @@ package com.mailbrew.email.google
 		{
 			this.status = NaN;
 			this.internalMode = InternalModes.INBOX;
+			this.dispose();
 			this.urlLoader = new URLLoader();
 			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
