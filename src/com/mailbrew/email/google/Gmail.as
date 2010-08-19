@@ -6,6 +6,7 @@ package com.mailbrew.email.google
 	import com.mailbrew.email.EmailModes;
 	import com.mailbrew.email.IEmailService;
 	
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.HTTPStatusEvent;
@@ -50,6 +51,7 @@ package com.mailbrew.email.google
 		private function start():void
 		{
 			this.status = NaN;
+			this.dispose();
 			this.urlLoader = new URLLoader();
 			this.urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 			this.urlLoader.addEventListener(Event.COMPLETE, onComplete);
@@ -78,6 +80,14 @@ package com.mailbrew.email.google
 		{
 			if (this.urlLoader != null)
 			{
+				try
+				{
+					this.urlLoader.close();
+				}
+				catch (e:IOError)
+				{
+					// no problem
+				}
 				this.urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
 				this.urlLoader.removeEventListener(Event.COMPLETE, onComplete);
 				this.urlLoader.removeEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, onResponseStatus);
