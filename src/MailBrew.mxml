@@ -57,10 +57,11 @@
 				this.controller = new Controller();
 				this.ml = ModelLocator.getInstance();
 
-				ChangeWatcher.watch(ModelLocator.getInstance(), "mainAppView", onMainAppViewChange);
-				ChangeWatcher.watch(ModelLocator.getInstance(), "accounts", onAccountsChange);
-				ChangeWatcher.watch(ModelLocator.getInstance(), "frameRate", onFrameRateChange);
-				ChangeWatcher.watch(ModelLocator.getInstance(), "prefs",    onPreferencesInitialized);
+				ChangeWatcher.watch(ml, "mainAppView",          onMainAppViewChange);
+				ChangeWatcher.watch(ml, "accounts",             onAccountsChange);
+				ChangeWatcher.watch(ml, "frameRate",            onFrameRateChange);
+				ChangeWatcher.watch(ml, "mainAppWindowVisible", onVisibleChange);
+				ChangeWatcher.watch(ml, "prefs",                onPreferencesInitialized);
 
 				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
 
@@ -74,15 +75,25 @@
 				
 				ml.tracker.eventLaunch();
 			}
-						
+			
 			private function onWindowClosing(e:Event):void
 			{
 				e.preventDefault();
+				this.ml.mainAppWindowVisible = false;
+			}
+			
+			private function onShowWindow(e:Event):void
+			{
+				this.ml.mainAppWindowVisible = true;
+			}
+			
+			private function closeWindow():void
+			{
 				this.visible = false;
 				ml.frameRate = 1;
 			}
 			
-			private function onShowWindow(e:Event):void
+			private function showWindow():void
 			{
 				this.visible = true;
 				ml.frameRate = ModelLocator.DEFAULT_FRAME_RATE;
@@ -112,6 +123,18 @@
 			private function onFrameRateChange(e:PropertyChangeEvent):void
 			{
 				this.stage.frameRate = ml.frameRate;
+			}
+			
+			private function onVisibleChange(e:PropertyChangeEvent):void
+			{
+				if (this.ml.mainAppWindowVisible)
+				{
+					this.showWindow();
+				}
+				else
+				{
+					this.closeWindow();
+				}
 			}
 			
 			private function onApplicationActivate(e:Event):void
