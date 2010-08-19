@@ -66,6 +66,7 @@ package com.mailbrew.model
 		[Bindable] public var checkEmailLock:Boolean;
 		[Bindable] public var reorderAccountsLock:Boolean;
 		[Bindable] public var frameRate:uint;
+		[Bindable] public var mainAppWindowVisible:Boolean;
 		[Bindable] public var prefs:Preference;
 		public var notificationManager:NotificationManager;
 		public var checkEmailTimer:Timer;
