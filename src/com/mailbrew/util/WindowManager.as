@@ -39,11 +39,11 @@ package com.mailbrew.util
 			return null;
 		}
 
-		public static function centerWindowOnMainScreen(win:NativeWindow):void
+		public static function centerWindowOnMainScreen(win:NativeWindow, makeVisible:Boolean = false):void
 		{
 			var initialBounds:Rectangle = new Rectangle((Screen.mainScreen.bounds.width / 2 - (win.width/2)), (Screen.mainScreen.bounds.height / 2 - (win.height/2)), win.width, win.height);
 			win.bounds = initialBounds;
-			win.visible = true;
+			if (makeVisible) win.visible = true;
 		}
 	}
 }

@@ -6,6 +6,7 @@ package com.mailbrew.commands
 	import com.adobe.air.preferences.Preference;
 	import com.adobe.cairngorm.commands.ICommand;
 	import com.adobe.cairngorm.control.CairngormEvent;
+	import com.mailbrew.components.PreferencesWindow;
 	import com.mailbrew.components.Summary;
 	import com.mailbrew.data.PreferenceKeys;
 	import com.mailbrew.database.Database;
@@ -17,10 +18,12 @@ package com.mailbrew.commands
 	import com.mailbrew.model.ModelLocator;
 	import com.mailbrew.notify.NotificationManager;
 	import com.mailbrew.util.Tracker;
+	import com.mailbrew.util.WindowManager;
 	
 	import flash.desktop.NativeApplication;
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
+	import flash.display.NativeWindow;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.filesystem.File;
@@ -107,7 +110,6 @@ package com.mailbrew.commands
 			appIcons.push(new this.ml.Dynamic16IconClass());
 			this.ml.notificationManager.setIcons(appIcons);
 			
-			// Exit option on Windows
 			var topLevelMenu:NativeMenu = this.ml.notificationManager.getMenu();
 			if (topLevelMenu == null)
 			{
@@ -115,22 +117,35 @@ package com.mailbrew.commands
 				this.ml.notificationManager.setMenu(topLevelMenu);
 			}
 
+			var sep1:NativeMenuItem = new NativeMenuItem(null, true);
+			topLevelMenu.addItemAt(sep1, 0);
+
 			var checkNowMenuItem:NativeMenuItem = new NativeMenuItem("Check Now");
 			checkNowMenuItem.name = "checkNow";
 			checkNowMenuItem.addEventListener(Event.SELECT, onCheckNow);
-			topLevelMenu.addItemAt(checkNowMenuItem, 0);
+			topLevelMenu.addItemAt(checkNowMenuItem, 1);
+
+			var sep2:NativeMenuItem = new NativeMenuItem(null, true);
+			topLevelMenu.addItemAt(sep2, 2);
+
 			var openMenuItem:NativeMenuItem = new NativeMenuItem("Open");
 			openMenuItem.name = "open";
 			openMenuItem.addEventListener(Event.SELECT, onOpen);
-			topLevelMenu.addItemAt(openMenuItem, 1);
-			var seperator:NativeMenuItem = new NativeMenuItem(null, true);
-			topLevelMenu.addItemAt(seperator, 0);
+			topLevelMenu.addItemAt(openMenuItem, 3);
 
+			var prefsMenuItem:NativeMenuItem = new NativeMenuItem("Settings");
+			prefsMenuItem.name = "open";
+			prefsMenuItem.addEventListener(Event.SELECT, onSettings);
+			topLevelMenu.addItemAt(prefsMenuItem, 4);
+			
+			// Exit option on Windows
 			if (NativeApplication.supportsSystemTrayIcon)
 			{
+				var sep3:NativeMenuItem = new NativeMenuItem(null, true);
+				topLevelMenu.addItemAt(sep3, 5);
 				var exitMenuItem:NativeMenuItem = new NativeMenuItem("Exit");
 				exitMenuItem.addEventListener(Event.SELECT, onExitApplication);
-				topLevelMenu.addItemAt(exitMenuItem, 2);
+				topLevelMenu.addItemAt(exitMenuItem, 6);
 			}
 			
 			var databasePassword:String = this.ml.prefs.getValue(PreferenceKeys.DATABASE_PASSWORD);
@@ -201,6 +216,21 @@ package com.mailbrew.commands
 		private function onOpen(e:Event):void
 		{
 			this.ml.mainAppWindowVisible = true;
+		}
+		
+		private function onSettings(e:Event):void
+		{
+			var win:NativeWindow = WindowManager.getWindowByTitle(WindowManager.PREFERENCES);
+			if (win != null)
+			{
+				win.activate();
+			}
+			else
+			{
+				var prefsWin:PreferencesWindow = new PreferencesWindow();
+				prefsWin.open(true);
+			}
+
 		}
 		
 		private function onExitApplication(e:Event):void
